@@ -123,10 +123,12 @@ export async function processPhoto(
     // 处理 BMP
     if (isBitmap(imageBuffer)) {
       try {
+        // Convert the BMP image to JPEG format and create a new Sharp instance for the converted image.
         sharpInstance = await convertBmpToJpegSharpInstance(
           imageBuffer,
           workerLoggers.image,
         )
+        // Update the image buffer to reflect the new JPEG data from the Sharp instance.
         imageBuffer = await sharpInstance.toBuffer()
       } catch (error) {
         workerLoggers.image.error(`转换 BMP 失败：${key}`, error)
