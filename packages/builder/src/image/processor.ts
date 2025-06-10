@@ -1,7 +1,8 @@
 import path from 'node:path'
 
+import * as bmp from '@vingle/bmp-js'
 import heicConvert from 'heic-convert'
-import type sharp from 'sharp'
+import sharp from 'sharp'
 
 import { HEIC_FORMATS } from '../constants/index.js'
 import type { Logger } from '../logger/index.js'
@@ -98,4 +99,48 @@ export async function preprocessImageBuffer(
 
   // 其他格式直接返回原始 buffer
   return buffer
+}
+
+// BMP 格式
+const BUF_BMP = Buffer.from([0x42, 0x4d])
+
+export function isBitmap(buf: Buffer): boolean {
+  return Buffer.compare(BUF_BMP, buf.slice(0, 2)) === 0
+}
+
+/**
+ * 将 BMP Buffer 转换为 Sharp 实例
+ * @param bmpBuffer Buffer
+ * @param imageLogger 日志记录器
+ * @returns Sharp 实例
+ */
+export async function convertBmpToJpegSharpInstance(
+  bmpBuffer: Buffer,
+  imageLogger?: Logger['image'],
+): Promise<sharp.Sharp> {
+  const log = imageLogger
+
+  try {
+    log?.info(`开始 BMP → JPEG 转换 (${Math.round(bmpBuffer.length / 1024)}KB)`)
+    const startTime = Date.now()
+
+    // 使用 @vingle/bmp-js 解析 BMP
+    const bmpImage = bmp.decode(bmpBuffer, true)
+    if (!bmpImage) {
+      throw new Error('BMP 解码失败')
+    }
+
+    // 创建 Sharp 实例
+    const sharpInstance = sharp(bmpImage.data, {
+      raw: { width: bmpImage.width, height: bmpImage.height, channels: 4 },
+    }).jpeg()
+
+    const duration = Date.now() - startTime
+    log?.success(`BMP 转换完成 (${duration}ms)`)
+
+    return sharpInstance
+  } catch (error) {
+    log?.error('BMP 转换失败：', error)
+    throw error
+  }
 }
