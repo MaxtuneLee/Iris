@@ -2,7 +2,7 @@ name: Deploy Iris to Server
 
 on:
   push:
-    branches: ['main']
+    branches: ['self-deployment']
 
   workflow_dispatch:
 
