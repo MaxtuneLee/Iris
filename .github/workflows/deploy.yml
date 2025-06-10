@@ -53,7 +53,7 @@ jobs:
           echo S3_CUSTOM_DOMAIN=${{ secrets.S3_CUSTOM_DOMAIN }} >> .env
 
       - name: Build manifest # Build the project manifest
-        run: pnpm --filter @photo-gallery/web run build:manifest
+        run: pnpm build:manifest
 
       - name: Build web package # Build the web application
         run: pnpm --filter @photo-gallery/web run build
