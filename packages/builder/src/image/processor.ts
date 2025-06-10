@@ -105,6 +105,9 @@ export async function preprocessImageBuffer(
 const BUF_BMP = Buffer.from([0x42, 0x4d])
 
 export function isBitmap(buf: Buffer): boolean {
+  if (buf.length < 2) {
+    return false
+  }
   return Buffer.compare(BUF_BMP, buf.slice(0, 2)) === 0
 }
 
