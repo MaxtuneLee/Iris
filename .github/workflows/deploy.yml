@@ -29,11 +29,6 @@ jobs:
       - name: Checkout # Checkout the repository
         uses: actions/checkout@v4
 
-      - name: Set up pnpm # Setup pnpm package manager
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10 # Use pnpm version from project's packageManager or a recent stable one
-
       - name: Set up Node.js # Setup Node.js environment
         uses: actions/setup-node@v4
         with:
