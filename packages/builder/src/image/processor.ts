@@ -131,8 +131,15 @@ export async function convertBmpToJpegSharpInstance(
     }
 
     // 创建 Sharp 实例
+    // Calculate the number of channels in the BMP image
+    const channels = bmpImage.data.length / (bmpImage.width * bmpImage.height);
+    if (channels !== 3 && channels !== 4) {
+      throw new Error(`Unsupported BMP channel count: ${channels}`);
+    }
+
+    // Create Sharp instance with the correct channel count
     const sharpInstance = sharp(bmpImage.data, {
-      raw: { width: bmpImage.width, height: bmpImage.height, channels: 4 },
+      raw: { width: bmpImage.width, height: bmpImage.height, channels },
     }).jpeg()
 
     const duration = Date.now() - startTime
