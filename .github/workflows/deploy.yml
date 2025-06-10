@@ -65,13 +65,6 @@ jobs:
       - name: Build manifest # Build the project manifest
         run: pnpm build:manifest
 
-      - name: Build web package # Build the web application
-        run: pnpm --filter @photo-gallery/web run build
-
-      - name: Copy web build output to ssr app # Copy the built index.html for SSR
-        run: |
-          cp -r ./apps/web/dist ./apps/ssr/src
-
       - name: Set up Docker Buildx # Setup Docker Buildx for multi-platform builds
         uses: docker/setup-buildx-action@v3
 
@@ -137,4 +130,4 @@ jobs:
               docker rmi max/iris-gallery
             fi
             docker load -i iris-gallery.tar
-            docker run --restart always -d --name iris-gallery -p 8081:8081 max/iris-gallery
+            docker run --restart always -d --name iris-gallery -p 8081:3000 max/iris-gallery
