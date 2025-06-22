@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { clsxm } from '~/lib/cn'
 
@@ -19,10 +20,12 @@ export const Slider = ({
   min,
   max,
   step = 1,
-  autoLabel = '自动',
+  autoLabel,
   className,
   disabled = false,
 }: SliderProps) => {
+  const { t } = useTranslation()
+  const finalAutoLabel = autoLabel || t('slider.auto')
   const [isDragging, setIsDragging] = useState(false)
   const sliderRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
@@ -92,7 +95,7 @@ export const Slider = ({
     <div className={clsxm('w-full', className)}>
       {/* 标签 */}
       <div className="text-text-secondary mb-2 flex justify-between text-xs">
-        <span>{autoLabel}</span>
+        <span>{finalAutoLabel}</span>
         <span>{max}</span>
       </div>
 
@@ -117,7 +120,7 @@ export const Slider = ({
           <div
             className={clsxm(
               'absolute top-0 h-full rounded-full transition-all duration-150',
-              value === 'auto' ? 'bg-green-500' : 'bg-blue-500',
+              value === 'auto' ? 'bg-green-500' : 'bg-accent',
             )}
             style={{
               width: `${Math.max(position, 5)}%`,
@@ -131,7 +134,7 @@ export const Slider = ({
           className={clsxm(
             'absolute top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow-lg transition-all duration-150',
             isDragging ? 'scale-110' : 'hover:scale-105',
-            value === 'auto' ? 'bg-green-500' : 'bg-blue-500',
+            value === 'auto' ? 'bg-green-500' : 'bg-accent',
             disabled && 'cursor-not-allowed',
           )}
           style={{
@@ -148,7 +151,7 @@ export const Slider = ({
                 value === 'auto' && 'font-medium text-green-500',
               )}
             >
-              自动
+              {finalAutoLabel}
             </span>
           </div>
           <div className="flex w-[85%] justify-between">
@@ -158,7 +161,7 @@ export const Slider = ({
                   key={num}
                   className={clsxm(
                     'transition-colors',
-                    value === num && 'font-medium text-blue-500',
+                    value === num && 'font-medium text-accent',
                   )}
                 >
                   {num}
@@ -171,7 +174,7 @@ export const Slider = ({
 
       {/* 当前值显示 */}
       <div className="mt-8 text-center text-sm font-medium text-gray-700 dark:text-gray-300">
-        {value === 'auto' ? autoLabel : `${value} 列`}
+        {value === 'auto' ? finalAutoLabel : `${value} 列`}
       </div>
     </div>
   )

@@ -2,6 +2,7 @@ import clsx from 'clsx'
 import { m } from 'motion/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Blurhash } from 'react-blurhash'
+import { useTranslation } from 'react-i18next'
 
 import {
   CarbonIsoOutline,
@@ -27,6 +28,7 @@ export const PhotoMasonryItem = ({
   onPhotoClick: (index: number, element?: HTMLElement) => void
   photos: PhotoManifest[]
 }) => {
+  const { t } = useTranslation()
   const [imageLoaded, setImageLoaded] = useState(false)
   const [imageError, setImageError] = useState(false)
 
@@ -75,27 +77,22 @@ export const PhotoMasonryItem = ({
       }
     }
 
-    const photo = exif.Photo || {}
-    const image = exif.Image || {}
-
     // 等效焦距 (35mm)
-    const focalLength35mm =
-      photo.FocalLengthIn35mmFilm ||
-      (photo.FocalLength ? Math.round(photo.FocalLength) : null)
+    const focalLength35mm = exif.FocalLengthIn35mmFormat
+      ? Number.parseInt(exif.FocalLengthIn35mmFormat)
+      : exif.FocalLength
+        ? Number.parseInt(exif.FocalLength)
+        : null
 
     // ISO
-    const iso = photo.ISOSpeedRatings || image.ISOSpeedRatings
+    const iso = exif.ISO
 
     // 快门速度
-    const exposureTime = photo.ExposureTime
-    const shutterSpeed = exposureTime
-      ? exposureTime >= 1
-        ? `${exposureTime}s`
-        : `1/${Math.round(1 / exposureTime)}`
-      : null
+    const exposureTime = exif.ExposureTime
+    const shutterSpeed = `${exposureTime}s`
 
     // 光圈
-    const aperture = photo.FNumber ? `f/${photo.FNumber}` : null
+    const aperture = exif.FNumber ? `f/${exif.FNumber}` : null
 
     return {
       focalLength35mm,
@@ -290,7 +287,7 @@ export const PhotoMasonryItem = ({
         <div className="bg-fill-quaternary text-text-tertiary absolute inset-0 flex items-center justify-center">
           <div className="text-center">
             <i className="i-mingcute-image-line text-2xl" />
-            <p className="mt-2 text-sm">Loaded error</p>
+            <p className="mt-2 text-sm">{t('photo.error.loading')}</p>
           </div>
         </div>
       )}
@@ -301,18 +298,23 @@ export const PhotoMasonryItem = ({
           className={clsx(
             'absolute z-20 flex items-center space-x-1 rounded-xl bg-black/50 px-1 py-1 text-xs text-white transition-all duration-200 hover:bg-black/70',
             'top-2 left-2',
+            'flex-wrap gap-y-1',
           )}
-          title={isMobileDevice ? '长按播放实况照片' : '悬浮播放实况照片'}
+          title={
+            isMobileDevice
+              ? t('photo.live.tooltip.mobile.main')
+              : t('photo.live.tooltip.desktop.main')
+          }
         >
           {isConvertingVideo ? (
             <div className="flex items-center gap-1 px-1">
               <i className="i-mingcute-loading-line animate-spin" />
-              <span>视频转码中</span>
+              <span>{t('loading.converting')}</span>
             </div>
           ) : (
             <>
-              <i className="i-mingcute-live-photo-line size-4" />
-              <span className="mr-1">实况</span>
+              <i className="i-mingcute-live-photo-line size-4 shrink-0" />
+              <span className="mr-1 shrink-0">{t('photo.live.badge')}</span>
               {conversionMethod && (
                 <span
                   className={clsx(
@@ -322,15 +324,15 @@ export const PhotoMasonryItem = ({
                 >
                   {videoConvertionError ? (
                     <div
-                      className="w-3 text-center font-bold text-yellow-400"
+                      className="text-yellow w-3 text-center font-bold"
                       title={(videoConvertionError as Error).message}
                     >
                       !
                     </div>
                   ) : conversionMethod === 'webcodecs' ? (
-                    'WebCodecs'
+                    t('photo.conversion.webcodecs')
                   ) : (
-                    'FFmpeg'
+                    t('photo.conversion.ffmpeg')
                   )}
                 </span>
               )}
@@ -346,20 +348,20 @@ export const PhotoMasonryItem = ({
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
           {/* 内容层 - 独立的层以支持 backdrop-filter */}
-          <div className="absolute inset-x-0 bottom-0 p-4 text-white ">
+          <div className="absolute inset-x-0 bottom-0 p-4 text-white">
             {/* 基本信息和标签 section */}
-            <div className="mb-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-              <h3 className="mb-2 truncate text-sm font-medium">
+            <div className="mb-3 [&_*]:duration-300">
+              <h3 className="mb-2 truncate text-sm font-medium opacity-0 group-hover:opacity-100">
                 {data.title}
               </h3>
               {data.description && (
-                <p className="mb-2 line-clamp-2 text-sm text-white/80">
+                <p className="mb-2 line-clamp-2 text-sm text-white/80 opacity-0 group-hover:opacity-100">
                   {data.description}
                 </p>
               )}
 
               {/* 基本信息 */}
-              <div className="mb-2 flex flex-wrap gap-2 text-xs text-white/80">
+              <div className="mb-2 flex flex-wrap gap-2 text-xs text-white/80 opacity-0 group-hover:opacity-100">
                 <span>{imageFormat}</span>
                 <span>•</span>
                 <span>
@@ -375,7 +377,7 @@ export const PhotoMasonryItem = ({
                   {data.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="rounded-full bg-white/20 px-2 py-0.5 text-xs text-white/90 backdrop-blur-sm"
+                      className="rounded-full bg-white/20 px-2 py-0.5 text-xs text-white/90 opacity-0 backdrop-blur-sm group-hover:opacity-100"
                     >
                       {tag}
                     </span>
@@ -385,7 +387,7 @@ export const PhotoMasonryItem = ({
             </div>
 
             {/* EXIF 信息网格 */}
-            <div className="grid grid-cols-2 gap-2 text-xs">
+            <div className="grid grid-cols-2 gap-2 text-xs opacity-0 group-hover:opacity-100">
               {exifData.focalLength35mm && (
                 <div className="flex items-center gap-1.5 rounded-md bg-white/10 px-2 py-1 opacity-0 backdrop-blur-md transition-opacity duration-300 group-hover:opacity-100">
                   <StreamlineImageAccessoriesLensesPhotosCameraShutterPicturePhotographyPicturesPhotoLens className="text-white/70" />

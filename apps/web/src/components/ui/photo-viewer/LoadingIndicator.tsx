@@ -1,4 +1,5 @@
 import { useCallback, useImperativeHandle, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 interface LoadingState {
   isVisible: boolean
@@ -41,6 +42,7 @@ export const LoadingIndicator = ({
 }: {
   ref?: React.Ref<LoadingIndicatorRef | null>
 }) => {
+  const { t } = useTranslation()
   const [loadingState, setLoadingState] =
     useState<LoadingState>(initialLoadingState)
 
@@ -79,7 +81,7 @@ export const LoadingIndicator = ({
             // 视频转换状态
             <>
               <p className="text-xs font-medium text-white tabular-nums">
-                {loadingState.conversionMessage || '转换中...'}
+                {loadingState.conversionMessage || t('loading.converting')}
               </p>
               {loadingState.codecInfo && (
                 <p className="text-xs text-white/70 tabular-nums">
@@ -92,7 +94,7 @@ export const LoadingIndicator = ({
             <>
               <div className="flex items-center gap-2">
                 <p className="text-xs font-medium text-white">
-                  {loadingState.webglMessage || 'WebGL 纹理加载中'}
+                  {loadingState.webglMessage || t('loading.webgl.main')}
                 </p>
                 {loadingState.webglQuality !== 'unknown' && (
                   <span
@@ -112,14 +114,18 @@ export const LoadingIndicator = ({
                   </span>
                 )}
               </div>
-              <p className="text-xs text-white/70">正在构建高质量纹理...</p>
+              <p className="text-xs text-white/70">
+                {t('loading.webgl.building')}
+              </p>
             </>
           ) : (
             // 图片加载状态
             <>
               <div className="flex items-center gap-2">
                 <p className="text-xs font-medium text-white">
-                  {loadingState.isHeicFormat ? 'HEIC' : '加载中'}
+                  {loadingState.isHeicFormat
+                    ? t('loading.heic.main')
+                    : t('loading.default')}
                 </p>
                 <span className="text-xs text-white/60 tabular-nums">
                   {Math.round(loadingState.loadingProgress)}%

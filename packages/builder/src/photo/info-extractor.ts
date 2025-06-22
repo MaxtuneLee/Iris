@@ -1,15 +1,14 @@
 import path from 'node:path'
 
 import { env } from '@env'
-import type { Exif } from 'exif-reader'
 
 import type { Logger } from '../logger/index.js'
-import type { PhotoInfo } from '../types/photo.js'
+import type { PhotoInfo, PickedExif } from '../types/photo.js'
 
 // 从文件名提取照片信息
 export function extractPhotoInfo(
   key: string,
-  exifData?: Exif | null,
+  exifData?: PickedExif | null,
   imageLogger?: Logger['image'],
 ): PhotoInfo {
   const log = imageLogger
@@ -48,23 +47,14 @@ export function extractPhotoInfo(
   }
 
   // 优先使用 EXIF 中的 DateTimeOriginal
-  if (exifData?.Photo?.DateTimeOriginal) {
+  if (exifData?.DateTimeOriginal) {
     try {
-      const dateTimeOriginal = exifData.Photo.DateTimeOriginal as any
+      const dateTimeOriginal = new Date(exifData.DateTimeOriginal)
 
       // 如果是 Date 对象，直接使用
       if (dateTimeOriginal instanceof Date) {
         dateTaken = dateTimeOriginal.toISOString()
         log?.debug('使用 EXIF Date 对象作为拍摄时间')
-      } else if (typeof dateTimeOriginal === 'string') {
-        // 如果是字符串，按原来的方式处理
-        // EXIF 日期格式通常是 "YYYY:MM:DD HH:MM:SS"
-        const formattedDateStr = dateTimeOriginal.replace(
-          /^(\d{4}):(\d{2}):(\d{2})/,
-          '$1-$2-$3',
-        )
-        dateTaken = new Date(formattedDateStr).toISOString()
-        log?.debug(`使用 EXIF 字符串作为拍摄时间：${dateTimeOriginal}`)
       } else {
         log?.warn(
           `未知的 DateTimeOriginal 类型：${typeof dateTimeOriginal}`,
@@ -73,7 +63,7 @@ export function extractPhotoInfo(
       }
     } catch (error) {
       log?.warn(
-        `解析 EXIF DateTimeOriginal 失败：${exifData.Photo.DateTimeOriginal}`,
+        `解析 EXIF DateTimeOriginal 失败：${exifData.DateTimeOriginal}`,
         error,
       )
     }

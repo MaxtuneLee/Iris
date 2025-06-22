@@ -388,15 +388,3 @@ export async function generateOGImage(options: OGImageOptions) {
     throw error
   }
 }
-
-// 如果直接运行此脚本
-if (import.meta.url === `file://${process.argv[1]}`) {
-  const timestamp = Date.now()
-  generateOGImage({
-    title: 'Photo Gallery',
-    description: 'Beautiful photo collection and gallery',
-    outputPath: `og-image-${timestamp}.png`,
-    includePhotos: true,
-    photoCount: 4,
-  }).catch(console.error)
-}

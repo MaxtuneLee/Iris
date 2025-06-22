@@ -1,18 +1,24 @@
 {
-  "name": "Innei's Photo Gallery",
-  "title": "Innei's Photo Gallery",
+  "name": "Innei's Afilmory",
+  "title": "Innei's Afilmory",
   "description": "Capturing beautiful moments in life, documenting daily warmth and emotions through my lens.",
-  "url": "https://gallery.innei.in",
+  "url": "https://afilmory.innei.in/",
   "accentColor": "#007bff",
   "author": {
-    "name": "Photo Gallery",
+    "name": "Innei",
     "url": "https://innei.in/",
-    "avatar": "//cdn.jsdelivr.net/gh/Innei/static@master/avatar.png"
+    "avatar": "https://cdn.jsdelivr.net/gh/Innei/static@master/avatar.png"
   },
   "social": {
-    "twitter": "@__oQuery"
+    "twitter": "@__oQuery",
+    "github": "Innei"
   },
-  "extra": {
-    "accessRepo": true
+  "feed": {
+    "folo": {
+      "challenge": {
+        "feedId": "155982289762921472",
+        "userId": "41312624216137728"
+      }
+    }
   }
 }

@@ -15,8 +15,8 @@ async function generateTestImages() {
 
   // 测试文本
   const testTexts = [
-    'Photo Gallery',
-    'Beautiful photo collection and gallery',
+    'Afilmory',
+    'Capturing beautiful moments in life, documenting daily warmth and emotions through my lens.',
     'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
     'abcdefghijklmnopqrstuvwxyz',
     '0123456789',
@@ -82,7 +82,7 @@ async function generateTestImages() {
       </text>
       
       <text x="60" y="128" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="white">
-        Photo Gallery
+         Afilmory
       </text>
       
       <text x="60" y="198" font-family="Arial, sans-serif" font-size="32" fill="rgba(255,255,255,0.9)">

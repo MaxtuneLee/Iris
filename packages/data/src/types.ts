@@ -1,5 +1,4 @@
-import type { Exif } from 'exif-reader'
-import type getRecipe from 'fuji-recipes'
+import type { PickedExif, ToneAnalysis } from '@afilmory/builder'
 
 export interface PhotoManifest {
   id: string
@@ -16,7 +15,8 @@ export interface PhotoManifest {
   s3Key: string
   lastModified: string
   size: number
-  exif: Exif & { FujiRecipe?: ReturnType<typeof getRecipe> }
+  exif: PickedExif
+  toneAnalysis: ToneAnalysis | null // 影调分析结果
   isLivePhoto?: boolean
   livePhotoVideoUrl?: string
   livePhotoVideoS3Key?: string

@@ -14,7 +14,7 @@ RUN corepack enable
 # -----------------
 FROM base AS builder
 
-RUN apk update && apk add --no-cache git
+RUN apk update && apk add --no-cache git perl
 COPY . .
 RUN sh ./scripts/preinstall.sh
 # Install all dependencies
@@ -22,7 +22,7 @@ RUN pnpm install --frozen-lockfile
 
 # Build the app.
 # The build script in the ssr package.json handles building the web app first.
-RUN pnpm --filter=@photo-gallery/ssr build
+RUN pnpm --filter=@afilmory/ssr build
 
 # -----------------
 # Runner stage

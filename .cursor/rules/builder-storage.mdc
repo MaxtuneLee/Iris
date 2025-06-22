@@ -1,6 +1,6 @@
 ---
 description: 
-globs: src/core/**/*.ts
+globs: 
 alwaysApply: false
 ---
 # 存储抽象层

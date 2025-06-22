@@ -1,6 +1,9 @@
 // @ts-check
 import { defineConfig } from 'eslint-config-hyoban'
 
+import checkI18nJson from './plugins/eslint/eslint-check-i18n-json.js'
+import recursiveSort from './plugins/eslint/eslint-recursive-sort.js'
+
 export default defineConfig(
   {
     formatting: false,
@@ -35,6 +38,20 @@ export default defineConfig(
             'You can use `useLocaltion` or `getReadonlyRoute` to get the route info.',
         },
       ],
+    },
+  },
+
+  // @ts-expect-error
+  {
+    files: ['locales/**/*.json'],
+    plugins: {
+      'recursive-sort': recursiveSort,
+      'check-i18n-json': checkI18nJson,
+    },
+    rules: {
+      'recursive-sort/recursive-sort': 'error',
+      'check-i18n-json/valid-i18n-keys': 'error',
+      'check-i18n-json/no-extra-keys': 'error',
     },
   },
   {

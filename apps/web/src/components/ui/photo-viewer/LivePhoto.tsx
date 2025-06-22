@@ -1,5 +1,6 @@
 import { m, useAnimationControls } from 'motion/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { clsxm } from '~/lib/cn'
 import { isMobileDevice } from '~/lib/device-viewport'
@@ -28,6 +29,8 @@ export const LivePhoto = ({
   isCurrentImage,
   className,
 }: LivePhotoProps) => {
+  const { t } = useTranslation()
+
   // Live Photo 相关状态
   const [isPlayingLivePhoto, setIsPlayingLivePhoto] = useState(false)
   const [livePhotoVideoLoaded, setLivePhotoVideoLoaded] = useState(false)
@@ -263,6 +266,7 @@ export const LivePhoto = ({
         ref={videoRef}
         className={clsxm(
           'absolute inset-0 z-10 h-full w-full object-contain',
+          !isPlayingLivePhoto && 'hidden',
           className,
         )}
         muted
@@ -283,17 +287,21 @@ export const LivePhoto = ({
         )}
         onMouseEnter={handleBadgeMouseEnter}
         onMouseLeave={handleBadgeMouseLeave}
-        title={isMobileDevice ? '长按播放实况照片' : '悬浮播放实况照片'}
+        title={
+          isMobileDevice
+            ? t('photo.live.tooltip.mobile.main')
+            : t('photo.live.tooltip.desktop.main')
+        }
       >
         {isConvertingVideo ? (
           <div className="flex items-center gap-1 px-1">
             <i className="i-mingcute-loading-line animate-spin" />
-            <span>实况视频转换中</span>
+            <span>{t('photo.live.converting.video')}</span>
           </div>
         ) : (
           <>
             <i className="i-mingcute-live-photo-line size-4" />
-            <span className="mr-1">实况</span>
+            <span className="mr-1">{t('photo.live.badge')}</span>
             {conversionMethod && (
               <span className="rounded bg-white/20 px-1 text-xs">
                 {conversionMethod === 'webcodecs' ? 'WebCodecs' : ''}
@@ -306,10 +314,12 @@ export const LivePhoto = ({
       {/* 操作提示 */}
       <div className="pointer-events-none absolute bottom-4 left-1/2 z-20 -translate-x-1/2 rounded bg-black/50 px-2 py-1 text-xs text-white opacity-0 duration-200 group-hover:opacity-50">
         {isConvertingVideo
-          ? `正在使用 ${isWebCodecsSupported() ? 'WebCodecs' : 'FFmpeg'} 转换视频格式...`
+          ? t('photo.live.converting.detail', {
+              method: isWebCodecsSupported() ? 'WebCodecs' : '',
+            })
           : isMobileDevice
-            ? '长按播放实况照片 / 双击缩放'
-            : '悬浮实况标识播放 / 双击缩放'}
+            ? t('photo.live.tooltip.mobile.zoom')
+            : t('photo.live.tooltip.desktop.zoom')}
       </div>
     </>
   )

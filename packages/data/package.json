@@ -1,5 +1,5 @@
 {
-  "name": "@photo-gallery/data",
+  "name": "@afilmory/data",
   "type": "module",
   "private": true,
   "exports": {
@@ -7,7 +7,6 @@
     "./types": "./src/types.ts"
   },
   "dependencies": {
-    "exif-reader": "2.0.2",
-    "fuji-recipes": "1.0.2"
+    "@afilmory/builder": "workspace:*"
   }
 }

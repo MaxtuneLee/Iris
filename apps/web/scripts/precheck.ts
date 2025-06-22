@@ -32,7 +32,7 @@ export const precheck = async () => {
       await $({
         cwd: workdir,
         stdio: 'inherit',
-      })`pnpm --filter @photo-gallery/builder cli`
+      })`pnpm --filter @afilmory/builder cli`
     }
   }
 }

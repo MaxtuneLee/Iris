@@ -1,4 +1,4 @@
-import { WebGLImageViewer } from '@photo-gallery/webgl-viewer'
+import { WebGLImageViewer } from '@afilmory/webgl-viewer'
 import { AnimatePresence, m } from 'motion/react'
 import {
   startTransition,
@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from 'react'
+import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
 import {
@@ -70,6 +71,7 @@ export const ProgressiveImage = ({
   isLivePhoto = false,
   livePhotoVideoUrl,
 }: ProgressiveImageProps) => {
+  const { t } = useTranslation()
   const [blobSrc, setBlobSrc] = useState<string | null>(null)
   const [highResLoaded, setHighResLoaded] = useState(false)
   const [error, setError] = useState(false)
@@ -198,7 +200,7 @@ export const ProgressiveImage = ({
       >
         <div className="text-text-secondary text-center">
           <i className="i-mingcute-image-line mb-2 text-4xl" />
-          <p className="text-sm">图片加载失败</p>
+          <p className="text-sm">{t('photo.error.loading')}</p>
         </div>
       </div>
     )
@@ -240,9 +242,9 @@ export const ProgressiveImage = ({
             showContextMenu(
               [
                 new MenuItemText({
-                  label: '复制图片',
+                  label: t('photo.copy.image'),
                   click: async () => {
-                    const loadingToast = toast.loading('正在复制图片...')
+                    const loadingToast = toast.loading(t('photo.copying'))
 
                     try {
                       // Create a canvas to convert the image to PNG
@@ -285,7 +287,7 @@ export const ProgressiveImage = ({
                       })
 
                       toast.dismiss(loadingToast)
-                      toast.success('图片已复制到剪贴板')
+                      toast.success(t('photo.copy.success'))
                     } catch (error) {
                       console.error('Failed to copy image:', error)
 
@@ -300,21 +302,21 @@ export const ProgressiveImage = ({
                           }),
                         ])
                         toast.dismiss(loadingToast)
-                        toast.success('图片已复制到剪贴板')
+                        toast.success(t('photo.copy.success'))
                       } catch (fallbackError) {
                         console.error(
                           'Fallback copy also failed:',
                           fallbackError,
                         )
                         toast.dismiss(loadingToast)
-                        toast.error('复制图片失败，请稍后重试')
+                        toast.error(t('photo.copy.error'))
                       }
                     }
                   },
                 }),
                 MenuItemSeparator.default,
                 new MenuItemText({
-                  label: '下载图片',
+                  label: t('photo.download'),
                   click: () => {
                     const a = document.createElement('a')
                     a.href = blobSrc
@@ -347,7 +349,7 @@ export const ProgressiveImage = ({
         <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-black/20">
           <i className="i-mingcute-warning-line mb-2 text-4xl" />
           <span className="text-center text-sm text-white">
-            WebGL 不可用，无法渲染图片
+            {t('photo.webgl.unavailable')}
           </span>
         </div>
       )}
@@ -358,7 +360,7 @@ export const ProgressiveImage = ({
       {/* 操作提示 */}
       {!isLivePhoto && (
         <div className="pointer-events-none absolute bottom-4 left-1/2 z-20 -translate-x-1/2 rounded bg-black/50 px-2 py-1 text-xs text-white opacity-0 duration-200 group-hover:opacity-50">
-          双击或双指缩放
+          {t('photo.zoom.hint')}
         </div>
       )}
 

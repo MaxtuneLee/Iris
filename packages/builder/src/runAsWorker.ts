@@ -1,6 +1,7 @@
 import process from 'node:process'
+import { deserialize } from 'node:v8'
 
-import { logger } from './logger'
+import type { StorageObject } from './storage/interfaces'
 import type { PhotoManifestItem } from './types/photo'
 import type {
   BatchTaskMessage,
@@ -9,6 +10,21 @@ import type {
   TaskResult,
 } from './worker/cluster-pool'
 
+// 新增接口定义
+interface WorkerInitMessage {
+  type: 'init'
+  sharedData: {
+    data: number[] // Buffer 转换为数组传输
+    length: number
+  }
+}
+
+interface SharedData {
+  existingManifestMap: Map<string, PhotoManifestItem>
+  livePhotoMap: Map<string, StorageObject>
+  imageObjects: StorageObject[]
+}
+
 // Worker 进程处理逻辑
 export async function runAsWorker() {
   process.title = 'photo-gallery-builder-worker'
@@ -16,40 +32,25 @@ export async function runAsWorker() {
 
   // 立即注册消息监听器，避免被异步初始化阻塞
   let isInitialized = false
-  let storageManager: any
-  let imageObjects: any[]
-  let existingManifestMap: Map<string, PhotoManifestItem>
-  let livePhotoMap: Map<string, any>
 
-  // 初始化函数，只在第一次收到任务时执行
-  const initializeWorker = async () => {
+  let imageObjects: StorageObject[]
+  let existingManifestMap: Map<string, PhotoManifestItem>
+  let livePhotoMap: Map<string, StorageObject>
+
+  // 初始化函数，从主进程接收共享数据
+  const initializeWorker = async (
+    serializedData: WorkerInitMessage['sharedData'],
+  ) => {
     if (isInitialized) return
 
-    // 动态导入所需模块
-    const [{ StorageManager }, { builderConfig }, { loadExistingManifest }] =
-      await Promise.all([
-        import('./storage/index.js'),
-        import('@builder'),
-        import('./manifest/manager.js'),
-      ])
+    // 将数组重新转换为 Buffer，然后反序列化
+    const buffer = Buffer.from(serializedData.data)
+    const sharedData = deserialize(buffer) as SharedData
 
-    // 在 worker 中初始化存储管理器和数据
-    storageManager = new StorageManager(builderConfig.storage)
-
-    // 获取图片列表（worker 需要知道要处理什么）
-    imageObjects = await storageManager.listImages()
-
-    // 获取现有 manifest 和 live photo 信息
-    const existingManifest = await loadExistingManifest()
-    existingManifestMap = new Map(
-      existingManifest.map((item: PhotoManifestItem) => [item.s3Key, item]),
-    )
-
-    // 检测 Live Photos
-    const allObjects = await storageManager.listAllFiles()
-    livePhotoMap = builderConfig.options.enableLivePhotoDetection
-      ? await storageManager.detectLivePhotos(allObjects)
-      : new Map()
+    // 从主进程接收的共享数据中恢复数据结构（数据已经是正确的类型）
+    imageObjects = sharedData.imageObjects
+    existingManifestMap = sharedData.existingManifestMap
+    livePhotoMap = sharedData.livePhotoMap
 
     isInitialized = true
   }
@@ -57,11 +58,12 @@ export async function runAsWorker() {
   const handleTask = async (message: TaskMessage): Promise<void> => {
     try {
       // 确保 worker 已初始化
-      await initializeWorker()
+      if (!isInitialized) {
+        throw new Error('Worker 未初始化，请先发送 init 消息')
+      }
 
       // 动态导入 processPhoto（放在这里以避免阻塞消息监听）
       const { processPhoto } = await import('./photo/processor.js')
-      const { logger: workerLogger } = await import('./logger/index.js')
 
       const { taskIndex } = message
 
@@ -106,7 +108,6 @@ export async function runAsWorker() {
         existingManifestMap,
         legacyLivePhotoMap,
         processorOptions,
-        workerLogger,
       )
 
       // 发送结果回主进程
@@ -137,7 +138,9 @@ export async function runAsWorker() {
   const handleBatchTask = async (message: BatchTaskMessage): Promise<void> => {
     try {
       // 确保已初始化
-      await initializeWorker()
+      if (!isInitialized) {
+        throw new Error('Worker 未初始化，请先发送 init 消息')
+      }
 
       const results: TaskResult[] = []
       const taskPromises: Promise<void>[] = []
@@ -181,7 +184,6 @@ export async function runAsWorker() {
                 isForceManifest: process.env.FORCE_MANIFEST === 'true',
                 isForceThumbnails: process.env.FORCE_THUMBNAILS === 'true',
               },
-              logger,
             )
 
             // 添加成功结果
@@ -241,6 +243,7 @@ export async function runAsWorker() {
       message:
         | TaskMessage
         | BatchTaskMessage
+        | WorkerInitMessage
         | { type: 'shutdown' }
         | { type: 'ping' },
     ) => {
@@ -253,6 +256,20 @@ export async function runAsWorker() {
         // 响应主进程的 ping，表示 worker 已准备好
         if (process.send) {
           process.send({ type: 'pong', workerId })
+        }
+        return
+      }
+
+      if (message.type === 'init') {
+        // 处理初始化消息
+        try {
+          await initializeWorker(message.sharedData)
+          if (process.send) {
+            process.send({ type: 'init-complete', workerId })
+          }
+        } catch (error) {
+          console.error('Worker 初始化失败:', error)
+          process.exit(1)
         }
         return
       }

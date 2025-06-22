@@ -16,18 +16,18 @@
 ## 📦 安装
 
 ```bash
-npm install @photo-gallery/webgl-viewer
+npm install @afilmory/webgl-viewer
 # 或
-yarn add @photo-gallery/webgl-viewer
+yarn add @afilmory/webgl-viewer
 # 或
-pnpm add @photo-gallery/webgl-viewer
+pnpm add @afilmory/webgl-viewer
 ```
 
 ## 🚀 快速开始
 
 ```tsx
 import React from 'react'
-import { WebGLImageViewer } from '@photo-gallery/webgl-viewer'
+import { WebGLImageViewer } from '@afilmory/webgl-viewer'
 
 function App() {
   return (

@@ -4,8 +4,16 @@ import 'swiper/css'
 import 'swiper/css/navigation'
 
 import { AnimatePresence, m } from 'motion/react'
-import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react'
 import { Blurhash } from 'react-blurhash'
+import { useTranslation } from 'react-i18next'
 import type { Swiper as SwiperType } from 'swiper'
 import { Keyboard, Navigation, Virtual } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
@@ -35,6 +43,7 @@ export const PhotoViewer = ({
   onClose,
   onIndexChange,
 }: PhotoViewerProps) => {
+  const { t } = useTranslation()
   const containerRef = useRef<HTMLDivElement>(null)
   const swiperRef = useRef<SwiperType | null>(null)
   const [isImageZoomed, setIsImageZoomed] = useState(false)
@@ -45,31 +54,13 @@ export const PhotoViewer = ({
   const currentPhoto = photos[currentIndex]
 
   // 当 PhotoViewer 关闭时重置缩放状态和面板状态
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!isOpen) {
       setIsImageZoomed(false)
       setShowExifPanel(false)
       setCurrentBlobSrc(null)
     }
   }, [isOpen])
-
-  // 预加载相邻图片
-  useEffect(() => {
-    if (!isOpen) return
-
-    const preloadImage = (src: string) => {
-      const img = new Image()
-      img.src = src
-    }
-
-    // 预加载前一张和后一张
-    if (currentIndex > 0) {
-      preloadImage(photos[currentIndex - 1].originalUrl)
-    }
-    if (currentIndex < photos.length - 1) {
-      preloadImage(photos[currentIndex + 1].originalUrl)
-    }
-  }, [isOpen, currentIndex, photos])
 
   const handlePrevious = useCallback(() => {
     if (currentIndex > 0) {
@@ -145,7 +136,7 @@ export const PhotoViewer = ({
     }
   }, [isOpen, handlePrevious, handleNext, onClose, showExifPanel])
 
-  // const imageSize = getImageDisplaySize() // 已改为直接使用原始尺寸优化WebGL加载
+  // const imageSize = getImageDisplaySize() // 已改为直接使用原始尺寸优化 WebGL 加载
 
   if (!currentPhoto) return null
 
@@ -201,7 +192,7 @@ export const PhotoViewer = ({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.3 }}
+                    transition={Spring.presets.snappy}
                     className={`pointer-events-none absolute ${isMobile ? 'top-2 right-2 left-2' : 'top-4 right-4 left-4'} z-30 flex items-center justify-between`}
                   >
                     {/* 左侧工具按钮 */}
@@ -228,7 +219,7 @@ export const PhotoViewer = ({
                           <button
                             type="button"
                             className="bg-material-ultra-thick pointer-events-auto flex size-8 items-center justify-center rounded-full text-white backdrop-blur-2xl duration-200 hover:bg-black/40"
-                            title="分享照片"
+                            title={t('photo.share.title')}
                           >
                             <i className="i-mingcute-share-2-line" />
                           </button>
@@ -281,10 +272,10 @@ export const PhotoViewer = ({
                           virtualIndex={index}
                         >
                           <m.div
-                            initial={{ opacity: 0, scale: 0.95 }}
+                            initial={{ opacity: 0.5, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            transition={{ duration: 0.3 }}
+                            transition={Spring.presets.smooth}
                             className="relative flex h-full w-full items-center justify-center"
                           >
                             <ProgressiveImage
@@ -358,15 +349,17 @@ export const PhotoViewer = ({
               {/* ExifPanel - 在桌面端始终显示，在移动端根据状态显示 */}
 
               <Suspense>
-                {(!isMobile || showExifPanel) && (
-                  <ExifPanel
-                    currentPhoto={currentPhoto}
-                    exifData={currentPhoto.exif}
-                    onClose={
-                      isMobile ? () => setShowExifPanel(false) : undefined
-                    }
-                  />
-                )}
+                <AnimatePresenceOnlyMobile>
+                  {(!isMobile || showExifPanel) && (
+                    <ExifPanel
+                      currentPhoto={currentPhoto}
+                      exifData={currentPhoto.exif}
+                      onClose={
+                        isMobile ? () => setShowExifPanel(false) : undefined
+                      }
+                    />
+                  )}
+                </AnimatePresenceOnlyMobile>
               </Suspense>
             </div>
           </div>
@@ -374,4 +367,14 @@ export const PhotoViewer = ({
       </AnimatePresence>
     </>
   )
+}
+
+const AnimatePresenceOnlyMobile = ({
+  children,
+}: {
+  children: React.ReactNode
+}) => {
+  const isMobile = useMobile()
+  if (!isMobile) return children
+  return <AnimatePresence>{children}</AnimatePresence>
 }

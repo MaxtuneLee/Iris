@@ -21,7 +21,7 @@
     "noEmit": true,
     "jsx": "preserve",
     "paths": {
-      "@photo-gallery/builder/*": [
+      "@afilmory/builder/*": [
         "./src/*"
       ],
       "@pkg": [
@@ -37,6 +37,7 @@
   },
   "include": [
     "./src/**/*",
-    "./scripts/**/*"
+    "./scripts/**/*",
+    "../../apps/web/src/lib/histogram.ts"
   ]
 }

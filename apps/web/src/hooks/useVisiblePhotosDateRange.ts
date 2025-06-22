@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import type { PhotoManifest } from '~/types/photo'
 
@@ -30,8 +31,8 @@ export const useVisiblePhotosDateRange = (_photos: PhotoManifest[]) => {
 
   const getPhotoDate = useCallback((photo: PhotoManifest): Date => {
     // 优先使用 EXIF 中的拍摄时间
-    if (photo.exif?.Photo?.DateTimeOriginal) {
-      const dateStr = photo.exif.Photo.DateTimeOriginal as unknown as string
+    if (photo.exif?.DateTimeOriginal) {
+      const dateStr = photo.exif.DateTimeOriginal as unknown as string
       // EXIF 日期格式通常是 "YYYY:MM:DD HH:mm:ss"
       const formattedDateStr = dateStr.replace(
         /^(\d{4}):(\d{2}):(\d{2})/,
@@ -46,6 +47,7 @@ export const useVisiblePhotosDateRange = (_photos: PhotoManifest[]) => {
     // 回退到 lastModified
     return new Date(photo.lastModified)
   }, [])
+  const { i18n } = useTranslation()
 
   const formatDateRange = useCallback(
     (startDate: Date, endDate: Date): string => {
@@ -56,7 +58,7 @@ export const useVisiblePhotosDateRange = (_photos: PhotoManifest[]) => {
 
       // 如果是同一天
       if (startDate.toDateString() === endDate.toDateString()) {
-        return startDate.toLocaleDateString('zh-CN', {
+        return startDate.toLocaleDateString(i18n.language, {
           year: 'numeric',
           month: 'long',
           day: 'numeric',
@@ -76,7 +78,7 @@ export const useVisiblePhotosDateRange = (_photos: PhotoManifest[]) => {
       // 不同年份
       return `${startYear}年${startDate.getMonth() + 1}月 - ${endYear}年${endDate.getMonth() + 1}月`
     },
-    [],
+    [i18n.language],
   )
 
   const extractLocation = useCallback(

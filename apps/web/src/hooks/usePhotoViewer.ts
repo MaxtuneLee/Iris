@@ -1,7 +1,6 @@
-import { photoLoader } from '@photo-gallery/data'
+import { photoLoader } from '@afilmory/data'
 import { atom, useAtom, useAtomValue } from 'jotai'
-import { useCallback, useEffect, useMemo } from 'react'
-import { useLocation, useNavigate } from 'react-router'
+import { useCallback, useMemo } from 'react'
 
 import { gallerySettingAtom } from '~/atoms/app'
 
@@ -26,14 +25,14 @@ export const usePhotos = () => {
       let aDateStr = ''
       let bDateStr = ''
 
-      if (a.exif && a.exif.Photo && a.exif.Photo.DateTimeOriginal) {
-        aDateStr = a.exif.Photo.DateTimeOriginal as unknown as string
+      if (a.exif && a.exif.DateTimeOriginal) {
+        aDateStr = a.exif.DateTimeOriginal as unknown as string
       } else {
         aDateStr = a.lastModified
       }
 
-      if (b.exif && b.exif.Photo && b.exif.Photo.DateTimeOriginal) {
-        bDateStr = b.exif.Photo.DateTimeOriginal as unknown as string
+      if (b.exif && b.exif.DateTimeOriginal) {
+        bDateStr = b.exif.DateTimeOriginal as unknown as string
       } else {
         bDateStr = b.lastModified
       }
@@ -52,8 +51,6 @@ export const usePhotoViewer = () => {
   const [isOpen, setIsOpen] = useAtom(openAtom)
   const [currentIndex, setCurrentIndex] = useAtom(currentIndexAtom)
   const [triggerElement, setTriggerElement] = useAtom(triggerElementAtom)
-
-  const navigate = useNavigate()
 
   const openViewer = useCallback(
     (index: number, element?: HTMLElement) => {
@@ -78,20 +75,6 @@ export const usePhotoViewer = () => {
       setCurrentIndex(currentIndex + 1)
     }
   }, [currentIndex, photos.length, setCurrentIndex])
-
-  const location = useLocation()
-  useEffect(() => {
-    if (!isOpen) {
-      const timer = setTimeout(() => {
-        navigate('/')
-      }, 500)
-      return () => clearTimeout(timer)
-    }
-    const targetPathname = `/${photos[currentIndex].id}`
-    if (location.pathname !== targetPathname) {
-      navigate(targetPathname)
-    }
-  }, [currentIndex, isOpen, location.pathname, navigate, photos])
 
   const goToPrevious = useCallback(() => {
     if (currentIndex > 0) {

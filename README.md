@@ -1,110 +1,105 @@
-# Iris Photo Gallery
+<p align="center">
+  <img src="https://github.com/Afilmory/assets/blob/main/512-mac.png?raw=true" alt="Afilmory" width="256px" />
+</p>
 
-一个现代化的照片画廊网站，采用 React + TypeScript 构建，支持从多种存储源（S3、GitHub）自动同步照片，具有高性能 WebGL 渲染、瀑布流布局、EXIF 信息展示、缩略图生成等功能。
+# <p align="center">Afilmory</p>
 
-## 🌟 特性
+Afilmory (/əˈfɪlməri/, "uh-FIL-muh-ree") is a term created for personal photography websites, blending Auto Focus (AF), aperture (light control), film (vintage medium), and memory (captured moments).
 
-### 核心功能
+A modern photo gallery website built with React + TypeScript, supporting automatic photo synchronization from multiple storage sources (S3, GitHub), featuring high-performance WebGL rendering, masonry layout, EXIF information display, thumbnail generation, and more.
 
-- 🖼️ **高性能 WebGL 图像渲染器** - 基于自研 WebGL 组件，支持流畅的缩放、平移操作
-- 📱 **响应式瀑布流布局** - 采用 Masonic 实现，自适应不同屏幕尺寸
-- 🎨 **现代化 UI 设计** - 基于 Tailwind CSS 和 Radix UI 组件库
-- ⚡ **增量同步** - 智能检测文件变化，仅处理新增或修改的照片
+Live Photo Galleries:
 
-### 图像处理
+- https://gallery.innei.in
+- https://gallery.mxte.cc
+- https://photography.pseudoyu.com
 
-- 🔄 **HEIC/HEIF 格式支持** - 自动转换 Apple 设备的 HEIC 格式
-- 🖼️ **智能缩略图生成** - 多尺寸缩略图，优化加载性能
-- 📊 **EXIF 信息展示** - 完整的拍摄参数，包括相机型号、焦距、光圈等
-- 🌈 **Blurhash 占位符** - 优雅的图片加载体验
-- 📱 **Live Photo 支持** - 检测并展示 iPhone Live Photo
+## 🌟 Features
 
-### 高级功能
+### Core Functionality
 
-- 🎛️ **富士胶片模拟** - 读取和展示富士相机的胶片模拟设置
-- 🔍 **全屏查看器** - 支持手势操作的图片查看器
-- 🏷️ **智能标签** - 基于 EXIF 数据自动生成标签
-- ⚡ **并发处理** - 支持多进程/多线程并发处理
-- 🗂️ **多存储支持** - S3、GitHub 等多种存储后端
+- 🖼️ **High-Performance WebGL Image Renderer** - Custom WebGL component with smooth zoom and pan operations
+- 📱 **Responsive Masonry Layout** - Powered by Masonic, adapts to different screen sizes
+- 🎨 **Modern UI Design** - Built with Tailwind CSS and Radix UI component library
+- ⚡ **Incremental Sync** - Smart change detection, processes only new or modified photos
+- 🌐 **i18n** - Multi-language support
+- 🌐 **OpenGraph** - OpenGraph metadata for social media sharing
 
-## 🏗️ 技术架构
+### Image Processing
 
-### 前端技术栈
+- 🔄 **HEIC/HEIF Format Support** - Automatic conversion of Apple device HEIC format
+- 🖼️ **Smart Thumbnail Generation** - Multi-size thumbnails for optimized loading performance
+- 📊 **EXIF Information Display** - Complete shooting parameters including camera model, focal length, aperture, etc.
+- 🌈 **Blurhash Placeholders** - Elegant image loading experience
+- 📱 **Live Photo Support** - Detection and display of iPhone Live Photos
 
-- **React 19** - 使用最新的 React 版本和 Compiler
-- **TypeScript** - 完整的类型安全
-- **Vite** - 现代化构建工具
-- **Tailwind CSS** - 原子化 CSS 框架
-- **Radix UI** - 无障碍组件库
-- **Jotai** - 状态管理
-- **TanStack Query** - 数据获取和缓存
-- **React Router 7** - 路由管理
+### Advanced Features
 
-### 构建系统
+- 🎛️ **Fujifilm Simulation** - Read and display Fujifilm camera film simulation settings
+- 🔍 **Fullscreen Viewer** - Image viewer with gesture support
+- 🏷️ **Smart Tags** - Auto-generated tags based on EXIF data
+- ⚡ **Concurrent Processing** - Multi-process/multi-thread concurrent processing support
+- 🗂️ **Multi-Storage Support** - S3, GitHub, and other storage backends
 
-- **Node.js** - 服务端运行时
-- **Sharp** - 高性能图像处理
-- **AWS SDK** - S3 存储操作
-- **Worker Threads/Cluster** - 并发处理
-- **EXIF-Reader** - EXIF 数据提取
+## 🏗️ Technical Architecture
 
-### 存储架构
+### Frontend Tech Stack
 
-采用适配器模式设计，支持多种存储后端：
+- **React 19** - Latest React version with Compiler
+- **TypeScript** - Complete type safety
+- **Vite** - Modern build tool
+- **Tailwind CSS** - Atomic CSS framework
+- **Radix UI** - Accessible component library
+- **Jotai** - State management
+- **TanStack Query** - Data fetching and caching
+- **React Router 7** - Routing management
+- **i18next** - Internationalization
 
-- **S3 兼容存储** - AWS S3、MinIO、阿里云 OSS 等
-- **GitHub 存储** - 使用 GitHub 仓库作为图片存储
+### Build System
 
-## 📦 项目结构
+- **Node.js** - Server-side runtime
+- **Sharp** - High-performance image processing
+- **AWS SDK** - S3 storage operations
+- **Worker Threads/Cluster** - Concurrent processing
+- **EXIF-Reader** - EXIF data extraction
 
-```
-photo-gallery-site/
-├── apps/web/                    # 主应用
-│   ├── src/
-│   │   ├── components/          # React 组件
-│   │   │   ├── ui/             # UI 组件库
-│   │   │   └── common/         # 通用组件
-│   │   ├── core/               # 核心构建系统
-│   │   │   ├── builder/        # 主构建器
-│   │   │   ├── storage/        # 存储适配器
-│   │   │   ├── image/          # 图像处理
-│   │   │   ├── photo/          # 照片处理
-│   │   │   └── worker/         # 并发处理
-│   │   ├── modules/            # 功能模块
-│   │   ├── pages/              # 页面组件
-│   ├── public/                 # 静态资源
-│   └── scripts/                # 构建脚本
-├── packages/webgl-viewer/       # WebGL 图像查看器
-├── config/                     # 配置文件
-└── docs/                       # 文档
-```
+### Storage Architecture
 
-## 🚀 快速开始
+Designed with adapter pattern, supporting multiple storage backends:
 
-### 环境要求
+- **S3-Compatible Storage** - AWS S3, MinIO, Alibaba Cloud OSS, etc.
+- **GitHub Storage** - Using GitHub repository as image storage
+
+## 🚀 Quick Start
+
+### Docker Deployment
+
+[Docker Deployment](https://github.com/Afilmory/docker)
+
+### Requirements
 
 - Node.js 18+
-- 至少 4GB RAM（用于图像处理）
+- At least 4GB RAM (for image processing)
 
-### 1. 克隆项目
+### 1. Clone the Project
 
 ```bash
-git clone https://github.com/Iris-Photo-Gallery/Iris.git
+git clone https://github.com/Afilmory/Afilmory.git
 cd photo-gallery-site
 ```
 
-### 2. 安装依赖
+### 2. Install Dependencies
 
 ```bash
 pnpm install
 ```
 
-### 3. 环境配置
+### 3. Environment Configuration
 
-创建 `.env` 文件：
+Create `.env` file:
 
 ```env
-# S3 存储配置
+# S3 Storage Configuration
 S3_REGION=us-east-1
 S3_ACCESS_KEY_ID=your_access_key_id
 S3_SECRET_ACCESS_KEY=your_secret_access_key
@@ -112,60 +107,61 @@ S3_ENDPOINT=https://s3.amazonaws.com
 S3_BUCKET_NAME=your_bucket_name
 S3_PREFIX=photos/
 S3_CUSTOM_DOMAIN=your_custom_domain.com
+S3_EXCLUDE_REGEX=
 ```
 
-### 4. 站点配置
+### 4. Site Configuration
 
-复制并编辑配置文件：
+Copy and edit the configuration file:
 
 ```bash
 cp config.example.json config.json
 ```
 
-编辑 `config.json`：
+Edit `config.json`:
 
 ```json
 {
-  "name": "我的照片画廊",
-  "title": "我的照片画廊",
-  "description": "记录生活中的美好瞬间",
-  "url": "https://gallery.example.com",
-  "accentColor": "#007bff", // 可选, 设置主题色
+  "name": "My Afilmory",
+  "title": "My Afilmory",
+  "description": "Capturing beautiful moments in life",
+  "url": "https://afilmory.example.com",
+  "accentColor": "#007bff", // Optional, set theme color
   "author": {
-    "name": "Your Name", // 必填, 设置作者名称
-    "url": "https://example.com", // 可选, 设置作者主页
-    "avatar": "https://example.com/avatar.png" // 可选, 设置作者头像
+    "name": "Your Name", // Required, set author name
+    "url": "https://example.com", // Optional, set author homepage
+    "avatar": "https://example.com/avatar.png" // Optional, set author avatar
   },
   "social": {
-    "twitter": "@yourusername" // 可选, 设置社交账号
+    "twitter": "@yourusername" // Optional, set social accounts
   }
 }
 ```
 
-### 5. 构建照片清单
+### 5. Build Photo Manifest
 
 ```bash
-# 首次构建
+# Initial build
 pnpm run build:manifest
 
-# 增量更新
+# Incremental update
 pnpm run build:manifest
 
-# 强制全量更新
+# Force full update
 pnpm run build:manifest -- --force
 ```
 
-### 6. 启动开发服务器
+### 6. Start Development Server
 
 ```bash
 pnpm dev
 ```
 
-## ⚙️ 配置选项
+## ⚙️ Configuration Options
 
-### 构建器配置
+### Builder Configuration
 
-创建 `builder.config.json` 文件进行高级配置：
+Create `builder.config.json` file for advanced configuration:
 
 ```json
 {
@@ -178,7 +174,7 @@ pnpm dev
     "bucket": "my-photos",
     "region": "us-east-1",
     "prefix": "photos/",
-    "customDomain": "cdn.example.com"
+    "customDomain": "https://cdn.example.com"
   },
   "options": {
     "defaultConcurrency": 8,
@@ -202,39 +198,40 @@ pnpm dev
 }
 ```
 
-### 配置选项说明
+### Configuration Options Description
 
-#### 存储配置 (`storage`)
+#### Storage Configuration (`storage`)
 
-- `provider`: 存储提供商 (`s3` | `github`)
-- `bucket`: S3 存储桶名称
-- `region`: S3 区域
-- `endpoint`: S3 端点（可选）
-- `prefix`: 文件前缀
-- `customDomain`: 自定义域名
+- `provider`: Storage provider (`s3` | `github`)
+- `bucket`: S3 bucket name
+- `region`: S3 region
+- `endpoint`: S3 endpoint (optional)
+- `prefix`: File prefix
+- `customDomain`: Custom domain
+- `excludeRegex`: Regular expression to exclude files (optional)
 
-#### 构建选项 (`options`)
+#### Build Options (`options`)
 
-- `defaultConcurrency`: 默认并发数
-- `enableLivePhotoDetection`: 启用 Live Photo 检测
-- `showProgress`: 显示构建进度
-- `showDetailedStats`: 显示详细统计信息
+- `defaultConcurrency`: Default concurrency
+- `enableLivePhotoDetection`: Enable Live Photo detection
+- `showProgress`: Show build progress
+- `showDetailedStats`: Show detailed statistics
 
-#### 性能配置 (`performance`)
+#### Performance Configuration (`performance`)
 
-- `worker.workerCount`: Worker 进程数
-- `worker.timeout`: Worker 超时时间（毫秒）
-- `worker.useClusterMode`: 启用集群模式
+- `worker.workerCount`: Number of worker processes
+- `worker.timeout`: Worker timeout (milliseconds)
+- `worker.useClusterMode`: Enable cluster mode
 
-#### 日志配置 (`logging`)
+#### Logging Configuration (`logging`)
 
-- `verbose`: 详细日志
-- `level`: 日志级别 (`info` | `warn` | `error` | `debug`)
-- `outputToFile`: 输出到文件
+- `verbose`: Verbose logging
+- `level`: Log level (`info` | `warn` | `error` | `debug`)
+- `outputToFile`: Output to file
 
-### 远程资源库配置
+### Remote Repository Configuration
 
-如果你有独立的资源仓库存储缩略图和清单：
+If you have a separate asset repository for storing thumbnails and manifests:
 
 ```json
 {
@@ -245,117 +242,87 @@ pnpm dev
 }
 ```
 
-这将自动从远程仓库拉取资源，避免每次构建。
+This will automatically pull resources from the remote repository, avoiding rebuilds each time.
 
-## 📋 CLI 命令
+## 📋 CLI Commands
 
-### 构建命令
+### Build Commands
 
 ```bash
-# 查看帮助
+# View help
 pnpm run build:manifest -- --help
 
-# 增量更新（默认）
+# Incremental update (default)
 pnpm run build:manifest
 
-# 强制全量更新
+# Force full update
 pnpm run build:manifest -- --force
 
-# 仅重新生成缩略图
+# Only regenerate thumbnails
 pnpm run build:manifest -- --force-thumbnails
 
-# 仅重新生成清单
+# Only regenerate manifest
 pnpm run build:manifest -- --force-manifest
 ```
 
-### 开发命令
+### Development Commands
 
 ```bash
-# 启动开发服务器
+# Start development server
 pnpm dev
 
-# 构建生产版本
+# Build production version
 pnpm build
 ```
 
-## 🚀 部署指南
+### Notes
 
-### Vercel 部署（推荐）
+- Ensure your S3 bucket already contains photo files
+- If using remote repository, configure `builder.config.json` first
 
-1. **Fork 项目**
+## 🔧 Advanced Usage
 
-   - 访问 [GitHub 仓库](https://github.com/Iris-Photo-Gallery/Iris)
-   - 点击右上角的 "Fork" 按钮，将项目 fork 到你的 GitHub 账户
+### Custom Storage Provider
 
-2. **在 Vercel 部署**
-   - 访问 [Vercel](https://vercel.com/)
-   - 使用 GitHub 账户登录
-   - 点击 "New Project"，选择你刚才 fork 的仓库
-   - 在项目设置中添加以下环境变量（如果你使用 S3 存储）：
-
-```env
-S3_REGION=us-east-1
-S3_ACCESS_KEY_ID=你的 S3 访问密钥 ID
-S3_SECRET_ACCESS_KEY=你的 S3 秘密访问密钥
-S3_ENDPOINT=https://s3.amazonaws.com
-S3_BUCKET_NAME=你的 S3 存储桶名称
-S3_PREFIX=photos/
-S3_CUSTOM_DOMAIN=你的自定义域名（可选）
-```
-
-3. **触发部署**
-   - 配置完环境变量后，Vercel 会自动开始部署
-   - 等待部署完成，你的照片画廊就上线了！
-
-### 注意事项
-
-- 确保你的 S3 存储桶已经包含照片文件
-- 如果使用远程资源库，需要先配置 `builder.config.json`
-
-## 🔧 高级用法
-
-### 自定义存储提供商
-
-实现 `StorageProvider` 接口以支持新的存储后端：
+Implement the `StorageProvider` interface to support new storage backends:
 
 ```typescript
 import { StorageProvider } from './src/core/storage/interfaces'
 
 class MyStorageProvider implements StorageProvider {
   async getFile(key: string): Promise<Buffer | null> {
-    // 实现文件获取逻辑
+    // Implement file retrieval logic
   }
 
   async listImages(): Promise<StorageObject[]> {
-    // 实现图片列表获取逻辑
+    // Implement image list retrieval logic
   }
 
-  // ... 其他方法
+  // ... other methods
 }
 ```
 
-### 自定义图像处理
+### Custom Image Processing
 
-在 `src/core/image/` 目录下添加自定义处理器：
+Add custom processors in the `src/core/image/` directory:
 
 ```typescript
 export async function customImageProcessor(buffer: Buffer) {
-  // 自定义图像处理逻辑
+  // Custom image processing logic
   return processedBuffer
 }
 ```
 
-## 📄 许可证
+## 📄 License
 
 MIT License © 2025 Innei
 
-## 🔗 相关链接
+## 🔗 Related Links
 
-- [在线演示](https://gallery.innei.in)
-- [个人网站](https://innei.in)
+- [Live Demo](https://gallery.innei.in)
+- [Personal Website](https://innei.in)
 - [GitHub](https://github.com/innei)
-- [问题反馈](https://github.com/Iris-Photo-Gallery/Iris/issues)
 
 ---
 
-如果这个项目对你有帮助，请给个 ⭐️ Star 支持一下！
+If this project helps you, please give it a ⭐️ Star for support!

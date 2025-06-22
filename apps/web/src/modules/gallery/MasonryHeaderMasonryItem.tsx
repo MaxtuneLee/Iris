@@ -1,12 +1,13 @@
+import { photoLoader } from '@afilmory/data'
 import { siteConfig } from '@config'
-import { photoLoader } from '@photo-gallery/data'
+import { repository } from '@pkg'
 import * as AvatarPrimitive from '@radix-ui/react-avatar'
+import { useTranslation } from 'react-i18next'
 
 import { clsxm } from '~/lib/cn'
 
 import { ActionGroup } from './ActionGroup'
 
-const numberFormatter = new Intl.NumberFormat('zh-CN')
 const data = photoLoader.getPhotos()
 
 export const MasonryHeaderMasonryItem = ({
@@ -16,6 +17,8 @@ export const MasonryHeaderMasonryItem = ({
   style?: React.CSSProperties
   className?: string
 }) => {
+  const { t } = useTranslation()
+  const { i18n } = useTranslation()
   return (
     <div
       className={clsxm(
@@ -52,12 +55,40 @@ export const MasonryHeaderMasonryItem = ({
           </div>
         </div>
 
-        <h2 className="mb-1 text-2xl font-semibold text-gray-900 dark:text-white">
+        <h2 className="mt-1 mb-1 text-2xl font-semibold text-gray-900 dark:text-white">
           {siteConfig.name}
         </h2>
 
+        {/* Social media links */}
+        {siteConfig.social && (
+          <div className="mt-1 mb-3 flex items-center justify-center gap-3">
+            {siteConfig.social.github && (
+              <a
+                href={`https://github.com/${siteConfig.social.github}`}
+                target="_blank"
+                rel="noreferrer"
+                className="text-text-secondary flex items-center justify-center p-2 duration-200 hover:text-[#E7E8E8]"
+                title="GitHub"
+              >
+                <i className="i-mingcute-github-fill text-sm" />
+              </a>
+            )}
+            {siteConfig.social.twitter && (
+              <a
+                href={`https://twitter.com/${siteConfig.social.twitter.replace('@', '')}`}
+                target="_blank"
+                rel="noreferrer"
+                className="text-text-secondary flex items-center justify-center p-2 duration-200 hover:text-[#1da1f2]"
+                title="Twitter"
+              >
+                <i className="i-mingcute-twitter-fill text-sm" />
+              </a>
+            )}
+          </div>
+        )}
+
         <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-          {numberFormatter.format(data?.length || 0)} 张照片
+          {t('gallery.photos', { count: data?.length || 0 })}
         </p>
       </div>
 
@@ -71,12 +102,26 @@ export const MasonryHeaderMasonryItem = ({
         <div className="flex items-center justify-center gap-2 text-xs text-gray-500 dark:text-gray-400">
           <i className="i-mingcute-calendar-line text-sm" />
           <span>
-            构建于{' '}
-            {new Date(BUILT_DATE).toLocaleDateString('zh-CN', {
+            {t('gallery.built.at')}
+            {new Date(BUILT_DATE).toLocaleDateString(i18n.language, {
               year: 'numeric',
               month: 'long',
               day: 'numeric',
             })}
+            {GIT_COMMIT_HASH && (
+              <span className="ml-1">
+                (
+                <a
+                  href={`${repository.url}/commit/${GIT_COMMIT_HASH}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-gray-500 dark:text-gray-400"
+                >
+                  {GIT_COMMIT_HASH.slice(0, 6)}
+                </a>
+                )
+              </span>
+            )}
           </span>
         </div>
       </div>

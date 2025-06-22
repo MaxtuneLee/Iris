@@ -1,6 +1,6 @@
 {
-  "name": "Photo Gallery",
-  "short_name": "Gallery",
+  "name": "Afilmory",
+  "short_name": "Afilmory",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",

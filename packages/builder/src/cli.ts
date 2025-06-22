@@ -169,6 +169,8 @@ async function main() {
     isForceThumbnails,
     concurrencyLimit,
   })
+  // eslint-disable-next-line unicorn/no-process-exit
+  process.exit(0)
 }
 
 // 运行主函数

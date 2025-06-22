@@ -13,9 +13,9 @@ interface OGImagePluginOptions {
 
 export function ogImagePlugin(options: OGImagePluginOptions = {}): Plugin {
   const {
-    title = 'Photo Gallery',
-    description = 'Beautiful photo collection and gallery',
-    siteName = 'Photo Gallery',
+    title = 'Afilmory',
+    description = 'Capturing beautiful moments in life, documenting daily warmth and emotions through my lens.',
+    siteName = 'Afilmory',
     siteUrl,
   } = options
 

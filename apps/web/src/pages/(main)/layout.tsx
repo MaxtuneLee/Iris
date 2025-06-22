@@ -1,18 +1,27 @@
+import { photoLoader } from '@afilmory/data'
 import { siteConfig } from '@config'
-import { photoLoader } from '@photo-gallery/data'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { useEffect, useRef } from 'react'
-import { Outlet, useParams, useSearchParams } from 'react-router'
+import {
+  Outlet,
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from 'react-router'
 
 import { gallerySettingAtom } from '~/atoms/app'
+import { ScrollElementContext } from '~/components/ui/scroll-areas/ctx'
 import { ScrollArea } from '~/components/ui/scroll-areas/ScrollArea'
+import { useMobile } from '~/hooks/useMobile'
 import { usePhotoViewer } from '~/hooks/usePhotoViewer'
 import { MasonryRoot } from '~/modules/gallery/MasonryRoot'
 
 export const Component = () => {
   useStateRestoreFromUrl()
   useSyncStateToUrl()
-  useSyncStateToUrl()
+
+  const isMobile = useMobile()
 
   return (
     <>
@@ -30,18 +39,25 @@ export const Component = () => {
         />
       )}
 
-      <ScrollArea
-        rootClassName={'h-svh w-full transition-opacity duration-300'}
-        viewportClassName="size-full"
-      >
-        <MasonryRoot />
-      </ScrollArea>
+      {isMobile ? (
+        <ScrollElementContext value={document.body}>
+          <MasonryRoot />
+        </ScrollElementContext>
+      ) : (
+        <ScrollArea
+          rootClassName={'h-svh w-full'}
+          viewportClassName="size-full"
+        >
+          <MasonryRoot />
+        </ScrollArea>
+      )}
 
       <Outlet />
     </>
   )
 }
 
+let isRestored = false
 const useStateRestoreFromUrl = () => {
   const triggerOnceRef = useRef(false)
 
@@ -53,6 +69,7 @@ const useStateRestoreFromUrl = () => {
   useEffect(() => {
     if (triggerOnceRef.current) return
     triggerOnceRef.current = true
+    isRestored = true
 
     if (photoId) {
       const photo = photoLoader
@@ -76,8 +93,29 @@ const useStateRestoreFromUrl = () => {
 const useSyncStateToUrl = () => {
   const { selectedTags } = useAtomValue(gallerySettingAtom)
   const [_, setSearchParams] = useSearchParams()
+  const navigate = useNavigate()
+
+  const location = useLocation()
+  const { isOpen, currentIndex } = usePhotoViewer()
 
   useEffect(() => {
+    if (!isRestored) return
+
+    if (!isOpen) {
+      const timer = setTimeout(() => {
+        navigate('/')
+      }, 500)
+      return () => clearTimeout(timer)
+    }
+    const photos = photoLoader.getPhotos()
+    const targetPathname = `/${photos[currentIndex].id}`
+    if (location.pathname !== targetPathname) {
+      navigate(targetPathname)
+    }
+  }, [currentIndex, isOpen, location.pathname, navigate])
+
+  useEffect(() => {
+    if (!isRestored) return
     const tags = selectedTags.join(',')
     if (tags) {
       setSearchParams((search) => {

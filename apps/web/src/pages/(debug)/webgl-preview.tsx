@@ -1,4 +1,4 @@
-import { WebGLImageViewer } from '@photo-gallery/webgl-viewer'
+import { WebGLImageViewer } from '@afilmory/webgl-viewer'
 import { useState } from 'react'
 
 import { Button } from '~/components/ui/button'

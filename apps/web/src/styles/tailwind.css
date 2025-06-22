@@ -58,13 +58,13 @@
   --radius-sm: calc(var(--radius) - 4px);
 
   /* Font families */
-  --font-family-sans: 'Geist Sans', ui-sans-serif, system-ui, sans-serif;
-  --font-family-serif:
+  --font-sans: Geist, ui-sans-serif, system-ui, sans-serif;
+  --font-serif:
     'Noto Serif CJK SC', 'Noto Serif SC', var(--font-serif),
     'Source Han Serif SC', 'Source Han Serif', source-han-serif-sc, SongTi SC,
     SimSum, 'Hiragino Sans GB', system-ui, -apple-system, Segoe UI, Roboto,
     Helvetica, 'Microsoft YaHei', 'WenQuanYi Micro Hei', sans-serif;
-  --font-family-mono:
+  --font-mono:
     'OperatorMonoSSmLig Nerd Font', 'Cascadia Code PL',
     'FantasqueSansMono Nerd Font', 'operator mono', JetBrainsMono,
     'Fira code Retina', 'Fira code', Consolas, Monaco, 'Hannotate SC',
@@ -112,47 +112,6 @@ html body {
 
 *:not(input):not(textarea):not([contenteditable='true']):focus-visible {
   outline: 0 !important;
-}
-
-@font-face {
-  font-family: 'Geist Sans';
-  src: url('../assets/fonts/GeistVF.woff2') format('woff2');
-  font-style: normal;
-  font-weight: 100 900;
-}
-
-body {
-  font-feature-settings:
-    'rlig' 1,
-    'calt' 1;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: transparent;
-  border: 3px solid theme(colors.gray.300);
-  @apply rounded-xl;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  border-color: theme(colors.zinc.500/0.8);
-}
-
-::-webkit-scrollbar {
-  width: 6px !important;
-  height: 6px !important;
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  border: 3px solid theme(colors.zinc.500);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: theme(colors.zinc.500/0.5);
-}
-
-::-webkit-scrollbar-corner {
-  background: theme(colors.zinc.100);
 }
 
 @layer components {

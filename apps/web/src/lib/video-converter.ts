@@ -1,3 +1,7 @@
+import { ArrayBufferTarget, Muxer } from 'mp4-muxer'
+
+import { getI18n } from '~/i18n'
+
 import { isSafari } from './device-viewport'
 import { LRUCache } from './lru-cache'
 
@@ -53,19 +57,30 @@ export function isVideoConversionSupported(): boolean {
 // 使用简化的 MediaRecorder 方式转换视频
 function convertVideoWithWebCodecs(
   videoUrl: string,
+
   onProgress?: (progress: ConversionProgress) => void,
-  preferMp4 = true, // 新增参数：是否优先选择MP4格式
+  preferMp4 = true,
 ): Promise<ConversionResult> {
+  const { t } = getI18n()
   return new Promise((resolve) => {
-    const composeVideo = async () => {
+    let muxer: Muxer<ArrayBufferTarget> | null = null
+    let encoder: VideoEncoder | null = null
+    let conversionHasFailed = false
+
+    const cleanup = () => {
+      if (encoder?.state !== 'closed') encoder?.close()
+      muxer = null
+      encoder = null
+    }
+
+    const startConversion = async () => {
       try {
         onProgress?.({
           isConverting: true,
           progress: 0,
-          message: '正在初始化视频转换器...',
+          message: t('video.conversion.initializing'),
         })
 
-        // 创建视频元素来读取源视频
         const video = document.createElement('video')
         video.crossOrigin = 'anonymous'
         video.muted = true
@@ -74,267 +89,171 @@ function convertVideoWithWebCodecs(
         onProgress?.({
           isConverting: true,
           progress: 10,
-          message: '正在加载视频文件...',
+          message: t('video.conversion.loading'),
         })
 
-        // 等待视频加载
         await new Promise<void>((videoResolve, videoReject) => {
           video.onloadedmetadata = () => videoResolve()
-          video.onerror = () => videoReject(new Error('Failed to load video'))
+          video.onerror = (e) =>
+            videoReject(new Error(`Failed to load video metadata: ${e}`))
           video.src = videoUrl
         })
 
         const { videoWidth, videoHeight, duration } = video
-        const selectedFrameRate = 30 // 固定使用30fps
+        if (!duration || !Number.isFinite(duration)) {
+          throw new Error(t('video.conversion.duration.error'))
+        }
+        const frameRate = 30 // Desired frame rate
 
         console.info(
-          `Original video: ${videoWidth}x${videoHeight}, duration: ${duration}s`,
+          `Original video: ${videoWidth}x${videoHeight}, duration: ${duration.toFixed(
+            2,
+          )}s`,
         )
+
+        let mimeType = 'video/webm; codecs=vp9'
+        let codec = 'vp09.00.10.08' // VP9, profile 0, level 1.0, 8-bit
+        let outputFormat = 'WebM'
+
+        if (preferMp4) {
+          const avcConfigs = [
+            // From highest quality/level to lowest
+            { codec: 'avc1.640033', name: 'H.264 High @L5.1' }, // 4K+
+            { codec: 'avc1.64002A', name: 'H.264 High @L4.2' }, // 1080p
+            { codec: 'avc1.4D4029', name: 'H.264 Main @L4.1' }, // 1080p
+            { codec: 'avc1.42E01F', name: 'H.264 Baseline @L3.1' }, // 720p
+          ]
+
+          for (const config of avcConfigs) {
+            if (
+              await VideoEncoder.isConfigSupported({
+                codec: config.codec,
+                width: videoWidth,
+                height: videoHeight,
+              })
+            ) {
+              mimeType = `video/mp4; codecs=${config.codec}`
+              codec = config.codec
+              outputFormat = 'MP4'
+              console.info(
+                `Using supported codec: ${config.name} (${config.codec})`,
+              )
+              break
+            }
+          }
+        }
+
+        if (outputFormat === 'WebM' && preferMp4) {
+          console.warn(t('video.conversion.codec.fallback'))
+        }
+
+        console.info(`Target format: ${outputFormat} (${codec})`)
+
+        muxer = new Muxer({
+          target: new ArrayBufferTarget(),
+          video: {
+            codec: outputFormat === 'MP4' ? 'avc' : 'vp9',
+            width: videoWidth,
+            height: videoHeight,
+            frameRate,
+          },
+          fastStart: 'fragmented',
+          firstTimestampBehavior: 'offset',
+        })
+
+        encoder = new VideoEncoder({
+          output: (chunk, meta) => {
+            if (conversionHasFailed) return
+            muxer!.addVideoChunk(chunk, meta)
+          },
+          error: (e) => {
+            if (conversionHasFailed) return
+            conversionHasFailed = true
+            console.error('VideoEncoder error:', e)
+            resolve({ success: false, error: e.message })
+          },
+        })
+        encoder.configure({
+          codec,
+          width: videoWidth,
+          height: videoHeight,
+          bitrate: 5_000_000, // 5 Mbps
+          framerate: frameRate,
+        })
+
+        const totalFrames = Math.floor(duration * frameRate)
 
         onProgress?.({
           isConverting: true,
           progress: 20,
-          message: '正在提取视频帧...',
+          message: t('video.conversion.starting'),
         })
 
-        // 创建Canvas用于录制
-        const canvas = document.createElement('canvas')
-        canvas.width = videoWidth
-        canvas.height = videoHeight
-        const ctx = canvas.getContext('2d')
-
-        if (!ctx) {
-          throw new Error('无法创建Canvas上下文')
-        }
-
-        // 提取帧 - 按固定帧率提取视频的每一帧
-        const totalFrames = Math.floor(duration * selectedFrameRate)
-        const frameInterval = 1 / selectedFrameRate // 每帧的时间间隔（秒）
-
-        interface Frame {
-          timestamp: number
-          canvas: HTMLCanvasElement
-        }
-
-        const frames: Frame[] = []
-
+        const frameInterval = 1 / frameRate
         for (let i = 0; i < totalFrames; i++) {
-          const timestamp = i * frameInterval
-
-          // 确保不超过视频总时长
-          if (timestamp >= duration) break
-
-          video.currentTime = timestamp
-
-          // 等待视频跳转到指定时间
-          await new Promise<void>((frameResolve) => {
-            const onSeeked = () => {
-              video.removeEventListener('seeked', onSeeked)
-              frameResolve()
-            }
-
-            const onTimeUpdate = () => {
-              if (Math.abs(video.currentTime - timestamp) < 0.1) {
-                video.removeEventListener('timeupdate', onTimeUpdate)
-                frameResolve()
-              }
-            }
-
-            video.addEventListener('seeked', onSeeked)
-            video.addEventListener('timeupdate', onTimeUpdate)
-
-            // 超时保护
-            setTimeout(() => {
-              video.removeEventListener('seeked', onSeeked)
-              video.removeEventListener('timeupdate', onTimeUpdate)
-              frameResolve()
-            }, 1000)
-          })
-
-          // 绘制当前帧到Canvas
-          ctx.drawImage(video, 0, 0, videoWidth, videoHeight)
-
-          // 创建帧的Canvas副本
-          const frameCanvas = document.createElement('canvas')
-          frameCanvas.width = videoWidth
-          frameCanvas.height = videoHeight
-          const frameCtx = frameCanvas.getContext('2d')
-
-          if (frameCtx) {
-            frameCtx.drawImage(canvas, 0, 0)
-
-            frames.push({
-              timestamp: timestamp * 1000000, // 转换为微秒
-              canvas: frameCanvas,
-            })
+          if (conversionHasFailed) {
+            console.warn(t('video.conversion.encoder.error'))
+            return
           }
 
-          // 更新提取进度
-          const extractProgress = 20 + ((i + 1) / totalFrames) * 30
+          const time = i * frameInterval
+          video.currentTime = time
+          await new Promise((r) => (video.onseeked = r))
+
+          const frame = new VideoFrame(video, {
+            timestamp: time * 1_000_000,
+            duration: frameInterval * 1_000_000,
+          })
+
+          await encoder.encode(frame)
+          frame.close()
+
+          const progress = 20 + ((i + 1) / totalFrames) * 70
           onProgress?.({
             isConverting: true,
-            progress: extractProgress,
-            message: `正在提取视频帧... ${i + 1}/${totalFrames}`,
+            progress,
+            message: t('video.conversion.converting', {
+              current: i + 1,
+              total: totalFrames,
+            }),
           })
         }
 
-        if (frames.length === 0) {
-          throw new Error('没有可用的帧来合成视频')
-        }
+        if (conversionHasFailed) return
+
+        await encoder.flush()
+        muxer.finalize()
+
+        const { buffer } = muxer.target
+        const blob = new Blob([buffer], { type: mimeType })
+        const url = URL.createObjectURL(blob)
 
         onProgress?.({
-          isConverting: true,
-          progress: 50,
-          message: '正在检测编码器支持...',
+          isConverting: false,
+          progress: 100,
+          message: t('video.conversion.complete'),
         })
 
-        // 检查浏览器支持的MIME类型，优先选择用户偏好
-        let mimeType = 'video/webm;codecs=vp9'
-        let outputFormat = 'WebM'
-
-        if (preferMp4) {
-          // 尝试MP4格式
-          const mp4Types = [
-            'video/mp4;codecs=avc1.64002A', // H.264 High Profile
-            'video/mp4;codecs=avc1.4D4029', // H.264 Main Profile
-            'video/mp4;codecs=avc1.42E01E', // H.264 Baseline
-            'video/mp4',
-          ]
-
-          for (const type of mp4Types) {
-            if (MediaRecorder.isTypeSupported(type)) {
-              mimeType = type
-              outputFormat = 'MP4'
-              break
-            }
-          }
-        }
-
-        // 如果MP4不支持或不偏好MP4，使用WebM
-        if (outputFormat !== 'MP4') {
-          const webmTypes = [
-            'video/webm;codecs=vp9',
-            'video/webm;codecs=vp8',
-            'video/webm',
-          ]
-
-          for (const type of webmTypes) {
-            if (MediaRecorder.isTypeSupported(type)) {
-              mimeType = type
-              outputFormat = 'WebM'
-              break
-            }
-          }
-        }
-
-        console.info(`Using MediaRecorder with mimeType: ${mimeType}`)
-        console.info(`Output format: ${outputFormat}`)
-
-        onProgress?.({
-          isConverting: true,
-          progress: 60,
-          message: `正在使用 ${outputFormat} 编码器合成视频...`,
-        })
-
-        // 设置MediaRecorder
-        const stream = canvas.captureStream(selectedFrameRate)
-        const mediaRecorder = new MediaRecorder(stream, {
-          mimeType,
-          videoBitsPerSecond: 5000000, // 5Mbps for good quality
-        })
-
-        const chunks: Blob[] = []
-
-        return new Promise<void>((composeResolve, composeReject) => {
-          mediaRecorder.ondataavailable = (event) => {
-            if (event.data.size > 0) {
-              chunks.push(event.data)
-            }
-          }
-
-          mediaRecorder.onstop = () => {
-            const blob = new Blob(chunks, { type: mimeType })
-            const url = URL.createObjectURL(blob)
-
-            onProgress?.({
-              isConverting: false,
-              progress: 100,
-              message: '转换完成',
-            })
-
-            resolve({
-              success: true,
-              videoUrl: url,
-              convertedSize: blob.size,
-              method: 'webcodecs',
-            })
-            composeResolve()
-          }
-
-          mediaRecorder.onerror = (event) => {
-            console.error('MediaRecorder error:', event)
-            resolve({
-              success: false,
-              error: '录制过程中发生错误',
-            })
-            composeReject(new Error('录制过程中发生错误'))
-          }
-
-          // 开始录制
-          mediaRecorder.start(100) // 每100ms收集一次数据
-
-          let frameIndex = 0
-          const frameDuration = 1000 / selectedFrameRate // 毫秒
-
-          const renderFrame = () => {
-            if (frameIndex >= frames.length) {
-              // 录制完成
-              mediaRecorder.stop()
-              return
-            }
-
-            const frame = frames[frameIndex]
-
-            // 绘制帧到Canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height)
-            ctx.drawImage(frame.canvas, 0, 0)
-
-            // 更新进度
-            const progress = 60 + ((frameIndex + 1) / frames.length) * 30
-            onProgress?.({
-              isConverting: true,
-              progress,
-              message: `正在合成视频... ${frameIndex + 1}/${frames.length}`,
-            })
-
-            frameIndex++
-
-            // 使用requestAnimationFrame和setTimeout来控制帧率
-            if (frameIndex < frames.length) {
-              setTimeout(() => {
-                requestAnimationFrame(renderFrame)
-              }, frameDuration)
-            } else {
-              // 最后一帧，停止录制
-              setTimeout(() => {
-                mediaRecorder.stop()
-              }, frameDuration)
-            }
-          }
-
-          // 开始渲染第一帧
-          requestAnimationFrame(renderFrame)
+        resolve({
+          success: true,
+          videoUrl: url,
+          convertedSize: blob.size,
+          method: 'webcodecs',
         })
       } catch (error) {
         console.error('Video conversion failed:', error)
         resolve({
           success: false,
-          error: error instanceof Error ? error.message : '视频转换失败',
+          error:
+            error instanceof Error
+              ? error.message
+              : t('video.conversion.failed'),
         })
+      } finally {
+        cleanup()
       }
     }
-
-    composeVideo()
+    startConversion()
   })
 }
 
@@ -379,10 +298,12 @@ export function needsVideoConversion(url: string): boolean {
 
 export async function convertMovToMp4(
   videoUrl: string,
+
   onProgress?: (progress: ConversionProgress) => void,
   forceReconvert = false, // 添加强制重新转换参数
   preferMp4 = true, // 新增参数：是否优先选择MP4格式
 ): Promise<ConversionResult> {
+  const { t } = getI18n()
   // Check cache first, unless forced to reconvert
   if (!forceReconvert) {
     const cachedResult = videoCache.get(videoUrl)
@@ -391,7 +312,7 @@ export async function convertMovToMp4(
       onProgress?.({
         isConverting: false,
         progress: 100,
-        message: '使用缓存结果',
+        message: t('video.conversion.cached.result'),
       })
       console.info(`Cached video conversion result:`, cachedResult)
       return cachedResult
@@ -410,7 +331,7 @@ export async function convertMovToMp4(
     onProgress?.({
       isConverting: true,
       progress: 0,
-      message: '使用高质量 WebCodecs 转换器...',
+      message: t('video.conversion.webcodecs.high.quality'),
     })
 
     const result = await convertVideoWithWebCodecs(
@@ -431,11 +352,11 @@ export async function convertMovToMp4(
     return result
   }
 
-  console.info('WebCodecs not supported, falling back to FFmpeg...')
+  console.error('WebCodecs not supported.')
 
   const fallbackResult = {
     success: false,
-    error: 'WebCodecs not supported in this browser',
+    error: t('video.conversion.webcodecs.not.supported'),
   }
 
   return fallbackResult

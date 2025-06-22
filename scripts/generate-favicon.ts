@@ -111,8 +111,8 @@ export async function generateFavicons() {
 
     // 生成 site.webmanifest
     const manifest = {
-      name: 'Photo Gallery',
-      short_name: 'Gallery',
+      name: 'Afilmory',
+      short_name: 'Afilmory',
       icons: [
         {
           src: '/android-chrome-192x192.png',

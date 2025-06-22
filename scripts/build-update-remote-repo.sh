@@ -1,5 +1,5 @@
 set -e
-pnpm --filter=@photo-gallery/web run build:manifest
+pnpm --filter=@afilmory/builder run cli
 
 cd apps/web/assets-git
 

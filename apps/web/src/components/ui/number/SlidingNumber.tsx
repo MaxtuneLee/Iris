@@ -6,6 +6,7 @@ import * as React from 'react'
 import useMeasure from 'react-use-measure'
 
 import { clsxm } from '~/lib/cn'
+import { Spring } from '~/lib/spring'
 
 type SlidingNumberRollerProps = {
   prevValue: number
@@ -109,11 +110,7 @@ function SlidingNumber({
   padStart = false,
   decimalSeparator = '.',
   decimalPlaces = 0,
-  transition = {
-    stiffness: 200,
-    damping: 20,
-    mass: 0.4,
-  },
+  transition = Spring.presets.snappy,
   ...props
 }: SlidingNumberProps) {
   const localRef = React.useRef<HTMLSpanElement>(null)

@@ -28,13 +28,16 @@
         "./package.json"
       ],
       "@config": [
-        "../../config/site.config.ts"
+        "../../site.config.ts"
       ],
       "@builder": [
         "../../builder.config.ts"
       ],
       "@env": [
         "../../env.ts"
+      ],
+      "@locales/*": [
+        "../../locales/*"
       ]
     },
   },

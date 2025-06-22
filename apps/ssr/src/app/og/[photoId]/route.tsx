@@ -1,4 +1,5 @@
-import { photoLoader } from '@photo-gallery/data'
+import { photoLoader } from '@afilmory/data'
+import { siteConfig } from '@config'
 import { ImageResponse } from 'next/og'
 import type { NextRequest } from 'next/server'
 
@@ -20,9 +21,9 @@ export const GET = async (
 
   try {
     // 格式化拍摄时间
-    const dateTaken = photo.exif?.Photo?.DateTimeOriginal || photo.lastModified
+    const dateTaken = photo.exif?.DateTimeOriginal || photo.lastModified
     const formattedDate = dateTaken
-      ? new Date(dateTaken).toLocaleDateString('zh-CN')
+      ? new Date(dateTaken).toLocaleDateString('en-US')
       : ''
 
     // 处理标签
@@ -32,29 +33,16 @@ export const GET = async (
     const formatExifInfo = () => {
       if (!photo.exif) return null
 
-      const photoExif = photo.exif.Photo || {}
-      const imageExif = photo.exif.Image || {}
-
       const info = {
-        focalLength: photoExif.FocalLengthIn35mmFilm
-          ? `${Math.round(photoExif.FocalLengthIn35mmFilm)}mm`
-          : null,
-        aperture: photoExif.FNumber ? `f/${photoExif.FNumber}` : null,
-        iso: photoExif.ISOSpeedRatings || imageExif.ISOSpeedRatings || null,
-        shutterSpeed: null as string | null,
+        focalLength:
+          photo.exif.FocalLengthIn35mmFormat || photo.exif.FocalLength,
+        aperture: photo.exif.FNumber ? `f/${photo.exif.FNumber}` : null,
+        iso: photo.exif.ISO || null,
+        shutterSpeed: `${photo.exif.ExposureTime}s`,
         camera:
-          imageExif.Make && imageExif.Model
-            ? `${imageExif.Make} ${imageExif.Model}`
+          photo.exif.Make && photo.exif.Model
+            ? `${photo.exif.Make} ${photo.exif.Model}`
             : null,
-      }
-
-      // Format shutter speed
-      const exposureTime = photoExif.ExposureTime
-      if (exposureTime) {
-        info.shutterSpeed =
-          exposureTime >= 1
-            ? `${exposureTime}s`
-            : `1/${Math.round(1 / exposureTime)}`
       }
 
       return info
@@ -75,6 +63,43 @@ export const GET = async (
       ).then((res) => res.arrayBuffer()),
     ])
 
+    // 计算图片显示尺寸以保持原始比例
+    const imageWidth = photo.width || 1
+    const imageHeight = photo.height || 1
+    const aspectRatio = imageWidth / imageHeight
+
+    // 胶片框的最大尺寸
+    const maxFrameWidth = 500
+    const maxFrameHeight = 420
+
+    // 计算胶片框尺寸（保持图片比例）
+    let frameWidth = maxFrameWidth
+    let frameHeight = maxFrameHeight
+
+    if (aspectRatio > maxFrameWidth / maxFrameHeight) {
+      // 图片较宽，以宽度为准
+      frameHeight = maxFrameWidth / aspectRatio
+    } else {
+      // 图片较高，以高度为准
+      frameWidth = maxFrameHeight * aspectRatio
+    }
+
+    // 图片区域尺寸（减去胶片边框）
+    const imageAreaWidth = frameWidth - 70
+    const imageAreaHeight = frameHeight - 70
+
+    // 计算实际图片显示尺寸
+    let displayWidth = imageAreaWidth
+    let displayHeight = imageAreaHeight
+
+    if (aspectRatio > imageAreaWidth / imageAreaHeight) {
+      // 图片较宽，以宽度为准
+      displayHeight = imageAreaWidth / aspectRatio
+    } else {
+      // 图片较高，以高度为准
+      displayWidth = imageAreaHeight * aspectRatio
+    }
+
     return new ImageResponse(
       (
         <div
@@ -87,7 +112,7 @@ export const GET = async (
             justifyContent: 'space-between',
             background:
               'linear-gradient(145deg, #0d0d0d 0%, #1c1c1c 20%, #121212 40%, #1a1a1a 60%, #0f0f0f 80%, #0a0a0a 100%)',
-            padding: '60px',
+            padding: '80px',
             fontFamily: 'Geist, system-ui, -apple-system, sans-serif',
             position: 'relative',
           }}
@@ -308,16 +333,16 @@ export const GET = async (
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'flex-start',
-              maxWidth: '55%',
+              maxWidth: '58%',
             }}
           >
             {/* 标题 */}
             <h1
               style={{
-                fontSize: '66px',
+                fontSize: '80px',
                 fontWeight: 'bold',
                 color: 'white',
-                margin: '0 0 24px 0',
+                margin: '0 0 16px 0',
                 lineHeight: '1.1',
                 letterSpacing: '1px',
                 display: 'flex',
@@ -329,16 +354,16 @@ export const GET = async (
             {/* 描述 */}
             <p
               style={{
-                fontSize: '30px',
+                fontSize: '36px',
                 color: 'rgba(255,255,255,0.9)',
-                margin: '0 0 24px 0',
+                margin: '0 0 16px 0',
                 lineHeight: '1.3',
                 letterSpacing: '0.3px',
                 display: 'flex',
                 fontFamily: 'Geist, SF Pro Display',
               }}
             >
-              {photo.description || 'Beautiful photography'}
+              {photo.description || siteConfig.name || siteConfig.title}
             </p>
 
             {/* 标签 */}
@@ -347,19 +372,19 @@ export const GET = async (
                 style={{
                   display: 'flex',
                   flexWrap: 'wrap',
-                  gap: '12px',
-                  margin: '0 0 24px 0',
+                  gap: '16px',
+                  margin: '0 0 32px 0',
                 }}
               >
                 {photo.tags?.slice(0, 3).map((tag, index) => (
                   <div
                     key={index}
                     style={{
-                      fontSize: '22px',
+                      fontSize: '26px',
                       color: 'rgba(255,255,255,0.9)',
                       backgroundColor: 'rgba(255,255,255,0.15)',
-                      padding: '8px 16px',
-                      borderRadius: '20px',
+                      padding: '12px 20px',
+                      borderRadius: '24px',
                       letterSpacing: '0.3px',
                       display: 'flex',
                       alignItems: 'center',
@@ -382,8 +407,8 @@ export const GET = async (
                 position: 'absolute',
                 top: '75px',
                 right: '45px',
-                width: '420px',
-                height: '360px',
+                width: `${frameWidth}px`,
+                height: `${frameHeight}px`,
                 background: 'linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%)',
                 borderRadius: '6px',
                 border: '1px solid #2a2a2a',
@@ -580,25 +605,37 @@ export const GET = async (
                   position: 'absolute',
                   left: '30px',
                   top: '30px',
-                  width: '360px',
-                  height: '300px',
+                  width: `${imageAreaWidth}px`,
+                  height: `${imageAreaHeight}px`,
                   background: '#000',
                   borderRadius: '2px',
                   border: '2px solid #1a1a1a',
                   overflow: 'hidden',
                   display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                   boxShadow: 'inset 0 0 8px rgba(0,0,0,0.5)',
                 }}
               >
-                <img
-                  // @ts-expect-error
-                  src={thumbnailBuffer}
+                <div
                   style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
+                    position: 'relative',
+                    width: `${displayWidth}px`,
+                    height: `${displayHeight}px`,
+                    overflow: 'hidden',
+                    display: 'flex',
                   }}
-                />
+                >
+                  <img
+                    // @ts-expect-error
+                    src={thumbnailBuffer}
+                    style={{
+                      width: `${displayWidth}px`,
+                      height: `${displayHeight}px`,
+                      objectFit: 'cover',
+                    }}
+                  />
+                </div>
 
                 {/* 胶片光泽效果 - 更柔和 */}
                 <div
@@ -621,7 +658,7 @@ export const GET = async (
                   position: 'absolute',
                   top: '0',
                   left: '30px',
-                  right: '30px',
+                  width: `${imageAreaWidth}px`,
                   height: '30px',
                   background:
                     'linear-gradient(180deg, #1a1a1a 0%, #2a2a2a 30%, #1a1a1a 100%)',
@@ -633,7 +670,7 @@ export const GET = async (
                   position: 'absolute',
                   bottom: '0',
                   left: '30px',
-                  right: '30px',
+                  width: `${imageAreaWidth}px`,
                   height: '30px',
                   background:
                     'linear-gradient(180deg, #1a1a1a 0%, #2a2a2a 30%, #1a1a1a 100%)',
@@ -647,7 +684,7 @@ export const GET = async (
                   position: 'absolute',
                   bottom: '8px',
                   right: '38px',
-                  fontSize: '12px',
+                  fontSize: '14px',
                   color: '#555',
                   fontFamily: 'monospace',
                   letterSpacing: '0.5px',
@@ -679,19 +716,19 @@ export const GET = async (
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'flex-start',
-              gap: '21px',
+              gap: '28px',
             }}
           >
             {/* 拍摄时间 */}
             {formattedDate && (
               <div
                 style={{
-                  fontSize: '24px',
+                  fontSize: '28px',
                   color: 'rgba(255,255,255,0.7)',
                   letterSpacing: '0.3px',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '9px',
+                  gap: '12px',
                 }}
               >
                 📸 {formattedDate}
@@ -701,7 +738,7 @@ export const GET = async (
             {exifInfo?.camera && (
               <div
                 style={{
-                  fontSize: '21px',
+                  fontSize: '25px',
                   color: 'rgba(255,255,255,0.6)',
                   letterSpacing: '0.3px',
                   display: 'flex',
@@ -720,8 +757,8 @@ export const GET = async (
                   style={{
                     display: 'flex',
                     flexWrap: 'wrap',
-                    gap: '15px',
-                    fontSize: '21px',
+                    gap: '18px',
+                    fontSize: '25px',
                     color: 'rgba(255,255,255,0.8)',
                   }}
                 >
@@ -730,10 +767,10 @@ export const GET = async (
                       style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '6px',
+                        gap: '8px',
                         backgroundColor: 'rgba(255,255,255,0.1)',
-                        padding: '9px 15px',
-                        borderRadius: '9px',
+                        padding: '12px 18px',
+                        borderRadius: '12px',
                         backdropFilter: 'blur(8px)',
                       }}
                     >
@@ -746,10 +783,10 @@ export const GET = async (
                       style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '6px',
+                        gap: '8px',
                         backgroundColor: 'rgba(255,255,255,0.1)',
-                        padding: '9px 15px',
-                        borderRadius: '9px',
+                        padding: '12px 18px',
+                        borderRadius: '12px',
                         backdropFilter: 'blur(8px)',
                       }}
                     >
@@ -762,10 +799,10 @@ export const GET = async (
                       style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '6px',
+                        gap: '8px',
                         backgroundColor: 'rgba(255,255,255,0.1)',
-                        padding: '9px 15px',
-                        borderRadius: '9px',
+                        padding: '12px 18px',
+                        borderRadius: '12px',
                         backdropFilter: 'blur(8px)',
                       }}
                     >
@@ -778,10 +815,10 @@ export const GET = async (
                       style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '6px',
+                        gap: '8px',
                         backgroundColor: 'rgba(255,255,255,0.1)',
-                        padding: '9px 15px',
-                        borderRadius: '9px',
+                        padding: '12px 18px',
+                        borderRadius: '12px',
                         backdropFilter: 'blur(8px)',
                       }}
                     >

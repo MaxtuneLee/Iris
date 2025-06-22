@@ -1,5 +1,6 @@
 import { repository } from '@pkg'
 import { useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { isRouteErrorResponse, useRouteError } from 'react-router'
 
 import { attachOpenInEditor } from '~/lib/dev'
@@ -7,6 +8,7 @@ import { attachOpenInEditor } from '~/lib/dev'
 import { Button } from '../ui/button'
 
 export function ErrorElement() {
+  const { t } = useTranslation()
   const error = useRouteError()
   const message = isRouteErrorResponse(error)
     ? `${error.status} ${error.statusText}`
@@ -36,9 +38,7 @@ export function ErrorElement() {
       <div className="fixed inset-x-0 top-0 h-12" />
       <div className="center flex flex-col">
         <i className="i-mingcute-bug-fill size-12 text-red-400" />
-        <h2 className="mt-12 text-2xl">
-          Sorry, the app has encountered an error
-        </h2>
+        <h2 className="mt-12 text-2xl">{t('error.title')}</h2>
       </div>
       <h3 className="text-xl">{message}</h3>
       {import.meta.env.DEV && stack ? (
@@ -47,17 +47,16 @@ export function ErrorElement() {
         </div>
       ) : null}
 
-      <p className="my-8">
-        The App has a temporary problem, click the button below to try reloading
-        the app or another solution?
-      </p>
+      <p className="my-8">{t('error.temporary.description')}</p>
 
       <div className="center gap-4">
-        <Button onClick={() => (window.location.href = '/')}>Reload</Button>
+        <Button onClick={() => (window.location.href = '/')}>
+          {t('error.reload')}
+        </Button>
       </div>
 
       <p className="mt-8">
-        Still having this issue? Please give feedback in Github, thanks!
+        {t('error.feedback')}
         <a
           className="text-accent ml-2 cursor-pointer duration-200"
           href={`${repository.url}/issues/new?title=${encodeURIComponent(
@@ -68,7 +67,7 @@ export function ErrorElement() {
           target="_blank"
           rel="noreferrer"
         >
-          Submit Issue
+          {t('error.submit.issue')}
         </a>
       </p>
       <div className="grow" />

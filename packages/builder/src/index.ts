@@ -10,22 +10,18 @@ export { type Logger, logger, type WorkerLogger } from './logger/index.js'
 
 // 类型定义
 export type {
+  CompressedHistogramData,
+  HistogramData,
   ImageMetadata,
   PhotoInfo,
   PhotoManifestItem,
   ProcessPhotoResult,
   ThumbnailResult,
+  ToneAnalysis,
+  ToneType,
 } from './types/photo.js'
 
 // S3 操作
-export { s3Client } from './s3/client.js'
-export {
-  generateS3Url,
-  getImageFromS3,
-  listImagesFromS3,
-} from './s3/operations.js'
-
-// 图像处理
 export { generateBlurhash } from './image/blurhash.js'
 export { extractExifData } from './image/exif.js'
 export {
@@ -36,6 +32,12 @@ export {
   generateThumbnailAndBlurhash,
   thumbnailExists,
 } from './image/thumbnail.js'
+export { s3Client } from './s3/client.js'
+export {
+  generateS3Url,
+  getImageFromS3,
+  listImagesFromS3,
+} from './s3/operations.js'
 
 // 照片处理
 export { extractPhotoInfo } from './photo/info-extractor.js'
@@ -52,7 +54,7 @@ export {
   needsUpdate,
   saveManifest,
 } from './manifest/manager.js'
-
+export type { FujiRecipe, PickedExif } from './types/photo.js'
 // Worker 池
 export {
   type TaskFunction,

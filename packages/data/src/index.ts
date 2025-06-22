@@ -10,7 +10,7 @@ class PhotoLoader {
     this.getPhotos = this.getPhotos.bind(this)
     this.getPhoto = this.getPhoto.bind(this)
 
-    this.photos = PhotosManifest as unknown as PhotoManifest[]
+    this.photos = PhotosManifest.data as unknown as PhotoManifest[]
 
     this.photos.forEach((photo) => {
       this.photoMap[photo.id] = photo
@@ -34,3 +34,6 @@ class PhotoLoader {
   }
 }
 export const photoLoader = new PhotoLoader()
+
+export type { PhotoManifest } from './types'
+export type { PickedExif, ToneAnalysis } from '@afilmory/builder'

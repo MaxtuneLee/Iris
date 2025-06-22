@@ -1,6 +1,7 @@
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
 import { AnimatePresence, m } from 'motion/react'
 import { useCallback, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
 import { clsxm } from '~/lib/cn'
@@ -31,49 +32,50 @@ interface SocialShareOption {
   bgColor: string
 }
 
-// 社交媒体分享选项
-const socialOptions: SocialShareOption[] = [
-  {
-    id: 'twitter',
-    label: 'Twitter',
-    icon: 'i-mingcute-twitter-fill',
-    url: 'https://twitter.com/intent/tweet?text={text}&url={url}',
-    color: 'text-white',
-    bgColor: 'bg-sky-500',
-  },
-  {
-    id: 'facebook',
-    label: 'Facebook',
-    icon: 'i-mingcute-facebook-line',
-    url: 'https://www.facebook.com/sharer/sharer.php?u={url}',
-    color: 'text-white',
-    bgColor: 'bg-[#1877F2]',
-  },
-  {
-    id: 'telegram',
-    label: 'Telegram',
-    icon: 'i-mingcute-telegram-line',
-    url: 'https://t.me/share/url?url={url}&text={text}',
-    color: 'text-white',
-    bgColor: 'bg-[#0088CC]',
-  },
-  {
-    id: 'weibo',
-    label: '微博',
-    icon: 'i-mingcute-weibo-line',
-    url: 'https://service.weibo.com/share/share.php?url={url}&title={text}',
-    color: 'text-white',
-    bgColor: 'bg-[#E6162D]',
-  },
-]
-
 export const SharePanel = ({ photo, trigger, blobSrc }: SharePanelProps) => {
+  const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
+
+  // 社交媒体分享选项
+  const socialOptions: SocialShareOption[] = [
+    {
+      id: 'twitter',
+      label: 'Twitter',
+      icon: 'i-mingcute-twitter-fill',
+      url: 'https://twitter.com/intent/tweet?text={text}&url={url}',
+      color: 'text-white',
+      bgColor: 'bg-sky-500',
+    },
+    {
+      id: 'facebook',
+      label: 'Facebook',
+      icon: 'i-mingcute-facebook-line',
+      url: 'https://www.facebook.com/sharer/sharer.php?u={url}',
+      color: 'text-white',
+      bgColor: 'bg-[#1877F2]',
+    },
+    {
+      id: 'telegram',
+      label: 'Telegram',
+      icon: 'i-mingcute-telegram-line',
+      url: 'https://t.me/share/url?url={url}&text={text}',
+      color: 'text-white',
+      bgColor: 'bg-[#0088CC]',
+    },
+    {
+      id: 'weibo',
+      label: t('photo.share.weibo'),
+      icon: 'i-mingcute-weibo-line',
+      url: 'https://service.weibo.com/share/share.php?url={url}&title={text}',
+      color: 'text-white',
+      bgColor: 'bg-[#E6162D]',
+    },
+  ]
 
   const handleNativeShare = useCallback(async () => {
     const shareUrl = window.location.href
-    const shareTitle = photo.title || '照片分享'
-    const shareText = `查看这张精美的照片：${shareTitle}`
+    const shareTitle = photo.title || t('photo.share.default.title')
+    const shareText = t('photo.share.text', { title: shareTitle })
 
     try {
       // 优先使用 blobSrc（转换后的图片），如果没有则使用 originalUrl
@@ -104,27 +106,28 @@ export const SharePanel = ({ photo, trigger, blobSrc }: SharePanelProps) => {
     } catch {
       // 如果分享失败，复制链接
       await navigator.clipboard.writeText(shareUrl)
-      toast.success('链接已复制到剪贴板')
+      toast.success(t('photo.share.link.copied'))
       setIsOpen(false)
     }
-  }, [photo.title, blobSrc, photo.originalUrl])
+  }, [photo.title, blobSrc, photo.originalUrl, t])
 
   const handleCopyLink = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(window.location.href)
-      toast.success('链接已复制到剪贴板')
+      toast.success(t('photo.share.link.copied'))
       setIsOpen(false)
     } catch {
-      toast.error('复制失败')
+      toast.error(t('photo.share.copy.failed'))
     }
-  }, [])
+  }, [t])
 
   const handleSocialShare = useCallback(
     (url: string) => {
       const shareUrl = encodeURIComponent(window.location.href)
-      const shareTitle = encodeURIComponent(photo.title || '照片分享')
+      const defaultTitle = t('photo.share.default.title')
+      const shareTitle = encodeURIComponent(photo.title || defaultTitle)
       const shareText = encodeURIComponent(
-        `查看这张精美的照片：${photo.title || '照片分享'}`,
+        t('photo.share.text', { title: photo.title || defaultTitle }),
       )
 
       const finalUrl = url
@@ -135,7 +138,7 @@ export const SharePanel = ({ photo, trigger, blobSrc }: SharePanelProps) => {
       window.open(finalUrl, '_blank', 'width=600,height=400')
       setIsOpen(false)
     },
-    [photo.title],
+    [photo.title, t],
   )
 
   // 功能选项
@@ -144,7 +147,7 @@ export const SharePanel = ({ photo, trigger, blobSrc }: SharePanelProps) => {
       ? [
           {
             id: 'native-share',
-            label: '系统分享',
+            label: t('photo.share.system'),
             icon: 'i-mingcute-share-2-line',
             action: handleNativeShare,
             color: 'text-blue-500',
@@ -153,7 +156,7 @@ export const SharePanel = ({ photo, trigger, blobSrc }: SharePanelProps) => {
       : []),
     {
       id: 'copy-link',
-      label: '复制链接',
+      label: t('photo.share.copy.link'),
       icon: 'i-mingcute-link-line',
       action: handleCopyLink,
     },
@@ -188,7 +191,9 @@ export const SharePanel = ({ photo, trigger, blobSrc }: SharePanelProps) => {
               >
                 {/* 标题区域 */}
                 <div className="mb-4 text-center">
-                  <h3 className="text-text font-semibold">分享照片</h3>
+                  <h3 className="text-text font-semibold">
+                    {t('photo.share.title')}
+                  </h3>
                   {photo.title && (
                     <p className="text-text-secondary mt-1 line-clamp-1 text-sm">
                       {photo.title}
@@ -200,7 +205,7 @@ export const SharePanel = ({ photo, trigger, blobSrc }: SharePanelProps) => {
                 <div className="mb-6">
                   <div className="mb-3">
                     <h4 className="text-text-secondary text-xs font-medium tracking-wide uppercase">
-                      社交媒体
+                      {t('photo.share.social.media')}
                     </h4>
                   </div>
                   <div className="flex justify-center gap-4">
@@ -239,7 +244,7 @@ export const SharePanel = ({ photo, trigger, blobSrc }: SharePanelProps) => {
                 <div>
                   <div className="mb-3">
                     <h4 className="text-text-secondary text-xs font-medium tracking-wide uppercase">
-                      操作
+                      {t('photo.share.actions')}
                     </h4>
                   </div>
                   <div className="grid grid-cols-2 gap-1">

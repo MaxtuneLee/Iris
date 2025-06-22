@@ -1,3 +1,5 @@
+import { i18nAtom } from '~/i18n'
+import { jotaiStore } from '~/lib/jotai'
 import { LRUCache } from '~/lib/lru-cache'
 import {
   convertMovToMp4,
@@ -69,6 +71,37 @@ export class ImageLoaderManager {
   private currentXHR: XMLHttpRequest | null = null
   private delayTimer: NodeJS.Timeout | null = null
 
+  /**
+   * 验证 Blob 是否为有效的图片格式
+   */
+  private isValidImageBlob(blob: Blob): boolean {
+    // 检查 MIME 类型
+    const validImageTypes = [
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+      'image/webp',
+      'image/bmp',
+      'image/tiff',
+      'image/heic',
+      'image/heif',
+    ]
+
+    // 检查 Content-Type
+    if (!blob.type || !validImageTypes.includes(blob.type.toLowerCase())) {
+      console.warn(`Invalid image MIME type: ${blob.type}`)
+      return false
+    }
+
+    // 检查文件大小（至少应该有一些字节）
+    if (blob.size === 0) {
+      console.warn('Empty blob detected')
+      return false
+    }
+
+    return true
+  }
+
   async loadImage(
     src: string,
     callbacks: LoadingCallbacks = {},
@@ -89,13 +122,28 @@ export class ImageLoaderManager {
         xhr.onload = async () => {
           if (xhr.status === 200) {
             try {
+              // 验证响应是否为图片
+              const blob = xhr.response as Blob
+              if (!this.isValidImageBlob(blob)) {
+                onLoadingStateUpdate?.({
+                  isVisible: false,
+                })
+                onError?.()
+                reject(new Error('Response is not a valid image'))
+                return
+              }
+
               const result = await this.processImageBlob(
-                xhr.response,
+                blob,
                 src, // 传递原始 URL
                 callbacks,
               )
               resolve(result)
             } catch (error) {
+              onLoadingStateUpdate?.({
+                isVisible: false,
+              })
+              onError?.()
               reject(error)
             }
           } else {
@@ -222,9 +270,10 @@ export class ImageLoaderManager {
     const { onError: _onError, onLoadingStateUpdate } = callbacks
 
     // 如果是 HEIC 格式，进行转换
+    const i18n = jotaiStore.get(i18nAtom)
     onLoadingStateUpdate?.({
       isConverting: true,
-      conversionMessage: 'HEIC/HEIF 图片格式转换中...',
+      conversionMessage: i18n.t('loading.heic.converting'),
     })
 
     try {
@@ -331,15 +380,26 @@ export class ImageLoaderManager {
 
     console.info('Converting MOV video to MP4...')
 
+    const i18n = jotaiStore.get(i18nAtom)
+
     const result = await convertMovToMp4(livePhotoVideoUrl, (progress) => {
+      // 检查是否包含编码器信息（支持多语言）
+      const codecKeywords: string[] = [
+        i18n.t('video.codec.keyword'), // 翻译键
+        'encoder',
+        'codec',
+        '编码器', // 备用关键词
+      ]
+      const isCodecInfo = codecKeywords.some((keyword: string) =>
+        progress.message.toLowerCase().includes(keyword.toLowerCase()),
+      )
+
       onLoadingStateUpdate?.({
         isVisible: true,
         isConverting: progress.isConverting,
         loadingProgress: progress.progress,
         conversionMessage: progress.message,
-        codecInfo: progress.message.includes('编码器')
-          ? progress.message
-          : undefined,
+        codecInfo: isCodecInfo ? progress.message : undefined,
       })
     })
 

@@ -1,4 +1,5 @@
 import type { Logger } from '../logger/index.js'
+import { logger } from '../logger/index.js'
 
 export interface WorkerPoolOptions {
   concurrency: number
@@ -17,7 +18,7 @@ export class WorkerPool<T> {
   private taskIndex = 0
   private logger: Logger
 
-  constructor(options: WorkerPoolOptions, logger: Logger) {
+  constructor(options: WorkerPoolOptions) {
     this.concurrency = options.concurrency
     this.totalTasks = options.totalTasks
     this.logger = logger
@@ -61,8 +62,9 @@ export class WorkerPool<T> {
     }
 
     // 启动工作池
-    const workers = Array.from({ length: this.concurrency }, (_, i) =>
-      worker(i + 1),
+    const workers = Array.from(
+      { length: Math.min(this.concurrency, this.totalTasks) },
+      (_, i) => worker(i + 1),
     )
     await Promise.all(workers)
 

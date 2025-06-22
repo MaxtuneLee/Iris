@@ -21,7 +21,12 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "paths": {
+      "@config": [
+        "../../site.config.ts"
+      ]
+    }
   },
   "include": [
     "next-env.d.ts",

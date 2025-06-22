@@ -5,6 +5,10 @@
       "source.fixAll.eslint": "explicit"
     }
   },
+  "search.exclude": {
+    "**/node_modules": true,
+    ".specstory": true
+  },
   // If you do not want to autofix some rules on save
   // You can put this in your user settings or workspace settings
   "eslint.codeActionsOnSave.rules": [
@@ -35,5 +39,8 @@
       "rule": "unused-imports/no-unused-imports",
       "severity": "off"
     }
+  ],
+  "cSpell.words": [
+    "Afilmory"
   ]
 }

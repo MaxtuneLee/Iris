@@ -1,79 +1,33 @@
-import type { Exif } from 'exif-reader'
-import exifReader from 'exif-reader'
-import getRecipe from 'fuji-recipes'
+import { writeFileSync } from 'node:fs'
+import { mkdir, unlink } from 'node:fs/promises'
+import path from 'node:path'
+
+import { isNil, noop } from 'es-toolkit'
+import type { ExifDateTime, Tags } from 'exiftool-vendored'
+import { exiftool } from 'exiftool-vendored'
+import type { Metadata } from 'sharp'
 import sharp from 'sharp'
 
 import type { Logger } from '../logger/index.js'
+import type { PickedExif } from '../types/photo.js'
 
-// 清理 EXIF 数据中的空字符和无用信息
-function cleanExifData(exifData: any): any {
-  if (!exifData || typeof exifData !== 'object') {
-    return exifData
-  }
-
-  if (Array.isArray(exifData)) {
-    return exifData.map((item) => cleanExifData(item))
-  }
-
-  // 如果是 Date 对象，直接返回
-  if (exifData instanceof Date) {
-    return exifData
-  }
-
-  const cleaned: any = {}
-
-  // 重要的日期字段，不应该被过度清理
-  const importantDateFields = new Set([
-    'DateTimeOriginal',
-    'DateTime',
-    'DateTimeDigitized',
-    'CreateDate',
-    'ModifyDate',
-  ])
-
-  for (const [key, value] of Object.entries(exifData)) {
-    if (value === null || value === undefined) {
-      continue
-    }
-
-    if (typeof value === 'string') {
-      // 对于重要的日期字段，只移除空字符，不进行过度清理
-      if (importantDateFields.has(key)) {
-        const cleanedString = value.replaceAll('\0', '')
-        if (cleanedString.length > 0) {
-          cleaned[key] = cleanedString
-        }
-      } else {
-        // 对于其他字符串字段，移除空字符并清理空白字符
-        const cleanedString = value.replaceAll('\0', '').trim()
-        if (cleanedString.length > 0) {
-          cleaned[key] = cleanedString
-        }
-      }
-    } else if (value instanceof Date) {
-      // Date 对象直接保留
-      cleaned[key] = value
-    } else if (typeof value === 'object') {
-      // 递归清理嵌套对象
-      const cleanedNested = cleanExifData(value)
-      if (cleanedNested && Object.keys(cleanedNested).length > 0) {
-        cleaned[key] = cleanedNested
-      }
-    } else {
-      // 其他类型直接保留
-      cleaned[key] = value
-    }
-  }
-
-  return cleaned
-}
+const baseImageBuffer = sharp({
+  create: {
+    width: 1,
+    height: 1,
+    channels: 3,
+    background: { r: 255, g: 255, b: 255 },
+  },
+})
+  .jpeg()
+  .toBuffer()
 
 // 提取 EXIF 数据
 export async function extractExifData(
   imageBuffer: Buffer,
   originalBuffer?: Buffer,
   exifLogger?: Logger['exif'],
-): Promise<Exif | null> {
+): Promise<PickedExif | null> {
   const log = exifLogger
 
   try {
@@ -113,19 +67,40 @@ export async function extractExifData(
     }
     const exifBuffer = metadata.exif.subarray(startIndex)
 
-    // 使用 exif-reader 解析 EXIF 数据
-    const exifData = exifReader(exifBuffer)
+    const soi = Buffer.from([0xff, 0xd8])
+    const app1Marker = Buffer.from([0xff, 0xe1])
+    const exifLength = Buffer.alloc(2)
+    exifLength.writeUInt16BE(exifBuffer.length + 2, 0)
 
-    if (exifData.Photo?.MakerNote) {
-      const recipe = getRecipe(exifData.Photo.MakerNote)
-      ;(exifData as any).FujiRecipe = recipe
-      log?.info('检测到富士胶片配方信息')
-    }
+    const finalBuffer = Buffer.concat([
+      soi,
+      app1Marker,
+      exifLength,
+      exifBuffer as any,
+      (await baseImageBuffer).subarray(2),
+    ])
+    await mkdir('/tmp/image_process', { recursive: true })
+    const tempImagePath = path.resolve(
+      '/tmp/image_process',
+      `${crypto.randomUUID()}.jpg`,
+    )
 
-    delete exifData.Photo?.MakerNote
-    delete exifData.Photo?.UserComment
-    delete exifData.Photo?.PrintImageMatching
-    delete exifData.Image?.PrintImageMatching
+    writeFileSync(tempImagePath, finalBuffer)
+
+    const exifData = await exiftool.read(tempImagePath)
+    const result = handleExifData(exifData, metadata)
+    // const makerNote = exifReader(exifBuffer).Photo?.MakerNote
+
+    // if (makerNote) {
+    //   const recipe = getRecipe(makerNote)
+
+    //   if (recipe) {
+    //     ;(exifData as any).FujiRecipe = recipe
+    //     log?.info('检测到富士胶片配方信息')
+    //   }
+    // }
+
+    await unlink(tempImagePath).catch(noop)
 
     if (!exifData) {
       log?.warn('EXIF 数据解析失败')
@@ -133,12 +108,151 @@ export async function extractExifData(
     }
 
     // 清理 EXIF 数据中的空字符和无用数据
-    const cleanedExifData = cleanExifData(exifData)
+
+    delete exifData.warnings
+    delete exifData.errors
+
+    // const cleanedExifData = cleanExifData(exifData)
 
     log?.success('EXIF 数据提取完成')
-    return cleanedExifData
+    return result
   } catch (error) {
     log?.error('提取 EXIF 数据失败:', error)
     return null
   }
+}
+
+const pickKeys: Array<keyof Tags | (string & {})> = [
+  'tz',
+  'tzSource',
+  'Orientation',
+  'Make',
+  'Model',
+  'Software',
+  'Artist',
+  'Copyright',
+  'ExposureTime',
+
+  'FNumber',
+  'ExposureProgram',
+  'ISO',
+  'OffsetTime',
+  'OffsetTimeOriginal',
+  'OffsetTimeDigitized',
+  'ShutterSpeedValue',
+  'ApertureValue',
+  'BrightnessValue',
+  'ExposureCompensationSet',
+  'ExposureCompensationMode',
+  'ExposureCompensationSetting',
+
+  'ExposureCompensation',
+  'MaxApertureValue',
+  'LightSource',
+  'Flash',
+  'FocalLength',
+
+  'ColorSpace',
+  'ExposureMode',
+  'FocalLengthIn35mmFormat',
+  'SceneCaptureType',
+  'LensMake',
+  'LensModel',
+  'MeteringMode',
+  'WhiteBalance',
+  'WBShiftAB',
+  'WBShiftGM',
+  'WhiteBalanceBias',
+  'WhiteBalanceFineTune',
+  'FlashMeteringMode',
+  'SensingMethod',
+  'FocalPlaneXResolution',
+  'FocalPlaneYResolution',
+
+  'Aperture',
+  'ScaleFactor35efl',
+  'ShutterSpeed',
+  'LightValue',
+  // GPS
+  'GPSAltitude',
+  'GPSCoordinates',
+  'GPSAltitudeRef',
+  'GPSLatitude',
+  'GPSLatitudeRef',
+  'GPSLongitude',
+  'GPSLongitudeRef',
+]
+function handleExifData(exifData: Tags, metadata: Metadata): PickedExif {
+  const date = {
+    DateTimeOriginal: formatExifDate(exifData.DateTimeOriginal),
+    DateTimeDigitized: formatExifDate(exifData.DateTimeDigitized),
+    OffsetTime: exifData.OffsetTime,
+    OffsetTimeOriginal: exifData.OffsetTimeOriginal,
+    OffsetTimeDigitized: exifData.OffsetTimeDigitized,
+  }
+
+  let FujiRecipe: any = null
+  if (exifData.FilmMode) {
+    FujiRecipe = {
+      FilmMode: exifData.FilmMode,
+      GrainEffectRoughness: exifData.GrainEffectRoughness,
+      GrainEffectSize: exifData.GrainEffectSize,
+      ColorChromeEffect: exifData.ColorChromeEffect,
+      ColorChromeFxBlue: exifData.ColorChromeFXBlue,
+      WhiteBalance: exifData.WhiteBalance,
+      WhiteBalanceFineTune: exifData.WhiteBalanceFineTune,
+      DynamicRange: exifData.DynamicRange,
+      HighlightTone: exifData.HighlightTone,
+      ShadowTone: exifData.ShadowTone,
+      Saturation: exifData.Saturation,
+      Sharpness: exifData.Sharpness,
+      NoiseReduction: exifData.NoiseReduction,
+      Clarity: exifData.Clarity,
+      ColorTemperature: exifData.ColorTemperature,
+      DevelopmentDynamicRange: (exifData as any).DevelopmentDynamicRange,
+      DynamicRangeSetting: exifData.DynamicRangeSetting,
+    }
+  }
+
+  let SonyRecipe: any = null
+  if (!isNil(exifData.CreativeStyle)) {
+    SonyRecipe = {
+      CreativeStyle: exifData.CreativeStyle,
+      PictureEffect: exifData.PictureEffect,
+      Hdr: exifData.Hdr,
+      SoftSkinEffect: exifData.SoftSkinEffect,
+    }
+  }
+  const size = {
+    ImageWidth: exifData.ExifImageWidth || metadata.width,
+    ImageHeight: exifData.ExifImageHeight || metadata.height,
+  }
+  const result: any = structuredClone(exifData)
+  for (const key in result) {
+    Reflect.deleteProperty(result, key)
+  }
+  for (const key of pickKeys) {
+    result[key] = exifData[key]
+  }
+
+  return {
+    ...date,
+    ...size,
+    ...result,
+
+    ...(FujiRecipe ? { FujiRecipe } : {}),
+    ...(SonyRecipe ? { SonyRecipe } : {}),
+  }
+}
+
+const formatExifDate = (date: string | ExifDateTime | undefined) => {
+  if (!date) {
+    return
+  }
+
+  if (typeof date === 'string') {
+    return new Date(date).toISOString()
+  }
+
+  return date.toISOString()
 }

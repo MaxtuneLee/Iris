@@ -25,6 +25,7 @@ declare global {
 
   const APP_NAME: string
   const BUILT_DATE: string
+  const GIT_COMMIT_HASH: string
 }
 
 export {}

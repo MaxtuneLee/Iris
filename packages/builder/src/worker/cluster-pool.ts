@@ -3,14 +3,22 @@ import type { Worker } from 'node:cluster'
 import cluster from 'node:cluster'
 import { EventEmitter } from 'node:events'
 import process from 'node:process'
+import { serialize } from 'node:v8'
 
 import type { Logger } from '../logger/index.js'
+import { logger } from '../logger/index.js'
 
 export interface ClusterPoolOptions {
   concurrency: number
   totalTasks: number
   workerEnv?: Record<string, string> // 传递给 worker 的环境变量
   workerConcurrency?: number // 每个 worker 内部的并发数
+  // 新增：传递给 worker 的共享数据
+  sharedData?: {
+    existingManifestMap: Map<string, any>
+    livePhotoMap: Map<string, any>
+    imageObjects: any[]
+  }
 }
 
 export interface WorkerReadyMessage {
@@ -53,6 +61,14 @@ export interface WorkerStats {
   isReady: boolean
 }
 
+export interface WorkerInitMessage {
+  type: 'init'
+  sharedData: {
+    data: number[] // Buffer 转换为数组传输
+    length: number
+  }
+}
+
 // 基于 Node.js cluster 的 Worker 池管理器
 export class ClusterPool<T> extends EventEmitter {
   private concurrency: number
@@ -60,6 +76,7 @@ export class ClusterPool<T> extends EventEmitter {
   private workerEnv: Record<string, string>
   private workerConcurrency: number
   private logger: Logger
+  private sharedData?: ClusterPoolOptions['sharedData']
 
   private taskQueue: Array<{ taskIndex: number }> = []
   private workers = new Map<number, Worker>()
@@ -73,14 +90,16 @@ export class ClusterPool<T> extends EventEmitter {
   private isShuttingDown = false
   private readyWorkers = new Set<number>()
   private workerTaskCounts = new Map<number, number>() // 追踪每个 worker 当前正在处理的任务数
+  private initializedWorkers = new Set<number>() // 追踪已初始化的 worker
 
-  constructor(options: ClusterPoolOptions, logger: Logger) {
+  constructor(options: ClusterPoolOptions) {
     super()
     this.concurrency = options.concurrency
     this.totalTasks = options.totalTasks
     this.workerEnv = options.workerEnv || {}
     this.workerConcurrency = options.workerConcurrency || 5 // 默认每个 worker 同时处理 5 个任务
     this.logger = logger
+    this.sharedData = options.sharedData
 
     this.results = Array.from({ length: this.totalTasks })
   }
@@ -173,13 +192,33 @@ export class ClusterPool<T> extends EventEmitter {
 
       worker.on(
         'message',
-        (message: TaskResult | BatchTaskResult | WorkerReadyMessage) => {
-          if (message.type === 'ready' || message.type === 'pong') {
+        (
+          message:
+            | TaskResult
+            | BatchTaskResult
+            | WorkerReadyMessage
+            | { type: 'init-complete'; workerId: number },
+        ) => {
+          switch (message.type) {
+          case 'ready': 
+          case 'pong': {
             this.handleWorkerReady(workerId, message as WorkerReadyMessage)
-          } else if (message.type === 'batch-result') {
+          
+          break;
+          }
+          case 'init-complete': {
+            this.handleWorkerInitComplete(workerId)
+          
+          break;
+          }
+          case 'batch-result': {
             this.handleWorkerBatchResult(workerId, message as BatchTaskResult)
-          } else {
+          
+          break;
+          }
+          default: {
             this.handleWorkerMessage(workerId, message as TaskResult)
+          }
           }
         },
       )
@@ -215,13 +254,54 @@ export class ClusterPool<T> extends EventEmitter {
     _message: WorkerReadyMessage,
   ): void {
     const stats = this.workerStats.get(workerId)
+    const worker = this.workers.get(workerId)
+    const workerLogger = this.logger.worker(workerId)
+
+    if (stats && worker && !this.initializedWorkers.has(workerId)) {
+      // 首次准备就绪时发送初始化数据，但不立即标记为 ready
+      if (this.sharedData) {
+        // 使用 v8.serialize 序列化数据以保持类型完整性
+        const serializedBuffer = serialize({
+          existingManifestMap: this.sharedData.existingManifestMap,
+          livePhotoMap: this.sharedData.livePhotoMap,
+          imageObjects: this.sharedData.imageObjects,
+        })
+
+        // 将 Buffer 转换为数组以通过 IPC 传输
+        const initMessage: WorkerInitMessage = {
+          type: 'init',
+          sharedData: {
+            data: Array.from(serializedBuffer),
+            length: serializedBuffer.length,
+          },
+        }
+        worker.send(initMessage)
+        workerLogger.info(`发送初始化数据到 Worker ${workerId}`)
+      }
+
+      this.initializedWorkers.add(workerId)
+      workerLogger.info(`Worker ${workerId} 已接收初始化请求，等待初始化完成`)
+    } else if (stats) {
+      // 后续的 ready 消息（如 pong 响应）
+      stats.isReady = true
+      this.readyWorkers.add(workerId)
+      workerLogger.info(`Worker ${workerId} 已准备就绪`)
+      this.emit('workerReady', workerId)
+    }
+  }
+
+  private handleWorkerInitComplete(workerId: number): void {
+    const stats = this.workerStats.get(workerId)
     const workerLogger = this.logger.worker(workerId)
 
     if (stats) {
       stats.isReady = true
       this.readyWorkers.add(workerId)
-      workerLogger.info(`Worker ${workerId} 已准备就绪`)
+      workerLogger.info(`Worker ${workerId} 初始化完成，可以接受任务`)
       this.emit('workerReady', workerId)
+
+      // 立即为这个 worker 分配任务
+      this.assignBatchTasksToWorker(workerId)
     }
   }
 
@@ -239,7 +319,14 @@ export class ClusterPool<T> extends EventEmitter {
     const stats = this.workerStats.get(workerId)
     const currentTaskCount = this.workerTaskCounts.get(workerId) || 0
 
-    if (!worker || !stats || !stats.isReady) return
+    // 确保 worker 已经完成初始化（包含在 initializedWorkers 中且 isReady 为 true）
+    if (
+      !worker ||
+      !stats ||
+      !stats.isReady ||
+      !this.initializedWorkers.has(workerId)
+    )
+      return
 
     // 如果当前 worker 的任务数已达到并发限制，则不分配新任务
     if (currentTaskCount >= this.workerConcurrency) return

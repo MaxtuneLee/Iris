@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
-import { workdir } from '@photo-gallery/builder/path.js'
+import { workdir } from '@afilmory/builder/path.js'
 import sharp from 'sharp'
 
 import type { Logger } from '../logger/index.js'

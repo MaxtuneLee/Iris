@@ -1,4 +1,4 @@
-# Photo Gallery Builder
+# Afilmory Builder
 
 这是照片库构建系统的核心模块，采用模块化设计，将不同功能分离到各自的模块中。
 

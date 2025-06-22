@@ -1,5 +1,5 @@
 {
-  "name": "@photo-gallery/builder",
+  "name": "@afilmory/builder",
   "type": "module",
   "version": "0.0.1",
   "private": true,
@@ -11,14 +11,14 @@
     "cli": "tsx src/cli.ts"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "3.826.0",
-    "@aws-sdk/s3-request-presigner": "3.826.0",
+    "@aws-sdk/client-s3": "3.828.0",
+    "@aws-sdk/s3-request-presigner": "3.828.0",
+    "@vingle/bmp-js": "^0.2.5",
     "blurhash": "2.0.5",
     "execa": "9.6.0",
-    "exif-reader": "2.0.2",
-    "fuji-recipes": "1.0.2",
+    "exiftool-vendored": "30.2.0",
     "heic-convert": "2.1.0",
-    "heic-to": "1.1.13",
+    "heic-to": "1.1.14",
     "sharp": "0.34.2"
   }
 }

@@ -1,7 +1,7 @@
 {
-  "name": "@photo-gallery/webgl-viewer",
+  "name": "@afilmory/webgl-viewer",
   "type": "module",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "packageManager": "pnpm@10.12.1",
   "description": "",
   "author": "Innei",
@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "@microsoft/api-extractor": "7.52.8",
-    "@types/react": "19.1.7",
+    "@types/react": "19.1.8",
     "nbump": "2.1.2",
     "tsdown": "0.12.7",
     "unplugin-dts": "1.0.0-beta.0",
