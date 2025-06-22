@@ -1,3 +1,5 @@
+import 'dotenv-expand/config'
+
 import cluster from 'node:cluster'
 import { existsSync } from 'node:fs'
 import path from 'node:path'
@@ -48,7 +50,7 @@ async function main() {
       cwd: workdir,
       stdio: 'inherit',
     })`ln -s ${path.resolve(workdir, 'assets-git', 'thumbnails')} ${thumbnailsDir}`
-    // 删除src/data/photos-manifest.json，并建立软连接到 assets-git/photos-manifest.json
+    // 删除 src/data/photos-manifest.json，并建立软连接到 assets-git/photos-manifest.json
     const photosManifestPath = path.resolve(
       workdir,
       'src',
