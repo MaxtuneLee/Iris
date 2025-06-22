@@ -10,7 +10,6 @@ export const SUPPORTED_FORMATS = new Set([
   '.heif',
   '.hif',
   '.tif',
-  '.nef',
 ])
 
 // HEIC/HEIF 格式
