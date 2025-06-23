@@ -36,14 +36,10 @@ const videoCache: LRUCache<string, ConversionResult> = new LRUCache<
 function convertMOVtoMP4(
   videoUrl: string,
   onProgress?: (progress: ConversionProgress) => void,
-  preferMp4 = true,
 ): Promise<ConversionResult> {
-  // const { t } = getI18n()
-
   return new Promise((resolve) => {
     // Start transmux conversion
     transmuxMovToMp4(videoUrl, {
-      preferMp4,
       onProgress,
     })
       .then((result) => {
@@ -103,7 +99,6 @@ export async function convertMovToMp4(
 
   onProgress?: (progress: ConversionProgress) => void,
   forceReconvert = false, // 添加强制重新转换参数
-  preferMp4 = true, // 新增参数：是否优先选择 MP4 格式
 ): Promise<ConversionResult> {
   const { t } = getI18n()
   // Check cache first, unless forced to reconvert
@@ -125,16 +120,14 @@ export async function convertMovToMp4(
   }
 
   try {
-    console.info(
-      `🎯 Target format: ${preferMp4 ? 'MP4 (H.264)' : 'WebM (VP8/VP9)'}`,
-    )
+    console.info(`🎯 Target format: MP4 (H.264)`)
     onProgress?.({
       isConverting: true,
       progress: 0,
       message: t('video.conversion.transmux.high.quality'),
     })
 
-    const result = await convertMOVtoMP4(videoUrl, onProgress, preferMp4)
+    const result = await convertMOVtoMP4(videoUrl, onProgress)
 
     // Cache the result
     videoCache.set(videoUrl, result)
