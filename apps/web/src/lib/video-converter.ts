@@ -103,7 +103,7 @@ export async function convertMovToMp4(
 
   onProgress?: (progress: ConversionProgress) => void,
   forceReconvert = false, // 添加强制重新转换参数
-  preferMp4 = true, // 新增参数：是否优先选择MP4格式
+  preferMp4 = true, // 新增参数：是否优先选择 MP4 格式
 ): Promise<ConversionResult> {
   const { t } = getI18n()
   // Check cache first, unless forced to reconvert
@@ -146,10 +146,11 @@ export async function convertMovToMp4(
     }
 
     return result
-  } catch {
+  } catch (error) {
+    console.error('conversion failed:', error)
     const fallbackResult = {
       success: false,
-      error: t('video.conversion.transmux.not.supported'),
+      error: `Conversion Failed: ${error instanceof Error ? error.message : error}`,
     }
 
     return fallbackResult
