@@ -132,13 +132,8 @@ export const PhotoMasonryItem = ({
           data.livePhotoVideoUrl!,
           videoRef.current!,
           {
-            onLoadingStateUpdate: (state) => {
-              // 静默处理加载状态，不显示加载指示器
-              if (state.conversionMessage?.includes('WebCodecs')) {
-                setConversionMethod('webcodecs')
-              } else if (state.conversionMessage?.includes('FFmpeg')) {
-                setConversionMethod('ffmpeg')
-              }
+            onLoadingStateUpdate: () => {
+              setConversionMethod('transmux')
             },
           },
         )
@@ -332,7 +327,7 @@ export const PhotoMasonryItem = ({
                   ) : conversionMethod === 'webcodecs' ? (
                     t('photo.conversion.webcodecs')
                   ) : (
-                    t('photo.conversion.ffmpeg')
+                    t('photo.conversion.transmux')
                   )}
                 </span>
               )}

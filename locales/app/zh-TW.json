@@ -135,7 +135,6 @@
   "loading.heic.main": "HEIC",
   "loading.webgl.building": "正在建置高品質紋理...",
   "loading.webgl.main": "WebGL 紋理載入",
-  "photo.conversion.ffmpeg": "FFmpeg",
   "photo.conversion.webcodecs": "WebCodecs",
   "photo.copy.error": "複製圖像失敗，請稍後重試",
   "photo.copy.image": "複製圖像",

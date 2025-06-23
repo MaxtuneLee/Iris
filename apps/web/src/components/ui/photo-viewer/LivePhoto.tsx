@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next'
 import { clsxm } from '~/lib/cn'
 import { isMobileDevice } from '~/lib/device-viewport'
 import type { ImageLoaderManager } from '~/lib/image-loader-manager'
-import { isWebCodecsSupported } from '~/lib/video-converter'
 
 import type { LoadingIndicatorRef } from './LoadingIndicator'
 
@@ -303,9 +302,7 @@ export const LivePhoto = ({
             <i className="i-mingcute-live-photo-line size-4" />
             <span className="mr-1">{t('photo.live.badge')}</span>
             {conversionMethod && (
-              <span className="rounded bg-white/20 px-1 text-xs">
-                {conversionMethod === 'webcodecs' ? 'WebCodecs' : ''}
-              </span>
+              <span className="rounded bg-white/20 px-1 text-xs">transmux</span>
             )}
           </>
         )}
@@ -315,7 +312,7 @@ export const LivePhoto = ({
       <div className="pointer-events-none absolute bottom-4 left-1/2 z-20 -translate-x-1/2 rounded bg-black/50 px-2 py-1 text-xs text-white opacity-0 duration-200 group-hover:opacity-50">
         {isConvertingVideo
           ? t('photo.live.converting.detail', {
-              method: isWebCodecsSupported() ? 'WebCodecs' : '',
+              method: 'transmux',
             })
           : isMobileDevice
             ? t('photo.live.tooltip.mobile.zoom')

@@ -1,9 +1,8 @@
-import { ArrayBufferTarget, Muxer } from 'mp4-muxer'
-
 import { getI18n } from '~/i18n'
 
 import { isSafari } from './device-viewport'
 import { LRUCache } from './lru-cache'
+import { transmuxMovToMp4 } from './mp4-utils'
 
 interface ConversionProgress {
   isConverting: boolean
@@ -16,7 +15,7 @@ interface ConversionResult {
   videoUrl?: string
   error?: string
   convertedSize?: number
-  method?: 'webcodecs'
+  method?: 'transmux'
 }
 
 // Global video cache instance using the generic LRU cache with custom cleanup
@@ -34,226 +33,29 @@ const videoCache: LRUCache<string, ConversionResult> = new LRUCache<
   }
 })
 
-// 检查 WebCodecs 支持
-export function isWebCodecsSupported(): boolean {
-  return (
-    typeof VideoEncoder !== 'undefined' &&
-    typeof VideoDecoder !== 'undefined' &&
-    typeof VideoFrame !== 'undefined' &&
-    typeof EncodedVideoChunk !== 'undefined'
-  )
-}
-
-// 检查浏览器是否支持视频转换（WebCodecs 或 FFmpeg）
-export function isVideoConversionSupported(): boolean {
-  return (
-    isWebCodecsSupported() ||
-    (typeof WebAssembly !== 'undefined' &&
-      typeof Worker !== 'undefined' &&
-      typeof SharedArrayBuffer !== 'undefined')
-  )
-}
-
-// 使用简化的 MediaRecorder 方式转换视频
-function convertVideoWithWebCodecs(
+function convertMOVtoMP4(
   videoUrl: string,
-
   onProgress?: (progress: ConversionProgress) => void,
   preferMp4 = true,
 ): Promise<ConversionResult> {
-  const { t } = getI18n()
+  // const { t } = getI18n()
+
   return new Promise((resolve) => {
-    let muxer: Muxer<ArrayBufferTarget> | null = null
-    let encoder: VideoEncoder | null = null
-    let conversionHasFailed = false
-
-    const cleanup = () => {
-      if (encoder?.state !== 'closed') encoder?.close()
-      muxer = null
-      encoder = null
-    }
-
-    const startConversion = async () => {
-      try {
-        onProgress?.({
-          isConverting: true,
-          progress: 0,
-          message: t('video.conversion.initializing'),
-        })
-
-        const video = document.createElement('video')
-        video.crossOrigin = 'anonymous'
-        video.muted = true
-        video.playsInline = true
-
-        onProgress?.({
-          isConverting: true,
-          progress: 10,
-          message: t('video.conversion.loading'),
-        })
-
-        await new Promise<void>((videoResolve, videoReject) => {
-          video.onloadedmetadata = () => videoResolve()
-          video.onerror = (e) =>
-            videoReject(new Error(`Failed to load video metadata: ${e}`))
-          video.src = videoUrl
-        })
-
-        const { videoWidth, videoHeight, duration } = video
-        if (!duration || !Number.isFinite(duration)) {
-          throw new Error(t('video.conversion.duration.error'))
-        }
-        const frameRate = 30 // Desired frame rate
-
-        console.info(
-          `Original video: ${videoWidth}x${videoHeight}, duration: ${duration.toFixed(
-            2,
-          )}s`,
-        )
-
-        let mimeType = 'video/webm; codecs=vp9'
-        let codec = 'vp09.00.10.08' // VP9, profile 0, level 1.0, 8-bit
-        let outputFormat = 'WebM'
-
-        if (preferMp4) {
-          const avcConfigs = [
-            // From highest quality/level to lowest
-            { codec: 'avc1.640033', name: 'H.264 High @L5.1' }, // 4K+
-            { codec: 'avc1.64002A', name: 'H.264 High @L4.2' }, // 1080p
-            { codec: 'avc1.4D4029', name: 'H.264 Main @L4.1' }, // 1080p
-            { codec: 'avc1.42E01F', name: 'H.264 Baseline @L3.1' }, // 720p
-          ]
-
-          for (const config of avcConfigs) {
-            if (
-              await VideoEncoder.isConfigSupported({
-                codec: config.codec,
-                width: videoWidth,
-                height: videoHeight,
-              })
-            ) {
-              mimeType = `video/mp4; codecs=${config.codec}`
-              codec = config.codec
-              outputFormat = 'MP4'
-              console.info(
-                `Using supported codec: ${config.name} (${config.codec})`,
-              )
-              break
-            }
-          }
-        }
-
-        if (outputFormat === 'WebM' && preferMp4) {
-          console.warn(t('video.conversion.codec.fallback'))
-        }
-
-        console.info(`Target format: ${outputFormat} (${codec})`)
-
-        muxer = new Muxer({
-          target: new ArrayBufferTarget(),
-          video: {
-            codec: outputFormat === 'MP4' ? 'avc' : 'vp9',
-            width: videoWidth,
-            height: videoHeight,
-            frameRate,
-          },
-          fastStart: 'fragmented',
-          firstTimestampBehavior: 'offset',
-        })
-
-        encoder = new VideoEncoder({
-          output: (chunk, meta) => {
-            if (conversionHasFailed) return
-            muxer!.addVideoChunk(chunk, meta)
-          },
-          error: (e) => {
-            if (conversionHasFailed) return
-            conversionHasFailed = true
-            console.error('VideoEncoder error:', e)
-            resolve({ success: false, error: e.message })
-          },
-        })
-        encoder.configure({
-          codec,
-          width: videoWidth,
-          height: videoHeight,
-          bitrate: 5_000_000, // 5 Mbps
-          framerate: frameRate,
-        })
-
-        const totalFrames = Math.floor(duration * frameRate)
-
-        onProgress?.({
-          isConverting: true,
-          progress: 20,
-          message: t('video.conversion.starting'),
-        })
-
-        const frameInterval = 1 / frameRate
-        for (let i = 0; i < totalFrames; i++) {
-          if (conversionHasFailed) {
-            console.warn(t('video.conversion.encoder.error'))
-            return
-          }
-
-          const time = i * frameInterval
-          video.currentTime = time
-          await new Promise((r) => (video.onseeked = r))
-
-          const frame = new VideoFrame(video, {
-            timestamp: time * 1_000_000,
-            duration: frameInterval * 1_000_000,
-          })
-
-          await encoder.encode(frame)
-          frame.close()
-
-          const progress = 20 + ((i + 1) / totalFrames) * 70
-          onProgress?.({
-            isConverting: true,
-            progress,
-            message: t('video.conversion.converting', {
-              current: i + 1,
-              total: totalFrames,
-            }),
-          })
-        }
-
-        if (conversionHasFailed) return
-
-        await encoder.flush()
-        muxer.finalize()
-
-        const { buffer } = muxer.target
-        const blob = new Blob([buffer], { type: mimeType })
-        const url = URL.createObjectURL(blob)
-
-        onProgress?.({
-          isConverting: false,
-          progress: 100,
-          message: t('video.conversion.complete'),
-        })
-
-        resolve({
-          success: true,
-          videoUrl: url,
-          convertedSize: blob.size,
-          method: 'webcodecs',
-        })
-      } catch (error) {
-        console.error('Video conversion failed:', error)
+    // Start transmux conversion
+    transmuxMovToMp4(videoUrl, {
+      preferMp4,
+      onProgress,
+    })
+      .then((result) => {
+        resolve(result)
+      })
+      .catch((error) => {
+        console.error('Transmux conversion failed:', error)
         resolve({
           success: false,
-          error:
-            error instanceof Error
-              ? error.message
-              : t('video.conversion.failed'),
+          error: error instanceof Error ? error.message : 'Transmux failed',
         })
-      } finally {
-        cleanup()
-      }
-    }
-    startConversion()
+      })
   })
 }
 
@@ -322,42 +124,34 @@ export async function convertMovToMp4(
     videoCache.delete(videoUrl)
   }
 
-  // 优先尝试 WebCodecs
-  if (isWebCodecsSupported()) {
-    console.info('Using WebCodecs for HIGH QUALITY video conversion...')
+  try {
     console.info(
       `🎯 Target format: ${preferMp4 ? 'MP4 (H.264)' : 'WebM (VP8/VP9)'}`,
     )
     onProgress?.({
       isConverting: true,
       progress: 0,
-      message: t('video.conversion.webcodecs.high.quality'),
+      message: t('video.conversion.transmux.high.quality'),
     })
 
-    const result = await convertVideoWithWebCodecs(
-      videoUrl,
-      onProgress,
-      preferMp4,
-    )
+    const result = await convertMOVtoMP4(videoUrl, onProgress, preferMp4)
 
     // Cache the result
     videoCache.set(videoUrl, result)
 
     if (result.success) {
-      console.info('WebCodecs conversion completed successfully and cached')
+      console.info('conversion completed successfully and cached')
     } else {
-      console.error('WebCodecs conversion failed:', result.error)
+      console.error('conversion failed:', result.error)
     }
 
     return result
+  } catch {
+    const fallbackResult = {
+      success: false,
+      error: t('video.conversion.transmux.not.supported'),
+    }
+
+    return fallbackResult
   }
-
-  console.error('WebCodecs not supported.')
-
-  const fallbackResult = {
-    success: false,
-    error: t('video.conversion.webcodecs.not.supported'),
-  }
-
-  return fallbackResult
 }
