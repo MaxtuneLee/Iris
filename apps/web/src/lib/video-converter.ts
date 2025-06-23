@@ -2,7 +2,7 @@ import { getI18n } from '~/i18n'
 
 import { isSafari } from './device-viewport'
 import { LRUCache } from './lru-cache'
-import { isTransmuxSupported, transmuxMovToMp4 } from './mp4-utils'
+import { transmuxMovToMp4 } from './mp4-utils'
 
 interface ConversionProgress {
   isConverting: boolean
@@ -38,18 +38,9 @@ function convertMOVtoMP4(
   onProgress?: (progress: ConversionProgress) => void,
   preferMp4 = true,
 ): Promise<ConversionResult> {
-  const { t } = getI18n()
+  // const { t } = getI18n()
 
   return new Promise((resolve) => {
-    // Check if transmux is supported
-    if (!isTransmuxSupported()) {
-      resolve({
-        success: false,
-        error: t('video.conversion.transmux.not.supported'),
-      })
-      return
-    }
-
     // Start transmux conversion
     transmuxMovToMp4(videoUrl, {
       preferMp4,
@@ -84,11 +75,6 @@ function isBrowserSupportMov(): boolean {
   // 对于其他浏览器，只有当 canPlayType 明确返回支持时才认为支持
   // 'probably' 或 'maybe' 表示支持，空字符串表示不支持
   return canPlayMov === 'probably' || canPlayMov === 'maybe'
-}
-
-// 检测是否支持视频转换功能
-export function isVideoConversionSupported(): boolean {
-  return isTransmuxSupported()
 }
 
 // 检测是否需要转换 mov 文件
@@ -138,7 +124,7 @@ export async function convertMovToMp4(
     videoCache.delete(videoUrl)
   }
 
-  if (!isVideoConversionSupported()) {
+  try {
     console.info(
       `🎯 Target format: ${preferMp4 ? 'MP4 (H.264)' : 'WebM (VP8/VP9)'}`,
     )
@@ -160,12 +146,12 @@ export async function convertMovToMp4(
     }
 
     return result
-  }
+  } catch {
+    const fallbackResult = {
+      success: false,
+      error: t('video.conversion.transmux.not.supported'),
+    }
 
-  const fallbackResult = {
-    success: false,
-    error: t('video.conversion.transmux.not.supported'),
+    return fallbackResult
   }
-
-  return fallbackResult
 }

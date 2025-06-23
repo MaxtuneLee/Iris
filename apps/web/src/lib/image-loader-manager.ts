@@ -1,11 +1,7 @@
 import { i18nAtom } from '~/i18n'
 import { jotaiStore } from '~/lib/jotai'
 import { LRUCache } from '~/lib/lru-cache'
-import {
-  convertMovToMp4,
-  isVideoConversionSupported,
-  needsVideoConversion,
-} from '~/lib/video-converter'
+import { convertMovToMp4, needsVideoConversion } from '~/lib/video-converter'
 
 export interface LoadingState {
   isVisible: boolean
@@ -364,12 +360,6 @@ export class ImageLoaderManager {
     callbacks: LoadingCallbacks,
   ): Promise<VideoProcessResult> {
     const { onLoadingStateUpdate } = callbacks
-
-    // 检查浏览器是否支持视频转换
-    if (!isVideoConversionSupported()) {
-      console.warn('Video conversion not supported in this browser')
-      return {}
-    }
 
     // 更新加载指示器显示转换进度
     onLoadingStateUpdate?.({

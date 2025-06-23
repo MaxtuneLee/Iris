@@ -119,21 +119,3 @@ export async function transmuxMovToMp4Simple(
     }
   }
 }
-
-/**
- * Check if transmux is supported in the current environment
- */
-export function isTransmuxSupported(): boolean {
-  try {
-    // Check if required APIs are available
-    return (
-      typeof ArrayBuffer !== 'undefined' &&
-      typeof Uint8Array !== 'undefined' &&
-      typeof Blob !== 'undefined' &&
-      typeof URL !== 'undefined' &&
-      typeof URL.createObjectURL === 'function'
-    )
-  } catch {
-    return false
-  }
-}
