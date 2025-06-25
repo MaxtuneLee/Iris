@@ -82,6 +82,9 @@ export default defineConfig({
     }),
     process.env.analyzer && analyzer(),
   ],
+  server: {
+    port: 1924, // 1924 年首款 35mm 相机问世
+  },
   define: {
     APP_DEV_CWD: JSON.stringify(process.cwd()),
     APP_NAME: JSON.stringify(PKG.name),

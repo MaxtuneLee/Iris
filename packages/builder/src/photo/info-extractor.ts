@@ -2,22 +2,21 @@ import path from 'node:path'
 
 import { env } from '@env'
 
-import type { Logger } from '../logger/index.js'
 import type { PhotoInfo, PickedExif } from '../types/photo.js'
+import { getGlobalLoggers } from './logger-adapter.js'
 
 // 从文件名提取照片信息
 export function extractPhotoInfo(
   key: string,
   exifData?: PickedExif | null,
-  imageLogger?: Logger['image'],
 ): PhotoInfo {
-  const log = imageLogger
+  const log = getGlobalLoggers().image
 
-  log?.debug(`提取照片信息: ${key}`)
+  log.info(`提取照片信息：${key}`)
 
   const fileName = path.basename(key, path.extname(key))
 
-  // 尝试从文件名解析信息，格式示例: "2024-01-15_城市夜景_1250views"
+  // 尝试从文件名解析信息，格式示例："2024-01-15_城市夜景_1250views"
   let title = fileName
   let dateTaken = new Date().toISOString()
   let views = 0
@@ -42,7 +41,7 @@ export function extractPhotoInfo(
         .filter((part) => part.trim() !== '')
       tags = pathParts.map((part) => part.trim())
 
-      log?.debug(`从路径提取标签：[${tags.join(', ')}]`)
+      log.info(`从路径提取标签：[${tags.join(', ')}]`)
     }
   }
 
@@ -54,7 +53,7 @@ export function extractPhotoInfo(
       // 如果是 Date 对象，直接使用
       if (dateTimeOriginal instanceof Date) {
         dateTaken = dateTimeOriginal.toISOString()
-        log?.debug('使用 EXIF Date 对象作为拍摄时间')
+        log.info('使用 EXIF Date 对象作为拍摄时间')
       } else {
         log?.warn(
           `未知的 DateTimeOriginal 类型：${typeof dateTimeOriginal}`,
@@ -72,7 +71,7 @@ export function extractPhotoInfo(
     const dateMatch = fileName.match(/(\d{4}-\d{2}-\d{2})/)
     if (dateMatch) {
       dateTaken = new Date(dateMatch[1]).toISOString()
-      log?.debug(`从文件名提取拍摄时间：${dateMatch[1]}`)
+      log.info(`从文件名提取拍摄时间：${dateMatch[1]}`)
     }
   }
 
@@ -80,7 +79,7 @@ export function extractPhotoInfo(
   const viewsMatch = fileName.match(/(\d+)views?/i)
   if (viewsMatch) {
     views = Number.parseInt(viewsMatch[1])
-    log?.debug(`从文件名提取浏览次数：${views}`)
+    log.info(`从文件名提取浏览次数：${views}`)
   }
 
   // 从文件名中提取标题（移除日期和浏览次数）
@@ -95,7 +94,7 @@ export function extractPhotoInfo(
     title = path.basename(key, path.extname(key))
   }
 
-  log?.debug(`照片信息提取完成："${title}"`)
+  log.info(`照片信息提取完成："${title}"`)
 
   return {
     title,

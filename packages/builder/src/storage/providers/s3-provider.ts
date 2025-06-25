@@ -4,7 +4,7 @@ import type { _Object } from '@aws-sdk/client-s3'
 import { GetObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3'
 
 import { SUPPORTED_FORMATS } from '../../constants/index.js'
-import type { Logger } from '../../logger/index.js'
+import { logger } from '../../logger/index.js'
 import { s3Client } from '../../s3/client.js'
 import type { S3Config, StorageObject, StorageProvider } from '../interfaces'
 
@@ -25,11 +25,9 @@ export class S3StorageProvider implements StorageProvider {
     this.config = config
   }
 
-  async getFile(key: string, logger?: Logger['s3']): Promise<Buffer | null> {
-    const log = logger
-
+  async getFile(key: string): Promise<Buffer | null> {
     try {
-      log?.info(`下载文件：${key}`)
+      logger.s3.info(`下载文件：${key}`)
       const startTime = Date.now()
 
       const command = new GetObjectCommand({
@@ -40,7 +38,7 @@ export class S3StorageProvider implements StorageProvider {
       const response = await s3Client.send(command)
 
       if (!response.Body) {
-        log?.error(`S3 响应中没有 Body: ${key}`)
+        logger.s3.error(`S3 响应中没有 Body: ${key}`)
         return null
       }
 
@@ -48,7 +46,7 @@ export class S3StorageProvider implements StorageProvider {
       if (response.Body instanceof Buffer) {
         const duration = Date.now() - startTime
         const sizeKB = Math.round(response.Body.length / 1024)
-        log?.success(`下载完成：${key} (${sizeKB}KB, ${duration}ms)`)
+        logger.s3.success(`下载完成：${key} (${sizeKB}KB, ${duration}ms)`)
         return response.Body
       }
 
@@ -65,17 +63,17 @@ export class S3StorageProvider implements StorageProvider {
           const buffer = Buffer.concat(chunks)
           const duration = Date.now() - startTime
           const sizeKB = Math.round(buffer.length / 1024)
-          log?.success(`下载完成：${key} (${sizeKB}KB, ${duration}ms)`)
+          logger.s3.success(`下载完成：${key} (${sizeKB}KB, ${duration}ms)`)
           resolve(buffer)
         })
 
         stream.on('error', (error) => {
-          log?.error(`下载失败：${key}`, error)
+          logger.s3.error(`下载失败：${key}`, error)
           reject(error)
         })
       })
     } catch (error) {
-      log?.error(`下载失败：${key}`, error)
+      logger.s3.error(`下载失败：${key}`, error)
       return null
     }
   }
@@ -84,7 +82,7 @@ export class S3StorageProvider implements StorageProvider {
     const listCommand = new ListObjectsV2Command({
       Bucket: this.config.bucket,
       Prefix: this.config.prefix,
-      MaxKeys: 1000, // 最多获取 1000 张照片
+      MaxKeys: this.config.maxFileLimit, // 最多获取 1000 张照片
     })
 
     const listResponse = await s3Client.send(listCommand)
@@ -111,7 +109,7 @@ export class S3StorageProvider implements StorageProvider {
     const listCommand = new ListObjectsV2Command({
       Bucket: this.config.bucket,
       Prefix: this.config.prefix,
-      MaxKeys: 1000,
+      MaxKeys: this.config.maxFileLimit,
     })
 
     const listResponse = await s3Client.send(listCommand)

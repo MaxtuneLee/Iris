@@ -55,6 +55,7 @@ export type S3Config = {
   prefix?: string
   customDomain?: string
   excludeRegex?: string
+  maxFileLimit?: number
 }
 
 export type GitHubConfig = {

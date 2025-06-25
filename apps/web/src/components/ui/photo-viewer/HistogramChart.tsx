@@ -61,7 +61,7 @@ export const HistogramChart: FC<HistogramChartProps> = ({
       const rect = canvas.getBoundingClientRect()
       const x = event.clientX - rect.left
       const padding = 8
-      const drawWidth = canvas.width - padding * 2
+      const drawWidth = rect.width - padding * 2
 
       // 计算对应的直方图索引
       const histogramIndex = Math.floor(((x - padding) / drawWidth) * 256)
@@ -102,9 +102,29 @@ export const HistogramChart: FC<HistogramChartProps> = ({
     const decompressedHistogram = decompressHistogram(toneAnalysis.histogram)
     const { red, green, blue, luminance } = decompressedHistogram
 
-    // 设置画布尺寸
-    const { width } = canvas
-    const { height } = canvas
+    // 获取设备像素比，提高画布分辨率
+    const devicePixelRatio = window.devicePixelRatio || 1
+    const rect = canvas.getBoundingClientRect()
+
+    // 设置画布内部分辨率
+    canvas.width = rect.width * devicePixelRatio
+    canvas.height = rect.height * devicePixelRatio
+
+    // 缩放上下文以匹配设备像素比
+    ctx.scale(devicePixelRatio, devicePixelRatio)
+
+    // 设置画布样式尺寸
+    canvas.style.width = `${rect.width}px`
+    canvas.style.height = `${rect.height}px`
+
+    // 启用抗锯齿和平滑渲染
+    ctx.imageSmoothingEnabled = true
+    ctx.imageSmoothingQuality = 'high'
+    ctx.lineJoin = 'round'
+    ctx.lineCap = 'round'
+
+    const { width } = rect
+    const { height } = rect
     const padding = 8
 
     // 清空画布
@@ -147,18 +167,31 @@ export const HistogramChart: FC<HistogramChartProps> = ({
 
     // 绘制直方图函数
     const drawHistogram = (data: number[], color: string, alpha = 0.6) => {
-      ctx.fillStyle = color
       ctx.globalAlpha = alpha
 
-      for (const [i, datum] of data.entries()) {
-        if (datum > 0) {
-          const x = padding + i * barWidth
-          const barHeight = (datum / globalMax) * drawHeight
-          const y = height - padding - barHeight
+      // 使用路径绘制更平滑的直方图
+      ctx.beginPath()
+      ctx.moveTo(padding, height - padding)
 
-          ctx.fillRect(x, y, Math.max(barWidth, 1), barHeight)
-        }
+      for (const [i, datum] of data.entries()) {
+        const x = padding + i * barWidth
+        const barHeight = (datum / globalMax) * drawHeight
+        const y = height - padding - barHeight
+
+        ctx.lineTo(x, y)
       }
+
+      ctx.lineTo(padding + drawWidth, height - padding)
+      ctx.closePath()
+
+      ctx.fillStyle = color
+      ctx.fill()
+
+      // 添加描边以增强视觉效果
+      ctx.strokeStyle = color
+      ctx.lineWidth = 0.5
+      ctx.globalAlpha = alpha * 1.5
+      ctx.stroke()
     }
 
     // 根据可见性绘制 RGB 直方图
@@ -175,17 +208,30 @@ export const HistogramChart: FC<HistogramChartProps> = ({
     // 绘制亮度直方图
     if (channelVisibility.luminance) {
       ctx.globalAlpha = 0.8
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'
+
+      // 使用路径绘制更平滑的亮度直方图
+      ctx.beginPath()
+      ctx.moveTo(padding, height - padding)
 
       for (const [i, element] of luminance.entries()) {
-        if (element > 0) {
-          const x = padding + i * barWidth
-          const barHeight = (element / globalMax) * drawHeight
-          const y = height - padding - barHeight
+        const x = padding + i * barWidth
+        const barHeight = (element / globalMax) * drawHeight
+        const y = height - padding - barHeight
 
-          ctx.fillRect(x, y, Math.max(barWidth, 1), barHeight)
-        }
+        ctx.lineTo(x, y)
       }
+
+      ctx.lineTo(padding + drawWidth, height - padding)
+      ctx.closePath()
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'
+      ctx.fill()
+
+      // 添加描边
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)'
+      ctx.lineWidth = 0.5
+      ctx.globalAlpha = 0.9
+      ctx.stroke()
     }
 
     // 重置透明度
@@ -214,7 +260,8 @@ export const HistogramChart: FC<HistogramChartProps> = ({
 
     // 绘制悬停指示线
     if (hoverInfo) {
-      const hoverX = padding + (hoverInfo.x * drawWidth) / 255
+      const barWidth = drawWidth / 256
+      const hoverX = padding + hoverInfo.x * barWidth
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)'
       ctx.lineWidth = 1
       ctx.setLineDash([])
@@ -276,10 +323,8 @@ export const HistogramChart: FC<HistogramChartProps> = ({
       <div className="relative">
         <canvas
           ref={canvasRef}
-          width={256}
-          height={100}
           className="h-[100px] w-full cursor-crosshair rounded-md bg-black/20"
-          style={{ imageRendering: 'pixelated' }}
+          style={{ imageRendering: 'auto' }}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
         />
@@ -295,19 +340,24 @@ export const HistogramChart: FC<HistogramChartProps> = ({
               {t('histogram.value')}: {hoverInfo.value}
             </div>
             {channelVisibility.red && (
-              <div className="text-red-400">R: {hoverInfo.channels.red}</div>
+              <div className="text-red">
+                R: {hoverInfo.channels.red.toFixed(2)}
+              </div>
             )}
             {channelVisibility.green && (
-              <div className="text-green-400">
-                G: {hoverInfo.channels.green}
+              <div className="text-green">
+                G: {hoverInfo.channels.green.toFixed(2)}
               </div>
             )}
             {channelVisibility.blue && (
-              <div className="text-blue-400">B: {hoverInfo.channels.blue}</div>
+              <div className="text-blue">
+                B: {hoverInfo.channels.blue.toFixed(2)}
+              </div>
             )}
             {channelVisibility.luminance && (
               <div className="text-white">
-                {t('histogram.luminance')}: {hoverInfo.channels.luminance}
+                {t('histogram.luminance')}:{' '}
+                {hoverInfo.channels.luminance.toFixed(2)}
               </div>
             )}
           </m.div>
@@ -324,12 +374,12 @@ export const HistogramChart: FC<HistogramChartProps> = ({
               onClick={() => toggleChannel('red')}
               className={`flex items-center gap-1 rounded px-2 py-1 text-xs transition-all ${
                 channelVisibility.red
-                  ? 'border border-red-500/30 bg-red-500/20 text-red-400'
+                  ? 'text-red border border-red-500/30 bg-red-500/20'
                   : 'border border-white/10 bg-white/5 text-white/40'
               }`}
             >
               <div
-                className={`size-2 rounded-full ${channelVisibility.red ? 'bg-red-400' : 'bg-white/20'}`}
+                className={`size-2 rounded-full ${channelVisibility.red ? 'bg-red' : 'bg-white/20'}`}
               />
               <span>R</span>
             </button>
@@ -343,7 +393,7 @@ export const HistogramChart: FC<HistogramChartProps> = ({
               }`}
             >
               <div
-                className={`size-2 rounded-full ${channelVisibility.green ? 'bg-green-400' : 'bg-white/20'}`}
+                className={`size-2 rounded-full ${channelVisibility.green ? 'bg-green' : 'bg-white/20'}`}
               />
               <span>G</span>
             </button>
@@ -357,7 +407,7 @@ export const HistogramChart: FC<HistogramChartProps> = ({
               }`}
             >
               <div
-                className={`size-2 rounded-full ${channelVisibility.blue ? 'bg-blue-400' : 'bg-white/20'}`}
+                className={`size-2 rounded-full ${channelVisibility.blue ? 'bg-blue' : 'bg-white/20'}`}
               />
               <span>B</span>
             </button>
@@ -371,7 +421,7 @@ export const HistogramChart: FC<HistogramChartProps> = ({
               }`}
             >
               <div
-                className={`size-2 rounded-full ${channelVisibility.luminance ? 'bg-white' : 'bg-white/20'}`}
+                className={`size-2 rounded-full ${channelVisibility.luminance ? 'bg-white/80' : 'bg-white/20'}`}
               />
               <span>{t('histogram.luminance')}</span>
             </button>

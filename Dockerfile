@@ -20,6 +20,8 @@ RUN sh ./scripts/preinstall.sh
 # Install all dependencies
 RUN pnpm install --frozen-lockfile
 
+ARG S3_ACCESS_KEY_ID
+ARG S3_SECRET_ACCESS_KEY
 # Build the app.
 # The build script in the ssr package.json handles building the web app first.
 RUN pnpm --filter=@afilmory/ssr build

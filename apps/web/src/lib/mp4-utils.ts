@@ -13,7 +13,6 @@ interface ConversionResult {
 }
 
 interface TransmuxOptions {
-  preferMp4?: boolean
   onProgress?: (progress: ConversionProgress) => void
 }
 
@@ -25,12 +24,7 @@ export async function transmuxMovToMp4(
   videoUrl: string,
   options: TransmuxOptions = {},
 ): Promise<ConversionResult> {
-  const { preferMp4 = true } = options
-
   try {
-    console.info(`🎯 Starting transmux conversion (prefer MP4: ${preferMp4})`)
-
-    // Use simplified transmux for better compatibility
     return await transmuxMovToMp4Simple(videoUrl, options)
   } catch (error) {
     console.error('Transmux error:', error)
@@ -49,12 +43,10 @@ export async function transmuxMovToMp4Simple(
   videoUrl: string,
   options: TransmuxOptions = {},
 ): Promise<ConversionResult> {
-  const { preferMp4 = true, onProgress } = options
+  const { onProgress } = options
 
   try {
-    console.info(
-      `🎯 Starting simple transmux conversion (prefer MP4: ${preferMp4})`,
-    )
+    console.info(`🎯 Starting simple transmux conversion`)
 
     onProgress?.({
       isConverting: true,

@@ -26,7 +26,7 @@ export interface BuilderOptions {
   concurrencyLimit?: number // 可选，如果未提供则使用配置文件中的默认值
 }
 
-export class PhotoGalleryBuilder {
+class PhotoGalleryBuilder {
   private storageManager: StorageManager
   private config: BuilderConfig
 
@@ -136,9 +136,9 @@ export class PhotoGalleryBuilder {
       `存储中找到 ${imageObjects.length} 张照片，实际需要处理 ${tasksToProcess.length} 张`,
     )
 
-    // 如果没有任务需要处理，直接使用现有的manifest
+    // 如果没有任务需要处理，直接使用现有的 manifest
     if (tasksToProcess.length === 0) {
-      logger.main.info('💡 没有需要处理的照片，使用现有manifest')
+      logger.main.info('💡 没有需要处理的照片，使用现有 manifest')
       manifest.push(
         ...existingManifestItems.filter((item) => s3ImageKeys.has(item.s3Key)),
       )
@@ -150,7 +150,7 @@ export class PhotoGalleryBuilder {
       // 根据配置和实际任务数量选择处理模式
       const { useClusterMode } = this.config.performance.worker
 
-      // 如果实际任务数量较少，则不使用cluster模式
+      // 如果实际任务数量较少，则不使用 cluster 模式
       const shouldUseCluster =
         useClusterMode && tasksToProcess.length >= concurrency * 2
 
@@ -251,7 +251,7 @@ export class PhotoGalleryBuilder {
         }
       }
 
-      // 添加未处理但仍然存在的照片到manifest
+      // 添加未处理但仍然存在的照片到 manifest
       for (const [key, item] of existingManifestMap) {
         if (s3ImageKeys.has(key) && !manifest.some((m) => m.s3Key === key)) {
           manifest.push(item)
@@ -371,7 +371,7 @@ export class PhotoGalleryBuilder {
   /**
    * 筛选出实际需要处理的图片
    * @param imageObjects 存储中的图片对象列表
-   * @param existingManifestMap 现有manifest的映射
+   * @param existingManifestMap 现有 manifest 的映射
    * @param options 构建选项
    * @returns 实际需要处理的图片数组
    */

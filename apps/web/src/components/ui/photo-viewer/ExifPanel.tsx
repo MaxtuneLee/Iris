@@ -2,11 +2,13 @@ import './PhotoViewer.css'
 
 import type { PickedExif } from '@afilmory/data'
 import { isNil } from 'es-toolkit/compat'
+import { useAtomValue } from 'jotai'
 import { m } from 'motion/react'
 import type { FC } from 'react'
 import { Fragment } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { isExiftoolLoadedAtom } from '~/atoms/app'
 import { ScrollArea } from '~/components/ui/scroll-areas/ScrollArea'
 import { useMobile } from '~/hooks/useMobile'
 import {
@@ -23,6 +25,7 @@ import type { PhotoManifest } from '~/types/photo'
 import { MotionButtonBase } from '../button'
 import { formatExifData, Row } from './formatExifData'
 import { HistogramChart } from './HistogramChart'
+import { RawExifViewer } from './RawExifViewer'
 
 export const ExifPanel: FC<{
   currentPhoto: PhotoManifest
@@ -33,7 +36,7 @@ export const ExifPanel: FC<{
   const { t } = useTranslation()
   const isMobile = useMobile()
   const formattedExifData = formatExifData(exifData)
-
+  const isExiftoolLoaded = useAtomValue(isExiftoolLoadedAtom)
   // 使用通用的图片格式提取函数
   const imageFormat = getImageFormat(
     currentPhoto.originalUrl || currentPhoto.s3Key || '',
@@ -64,6 +67,9 @@ export const ExifPanel: FC<{
         <h3 className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold`}>
           {t('exif.header.title')}
         </h3>
+        {!isMobile && isExiftoolLoaded && (
+          <RawExifViewer currentPhoto={currentPhoto} />
+        )}
         {isMobile && onClose && (
           <button
             type="button"
@@ -237,7 +243,7 @@ export const ExifPanel: FC<{
           {currentPhoto.toneAnalysis && (
             <div>
               <h4 className="mb-2 text-sm font-medium text-white/80">
-                影调分析
+                {t('exif.tone.analysis.title')}
               </h4>
               <div>
                 {/* 影调信息 */}
