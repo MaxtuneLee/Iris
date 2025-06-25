@@ -41,6 +41,7 @@
     "consola": "3.4.2",
     "dotenv": "16.5.0",
     "es-toolkit": "1.39.3",
+    "file-type": "^21.0.0",
     "foxact": "0.2.49",
     "heic-to": "1.1.14",
     "i18next": "25.2.1",
