@@ -265,6 +265,9 @@ importers:
       tailwind-merge:
         specifier: 3.3.1
         version: 3.3.1
+      tiff:
+        specifier: ^7.0.0
+        version: 7.0.0
       usehooks-ts:
         specifier: 3.1.1
         version: 3.1.1(react@19.1.0)
@@ -4695,6 +4698,9 @@ packages:
   inherits@2.0.4:
     resolution: {integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==}
 
+  iobuffer@6.0.0:
+    resolution: {integrity: sha512-sEIVQ307ZoqUxFl2P1oS3G6YLzYcQbvHCdAF7bS26cnfACkpFseR6ifwSAevTf3pItPjAbUpokLam0H7ZpMxQA==}
+
   is-arrayish@0.2.1:
     resolution: {integrity: sha512-zz06S8t0ozoDXMG+ube26zeCTNXcKIPJZJi8hBrF4idCLms4CG9QtK7qBl1boi5ODzFpjswb5JPmHCbMpjaYzg==}
 
@@ -5309,6 +5315,9 @@ packages:
 
   package-manager-manager@0.2.0:
     resolution: {integrity: sha512-V02gl0bafXJ2gcY6j+5IHM7UdnYwmF+2OsFZuqVcha6iMSStD4dpIOBOsypnUIwOi4jLcPz6RQuyifmAE3mG8g==}
+
+  pako@2.1.0:
+    resolution: {integrity: sha512-w+eufiZ1WuJYgPXbV/PO3NCMEc3xqylkKHzp8bxp1uW4qaSNQUkwmLLEc3kKsfz8lpV1F8Ht3U1Cm+9Srog2ug==}
 
   param-case@3.0.4:
     resolution: {integrity: sha512-RXlj7zCYokReqWpOPH9oYivUzLYZ5vAPIfEmCTNViosC78F8F0H9y7T7gG2M39ymgutxF5gcFEsyZQSph9Bp3A==}
@@ -6146,6 +6155,9 @@ packages:
     resolution: {integrity: sha512-H406eLPXpZbAX14+B8psIuvIr8+3c+2hkuYzpMkoE0ij+NdsVATbA78vb8neA/eqrj7rywa2pIkdmWRsXW6wmw==}
     engines: {node: '>=10'}
     hasBin: true
+
+  tiff@7.0.0:
+    resolution: {integrity: sha512-NhAYu+1cYzWpJ64bxaAC/b1fy6ZwkllMxYUziVZAISZa2TKu8H7AsC7Kpz4epZoMb0SNS4fOA6Ql1gZCZ27UXQ==}
 
   time-span@4.0.0:
     resolution: {integrity: sha512-MyqZCTGLDZ77u4k+jqg4UlrzPTPZ49NDlaekU6uuFaJLzPIN1woaRXCbGeqOfxwc3Y37ZROGAJ614Rdv7Olt+g==}
@@ -11544,6 +11556,8 @@ snapshots:
 
   inherits@2.0.4: {}
 
+  iobuffer@6.0.0: {}
+
   is-arrayish@0.2.1: {}
 
   is-arrayish@0.3.2: {}
@@ -12124,6 +12138,8 @@ snapshots:
     dependencies:
       js-yaml: 4.1.0
       shellac: 0.8.0
+
+  pako@2.1.0: {}
 
   param-case@3.0.4:
     dependencies:
@@ -12934,6 +12950,11 @@ snapshots:
       acorn: 8.14.1
       commander: 2.20.3
       source-map-support: 0.5.21
+
+  tiff@7.0.0:
+    dependencies:
+      iobuffer: 6.0.0
+      pako: 2.1.0
 
   time-span@4.0.0:
     dependencies:

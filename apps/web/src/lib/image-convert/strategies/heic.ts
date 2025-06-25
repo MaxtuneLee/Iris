@@ -1,19 +1,72 @@
 import { heicTo, isHeic } from 'heic-to'
 
-import { isSafari } from './device-viewport'
-import { LRUCache } from './lru-cache'
+import { i18nAtom } from '~/i18n'
+import { isSafari } from '~/lib/device-viewport'
+import type { LoadingCallbacks } from '~/lib/image-loader-manager'
+import { jotaiStore } from '~/lib/jotai'
+import { LRUCache } from '~/lib/lru-cache'
+
+import type { ConversionResult, ImageConverterStrategy } from '../type'
+
+// HEIC 转换策略
+export class HeicConverterStrategy implements ImageConverterStrategy {
+  getName(): string {
+    return 'HEIC'
+  }
+
+  getSupportedFormats(): string[] {
+    return ['image/heic', 'image/heif']
+  }
+
+  async shouldConvert(_blob: Blob): Promise<boolean> {
+    try {
+      // 只需检查浏览器是否支持，格式检测已由 file-type 完成
+      return !isBrowserSupportHeic()
+    } catch (error) {
+      console.error('HEIC browser support detection failed:', error)
+      return false
+    }
+  }
+
+  async convert(
+    blob: Blob,
+    originalUrl: string,
+    callbacks?: LoadingCallbacks,
+  ): Promise<ConversionResult> {
+    const { onLoadingStateUpdate } = callbacks || {}
+
+    try {
+      // 获取国际化文案
+      const i18n = jotaiStore.get(i18nAtom)
+
+      // 更新转换状态
+      onLoadingStateUpdate?.({
+        isConverting: true,
+        conversionMessage: i18n.t('loading.heic.converting'),
+        isHeicFormat: true,
+        loadingProgress: 100,
+        loadedBytes: blob.size,
+        totalBytes: blob.size,
+      })
+
+      const result = await convertHeicImage(blob, originalUrl)
+
+      return {
+        url: result.url,
+        convertedSize: result.convertedSize,
+        format: result.format,
+        originalSize: result.originalSize,
+      }
+    } catch (error) {
+      console.error('HEIC conversion failed:', error)
+      throw new Error(`HEIC conversion failed: ${error}`)
+    }
+  }
+}
 
 export interface HeicConversionOptions {
   quality?: number
   format?: 'image/jpeg' | 'image/png'
-}
-
-export interface ConversionResult {
-  blob: Blob
-  url: string
-  originalSize: number
-  convertedSize: number
-  format: string
 }
 
 // HEIC conversion cache using generic LRU cache
@@ -100,7 +153,6 @@ export async function convertHeicImage(
     const url = URL.createObjectURL(convertedBlob)
 
     const result: ConversionResult = {
-      blob: convertedBlob,
       url,
       originalSize: file.size,
       convertedSize: convertedBlob.size,
