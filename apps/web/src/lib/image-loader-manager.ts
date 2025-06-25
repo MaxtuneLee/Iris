@@ -1,6 +1,7 @@
 import { fileTypeFromBlob } from 'file-type'
 
 import { i18nAtom } from '~/i18n'
+import { imageConverterManager } from '~/lib/image-convert'
 import { jotaiStore } from '~/lib/jotai'
 import { LRUCache } from '~/lib/lru-cache'
 import { convertMovToMp4, needsVideoConversion } from '~/lib/video-converter'
@@ -232,84 +233,59 @@ export class ImageLoaderManager {
 
   private async processImageBlob(
     blob: Blob,
-    originalUrl: string, // 添加原始 URL 参数
-    callbacks: LoadingCallbacks,
-  ): Promise<ImageLoadResult> {
-    const { onError: _onError, onLoadingStateUpdate } = callbacks
-
-    try {
-      // 动态导入 heic-converter 模块
-      const { detectHeicFormat, isBrowserSupportHeic } = await import(
-        '~/lib/heic-converter'
-      )
-
-      // 检测是否为 HEIC 格式
-      const shouldHeicTransformed =
-        !isBrowserSupportHeic() && (await detectHeicFormat(blob))
-
-      // Update loading indicator with HEIC format info
-      onLoadingStateUpdate?.({
-        isHeicFormat: shouldHeicTransformed,
-        loadingProgress: 100,
-        loadedBytes: blob.size,
-        totalBytes: blob.size,
-      })
-
-      if (shouldHeicTransformed) {
-        return await this.processHeicImage(blob, originalUrl, callbacks)
-      } else {
-        return this.processRegularImage(blob, originalUrl, callbacks) // 传递原始 URL
-      }
-    } catch (detectionError) {
-      console.error('Format detection failed:', detectionError)
-      // 如果检测失败，按普通图片处理
-      return this.processRegularImage(blob, originalUrl, callbacks) // 传递原始 URL
-    }
-  }
-
-  private async processHeicImage(
-    blob: Blob,
     originalUrl: string,
     callbacks: LoadingCallbacks,
   ): Promise<ImageLoadResult> {
     const { onError: _onError, onLoadingStateUpdate } = callbacks
 
-    // 如果是 HEIC 格式，进行转换
-    const i18n = jotaiStore.get(i18nAtom)
-    onLoadingStateUpdate?.({
-      isConverting: true,
-      conversionMessage: i18n.t('loading.heic.converting'),
-    })
-
     try {
-      // 动态导入 heic-converter 模块
-      const { convertHeicImage } = await import('~/lib/heic-converter')
-
-      const conversionResult = await convertHeicImage(blob, originalUrl)
-
-      // Hide loading indicator
-      onLoadingStateUpdate?.({
-        isVisible: false,
-      })
-
-      console.info(
-        `HEIC converted: ${(blob.size / 1024).toFixed(1)}KB → ${(conversionResult.convertedSize / 1024).toFixed(1)}KB`,
+      // 使用策略模式检测并转换图像
+      const conversionResult = await imageConverterManager.convertImage(
+        blob,
+        originalUrl,
+        callbacks,
       )
 
-      return {
-        blobSrc: conversionResult.url,
-        convertedUrl: conversionResult.url,
+      if (conversionResult) {
+        // 需要转换的格式
+        console.info(
+          `Image converted: ${(blob.size / 1024).toFixed(1)}KB → ${(conversionResult.convertedSize / 1024).toFixed(1)}KB`,
+        )
+
+        // Hide loading indicator
+        onLoadingStateUpdate?.({
+          isVisible: false,
+        })
+
+        return {
+          blobSrc: conversionResult.url,
+          convertedUrl: conversionResult.url,
+        }
+      } else {
+        // 不需要转换的普通图片
+        return this.processRegularImage(blob, originalUrl, callbacks)
       }
     } catch (conversionError) {
-      console.error('HEIC conversion failed:', conversionError)
+      console.error('Image conversion failed:', conversionError)
 
-      // Hide loading indicator on error
-      onLoadingStateUpdate?.({
-        isVisible: false,
-      })
+      // 转换失败时，尝试按普通图片处理
+      try {
+        console.info('Falling back to regular image processing')
+        return this.processRegularImage(blob, originalUrl, callbacks)
+      } catch (fallbackError) {
+        console.error(
+          'Fallback to regular image processing also failed:',
+          fallbackError,
+        )
 
-      _onError?.()
-      throw conversionError
+        // Hide loading indicator on error
+        onLoadingStateUpdate?.({
+          isVisible: false,
+        })
+
+        _onError?.()
+        throw conversionError
+      }
     }
   }
 
