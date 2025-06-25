@@ -1,7 +1,7 @@
 import { fileTypeFromBlob } from 'file-type'
 
 import { i18nAtom } from '~/i18n'
-import { imageConverterManager } from '~/lib/image-converter-strategies'
+import { imageConverterManager } from '~/lib/image-convert'
 import { jotaiStore } from '~/lib/jotai'
 import { LRUCache } from '~/lib/lru-cache'
 import { convertMovToMp4, needsVideoConversion } from '~/lib/video-converter'
