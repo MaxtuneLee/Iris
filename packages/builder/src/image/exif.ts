@@ -8,7 +8,7 @@ import { exiftool } from 'exiftool-vendored'
 import type { Metadata } from 'sharp'
 import sharp from 'sharp'
 
-import type { Logger } from '../logger/index.js'
+import { getGlobalLoggers } from '../photo/logger-adapter.js'
 import type { PickedExif } from '../types/photo.js'
 
 const baseImageBuffer = sharp({
@@ -26,28 +26,27 @@ const baseImageBuffer = sharp({
 export async function extractExifData(
   imageBuffer: Buffer,
   originalBuffer?: Buffer,
-  exifLogger?: Logger['exif'],
 ): Promise<PickedExif | null> {
-  const log = exifLogger
+  const log = getGlobalLoggers().exif
 
   try {
-    log?.info('开始提取 EXIF 数据')
+    log.info('开始提取 EXIF 数据')
 
     // 首先尝试从处理后的图片中提取 EXIF
     let metadata = await sharp(imageBuffer).metadata()
 
     // 如果处理后的图片没有 EXIF 数据，且提供了原始 buffer，尝试从原始图片提取
     if (!metadata.exif && originalBuffer) {
-      log?.info('处理后的图片缺少 EXIF 数据，尝试从原始图片提取')
+      log.info('处理后的图片缺少 EXIF 数据，尝试从原始图片提取')
       try {
         metadata = await sharp(originalBuffer).metadata()
       } catch (error) {
-        log?.warn('从原始图片提取 EXIF 失败，可能是不支持的格式：', error)
+        log.warn('从原始图片提取 EXIF 失败，可能是不支持的格式：', error)
       }
     }
 
     if (!metadata.exif) {
-      log?.warn('未找到 EXIF 数据')
+      log.warn('未找到 EXIF 数据')
       return null
     }
 
@@ -89,21 +88,11 @@ export async function extractExifData(
 
     const exifData = await exiftool.read(tempImagePath)
     const result = handleExifData(exifData, metadata)
-    // const makerNote = exifReader(exifBuffer).Photo?.MakerNote
-
-    // if (makerNote) {
-    //   const recipe = getRecipe(makerNote)
-
-    //   if (recipe) {
-    //     ;(exifData as any).FujiRecipe = recipe
-    //     log?.info('检测到富士胶片配方信息')
-    //   }
-    // }
 
     await unlink(tempImagePath).catch(noop)
 
     if (!exifData) {
-      log?.warn('EXIF 数据解析失败')
+      log.warn('EXIF 数据解析失败')
       return null
     }
 
@@ -112,12 +101,10 @@ export async function extractExifData(
     delete exifData.warnings
     delete exifData.errors
 
-    // const cleanedExifData = cleanExifData(exifData)
-
-    log?.success('EXIF 数据提取完成')
+    log.success('EXIF 数据提取完成')
     return result
   } catch (error) {
-    log?.error('提取 EXIF 数据失败:', error)
+    log.error('提取 EXIF 数据失败:', error)
     return null
   }
 }

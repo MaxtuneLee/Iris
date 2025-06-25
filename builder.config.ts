@@ -86,6 +86,7 @@ export const defaultBuilderConfig: BuilderConfig = {
     prefix: env.S3_PREFIX,
     customDomain: env.S3_CUSTOM_DOMAIN,
     excludeRegex: env.S3_EXCLUDE_REGEX,
+    maxFileLimit: 1000,
   },
 
   options: {

@@ -9,10 +9,8 @@ import type {
 export class StorageManager {
   private provider: StorageProvider
 
-  constructor(config?: StorageConfig) {
-    this.provider = config
-      ? StorageFactory.createProvider(config)
-      : StorageFactory.createDefaultProvider()
+  constructor(config: StorageConfig) {
+    this.provider = StorageFactory.createProvider(config)
   }
 
   /**
@@ -78,6 +76,3 @@ export class StorageManager {
     this.provider = StorageFactory.createProvider(config)
   }
 }
-
-// 导出默认的存储管理器实例
-export const defaultStorageManager = new StorageManager()

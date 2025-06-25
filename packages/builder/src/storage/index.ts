@@ -9,7 +9,7 @@ export type {
 export { StorageFactory } from './factory.js'
 
 // 导出管理器
-export { defaultStorageManager, StorageManager } from './manager.js'
+export { StorageManager } from './manager.js'
 
 // 导出具体提供商（如果需要直接使用）
 export { GitHubStorageProvider } from './providers/github-provider.js'

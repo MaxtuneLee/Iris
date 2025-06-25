@@ -1,70 +1,52 @@
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
-import { join } from 'node:path'
+import path, { join } from 'node:path'
 
 import sharp from 'sharp'
 
-// 创建 SVG favicon 设计
-function createFaviconSVG(size: number) {
-  const iconSize = size * 0.8 // 图标占 80% 的空间
-  const padding = (size - iconSize) / 2
+const __dirname = path.dirname(new URL(import.meta.url).pathname)
 
+// 创建圆角遮罩
+function createRoundedCornersMask(size: number, cornerRadius: number) {
+  const r = cornerRadius
   return `
-    <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style="stop-color:#1a1a1a;stop-opacity:1" />
-          <stop offset="100%" style="stop-color:#0a0a0a;stop-opacity:1" />
-        </linearGradient>
-        <linearGradient id="frame1" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
-          <stop offset="100%" style="stop-color:#f0f0f0;stop-opacity:1" />
-        </linearGradient>
-        <linearGradient id="frame2" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style="stop-color:#f8f8f8;stop-opacity:1" />
-          <stop offset="100%" style="stop-color:#e8e8e8;stop-opacity:1" />
-        </linearGradient>
-        <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-          <feDropShadow dx="1" dy="2" stdDeviation="2" flood-color="rgba(0,0,0,0.3)"/>
-        </filter>
-      </defs>
-      
-      <!-- 背景 -->
-      <rect width="${size}" height="${size}" rx="${size * 0.15}" fill="url(#bg)"/>
-      
-      <!-- 主照片框 -->
-      <rect x="${padding + iconSize * 0.1}" y="${padding + iconSize * 0.15}" 
-            width="${iconSize * 0.5}" height="${iconSize * 0.4}" 
-            rx="${iconSize * 0.02}" fill="url(#frame1)" filter="url(#shadow)"
-            transform="rotate(-8 ${size / 2} ${size / 2})"/>
-      
-      <!-- 照片内容 -->
-      <rect x="${padding + iconSize * 0.12}" y="${padding + iconSize * 0.17}" 
-            width="${iconSize * 0.46}" height="${iconSize * 0.36}" 
-            rx="${iconSize * 0.01}" fill="#4a90e2"
-            transform="rotate(-8 ${size / 2} ${size / 2})"/>
-      
-      <!-- 第二张照片框 -->
-      <rect x="${padding + iconSize * 0.35}" y="${padding + iconSize * 0.25}" 
-            width="${iconSize * 0.5}" height="${iconSize * 0.4}" 
-            rx="${iconSize * 0.02}" fill="url(#frame2)" filter="url(#shadow)"
-            transform="rotate(5 ${size / 2} ${size / 2})"/>
-      
-      <!-- 第二张照片内容 -->
-      <rect x="${padding + iconSize * 0.37}" y="${padding + iconSize * 0.27}" 
-            width="${iconSize * 0.46}" height="${iconSize * 0.36}" 
-            rx="${iconSize * 0.01}" fill="#e74c3c"
-            transform="rotate(5 ${size / 2} ${size / 2})"/>
-      
-      <!-- 装饰点 -->
-      <circle cx="${size * 0.8}" cy="${size * 0.2}" r="${size * 0.03}" fill="rgba(255,255,255,0.3)"/>
-      <circle cx="${size * 0.2}" cy="${size * 0.8}" r="${size * 0.02}" fill="rgba(255,255,255,0.2)"/>
+    <svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="${size}" height="${size}" rx="${r}" ry="${r}" fill="white"/>
     </svg>
   `
 }
 
+// 为图片添加圆角
+async function addRoundedCorners(
+  imageBuffer: Buffer,
+  size: number,
+): Promise<Buffer> {
+  // 计算圆角半径，约为尺寸的 12%
+  const cornerRadius = Math.round(size * 0.12)
+
+  const maskSvg = createRoundedCornersMask(size, cornerRadius)
+  const maskBuffer = Buffer.from(maskSvg)
+
+  return sharp(imageBuffer)
+    .composite([
+      {
+        input: maskBuffer,
+        blend: 'dest-in',
+      },
+    ])
+    .png()
+    .toBuffer()
+}
+
 // 生成不同尺寸的 favicon
 export async function generateFavicons() {
+  const logoPath = join(__dirname, '../logo.jpg')
   const outputDir = join(process.cwd(), 'public')
+
+  // 检查 logo 文件是否存在
+  if (!existsSync(logoPath)) {
+    throw new Error('Logo file not found: logo.jpg')
+  }
+
   if (!existsSync(outputDir)) {
     mkdirSync(outputDir, { recursive: true })
   }
@@ -79,31 +61,44 @@ export async function generateFavicons() {
   ]
 
   try {
-    // 生成 ICO 文件（包含多个尺寸）
-    const icoSizes = [16, 32, 48]
-    const icoBuffers: Buffer[] = []
-
-    for (const size of icoSizes) {
-      const svgContent = createFaviconSVG(size)
-      const buffer = await sharp(Buffer.from(svgContent)).png().toBuffer()
-      icoBuffers.push(buffer)
-    }
+    // 读取原始 logo 图片
+    const logoBuffer = await sharp(logoPath).jpeg({ quality: 100 }).toBuffer()
 
     // 生成各种尺寸的 PNG 文件
     for (const { size, name } of sizes) {
-      const svgContent = createFaviconSVG(size)
-      const buffer = await sharp(Buffer.from(svgContent)).png().toBuffer()
+      const resizedBuffer = await sharp(logoBuffer)
+        .resize(size, size, {
+          fit: 'cover',
+          position: 'center',
+        })
+        .png({
+          quality: 100,
+          compressionLevel: 6,
+        })
+        .toBuffer()
+
+      // 添加圆角效果
+      const roundedBuffer = await addRoundedCorners(resizedBuffer, size)
 
       const outputPath = join(outputDir, name)
-      writeFileSync(outputPath, buffer)
+      writeFileSync(outputPath, roundedBuffer)
       console.info(`✅ Generated favicon: ${name} (${size}x${size})`)
     }
 
     // 生成主 favicon.ico（使用 32x32）
-    const mainFaviconSvg = createFaviconSVG(32)
-    const faviconBuffer = await sharp(Buffer.from(mainFaviconSvg))
-      .png()
+    const faviconResizedBuffer = await sharp(logoBuffer)
+      .resize(32, 32, {
+        fit: 'cover',
+        position: 'center',
+      })
+      .png({
+        quality: 100,
+        compressionLevel: 6,
+      })
       .toBuffer()
+
+    // 为 favicon.ico 添加圆角
+    const faviconBuffer = await addRoundedCorners(faviconResizedBuffer, 32)
 
     const faviconPath = join(outputDir, 'favicon.ico')
     writeFileSync(faviconPath, faviconBuffer)
@@ -134,7 +129,9 @@ export async function generateFavicons() {
     writeFileSync(manifestPath, JSON.stringify(manifest, null, 2))
     console.info(`✅ Generated web manifest: site.webmanifest`)
 
-    console.info(`🎨 All favicons generated successfully!`)
+    console.info(
+      `🎨 All favicons generated successfully from logo.jpg with rounded corners!`,
+    )
   } catch (error) {
     console.error('❌ Error generating favicons:', error)
     throw error

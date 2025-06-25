@@ -1,5 +1,5 @@
 import { Provider } from 'jotai'
-import { LazyMotion, MotionConfig } from 'motion/react'
+import { domMax, LazyMotion, MotionConfig } from 'motion/react'
 import type { FC, PropsWithChildren } from 'react'
 
 import { Toaster } from '~/components/ui/sonner'
@@ -12,10 +12,8 @@ import { I18nProvider } from './i18n-provider'
 import { SettingSync } from './setting-sync'
 import { StableRouterProvider } from './stable-router-provider'
 
-const loadFeatures = () =>
-  import('../framer-lazy-feature').then((res) => res.default)
 export const RootProviders: FC<PropsWithChildren> = ({ children }) => (
-  <LazyMotion features={loadFeatures} strict key="framer">
+  <LazyMotion features={domMax} strict key="framer">
     <MotionConfig transition={Spring.presets.smooth}>
       <Provider store={jotaiStore}>
         <EventProvider />

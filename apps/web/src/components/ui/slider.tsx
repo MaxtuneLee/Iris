@@ -119,7 +119,7 @@ export const Slider = ({
           {/* 激活区域 */}
           <div
             className={clsxm(
-              'absolute top-0 h-full rounded-full transition-all duration-150',
+              'absolute top-0 h-full rounded-full transition-all duration-150 max-w-full',
               value === 'auto' ? 'bg-green-500' : 'bg-accent',
             )}
             style={{

@@ -6,6 +6,7 @@ import sharp from 'sharp'
 
 import { HEIC_FORMATS } from '../constants/index.js'
 import type { Logger } from '../logger/index.js'
+import { getGlobalLoggers } from '../photo/logger-adapter.js'
 import type { ImageMetadata } from '../types/photo.js'
 
 // 获取图片元数据（复用 Sharp 实例）
@@ -86,9 +87,8 @@ export async function convertHeicToJpeg(
 export async function preprocessImageBuffer(
   buffer: Buffer,
   key: string,
-  imageLogger?: Logger['image'],
 ): Promise<Buffer> {
-  const log = imageLogger
+  const log = getGlobalLoggers().image.originalLogger
   const ext = path.extname(key).toLowerCase()
 
   // 如果是 HEIC/HEIF 格式，先转换为 JPEG
@@ -135,9 +135,9 @@ export async function convertBmpToJpegSharpInstance(
 
     // 创建 Sharp 实例
     // Calculate the number of channels in the BMP image
-    const channels = bmpImage.data.length / (bmpImage.width * bmpImage.height);
+    const channels = bmpImage.data.length / (bmpImage.width * bmpImage.height)
     if (channels !== 3 && channels !== 4) {
-      throw new Error(`Unsupported BMP channel count: ${channels}`);
+      throw new Error(`Unsupported BMP channel count: ${channels}`)
     }
 
     // Create Sharp instance with the correct channel count

@@ -63,7 +63,7 @@ export async function saveManifest(items: PhotoManifestItem[]): Promise<void> {
     ),
   )
 
-  logger.fs.info(`📁 Manifest 保存至：${manifestPath}`)
+  logger.fs.info(`📁 Manifest 保存至： ${manifestPath}`)
 }
 
 // 检测并处理已删除的图片
