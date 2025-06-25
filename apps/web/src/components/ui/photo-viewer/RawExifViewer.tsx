@@ -41,7 +41,7 @@ const parseRawExifData = (rawData: string): ParsedExifData => {
 
 const ExifDataRow = ({ label, value }: { label: string; value: string }) => (
   <div className="flex items-center justify-between border-b border-white/15 py-2 last:border-b-0">
-    <span className="max-w-[45%] min-w-0 flex-shrink-0 pr-4 text-sm font-medium break-words text-white/70">
+    <span className="max-w-[45%] min-w-0 flex-shrink-0 self-start pr-4 text-sm font-medium break-words text-white/70">
       {label}
     </span>
     <span className="max-w-[55%] min-w-0 text-right font-mono text-sm break-words text-white/95">
@@ -378,8 +378,9 @@ export const RawExifViewer: React.FC<RawExifViewerProps> = ({
         <ScrollArea
           rootClassName="h-0 grow flex-1 -mb-6 -mx-6"
           viewportClassName="px-7 pb-6 pt-4"
+          flex
         >
-          <div className="space-y-6">
+          <div className="min-w-0 space-y-6">
             {/* Basic File Information */}
             {getCategoryData(categories.basic).length > 0 && (
               <div>

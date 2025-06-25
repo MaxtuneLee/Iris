@@ -1,3 +1,5 @@
+import { fileTypeFromBlob } from 'file-type'
+
 import { i18nAtom } from '~/i18n'
 import { jotaiStore } from '~/lib/jotai'
 import { LRUCache } from '~/lib/lru-cache'
@@ -69,33 +71,40 @@ export class ImageLoaderManager {
 
   /**
    * 验证 Blob 是否为有效的图片格式
+   * 使用 magic number 检测文件类型，而不是依赖 MIME 类型
    */
-  private isValidImageBlob(blob: Blob): boolean {
-    // 检查 MIME 类型
-    const validImageTypes = [
-      'image/jpeg',
-      'image/jpg',
-      'image/png',
-      'image/webp',
-      'image/bmp',
-      'image/tiff',
-      'image/heic',
-      'image/heif',
-    ]
-
-    // 检查 Content-Type
-    if (!blob.type || !validImageTypes.includes(blob.type.toLowerCase())) {
-      console.warn(`Invalid image MIME type: ${blob.type}`)
-      return false
-    }
-
+  private async isValidImageBlob(blob: Blob): Promise<boolean> {
     // 检查文件大小（至少应该有一些字节）
     if (blob.size === 0) {
       console.warn('Empty blob detected')
       return false
     }
 
-    return true
+    try {
+      // 使用 magic number 检测文件类型
+      const fileType = await fileTypeFromBlob(blob)
+
+      if (!fileType) {
+        console.warn('Could not detect file type from blob')
+        return false
+      }
+
+      // 检查是否为图片格式
+      const isValidImage = fileType.mime.startsWith('image/')
+
+      if (!isValidImage) {
+        console.warn(
+          `Invalid file type detected: ${fileType.ext} (${fileType.mime})`,
+        )
+        return false
+      }
+
+      console.info(`Valid image detected: ${fileType.ext} (${fileType.mime})`)
+      return true
+    } catch (error) {
+      console.error('Failed to detect file type:', error)
+      return false
+    }
   }
 
   async loadImage(
@@ -120,7 +129,7 @@ export class ImageLoaderManager {
             try {
               // 验证响应是否为图片
               const blob = xhr.response as Blob
-              if (!this.isValidImageBlob(blob)) {
+              if (!(await this.isValidImageBlob(blob))) {
                 onLoadingStateUpdate?.({
                   isVisible: false,
                 })
