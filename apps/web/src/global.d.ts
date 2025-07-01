@@ -1,4 +1,7 @@
+import type { AfilmoryManifest } from '@packages/builder/src/types/manifest'
 import type { FC, PropsWithChildren } from 'react'
+
+import type { InjectConfig } from './config/types'
 
 declare global {
   export type Nullable<T> = T | null | undefined
@@ -26,6 +29,14 @@ declare global {
   const APP_NAME: string
   const BUILT_DATE: string
   const GIT_COMMIT_HASH: string
+
+  const __MANIFEST__: AfilmoryManifest
+
+  const __CONFIG__: InjectConfig
+  /**
+   * This function is a macro, will replace in the build stage.
+   */
+  export function tw(strings: TemplateStringsArray, ...values: any[]): string
 }
 
 export {}

@@ -1,0 +1,11 @@
+{
+  "name": "@afilmory/components",
+  "type": "module",
+  "private": true,
+  "exports": {
+    "./*": "./src/*"
+  },
+  "peerDependencies": {
+    "react": "^19"
+  }
+}

@@ -30,7 +30,7 @@ const initialLoadingState: LoadingState = {
   loadedBytes: 0,
   totalBytes: 0,
   conversionMessage: undefined,
-  codecInfo: undefined,
+
   isWebGLLoading: false,
   webglMessage: undefined,
   webglQuality: 'unknown',
@@ -38,7 +38,6 @@ const initialLoadingState: LoadingState = {
 
 export const LoadingIndicator = ({
   ref,
-  ..._
 }: {
   ref?: React.Ref<LoadingIndicatorRef | null>
 }) => {
@@ -71,10 +70,10 @@ export const LoadingIndicator = ({
   }
 
   return (
-    <div className="pointer-events-none absolute right-4 bottom-4 z-10 rounded-xl border border-white/10 bg-black/80 px-3 py-2 backdrop-blur-sm">
+    <div className="pointer-events-none absolute right-4 bottom-4 z-10 rounded-xl border border-white/10 bg-black/80 px-3 py-2 backdrop-blur">
       <div className="flex items-center gap-3 text-white">
         <div className="relative">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+          <div className="i-mingcute-loading-3-line animate-spin text-lg" />
         </div>
         <div className="flex min-w-0 flex-col gap-0.5">
           {loadingState.isConverting ? (
@@ -83,11 +82,6 @@ export const LoadingIndicator = ({
               <p className="text-xs font-medium text-white tabular-nums">
                 {loadingState.conversionMessage || t('loading.converting')}
               </p>
-              {loadingState.codecInfo && (
-                <p className="text-xs text-white/70 tabular-nums">
-                  {loadingState.codecInfo}
-                </p>
-              )}
             </>
           ) : loadingState.isWebGLLoading ? (
             // WebGL 加载状态
@@ -144,7 +138,5 @@ export const LoadingIndicator = ({
     </div>
   )
 }
-
-LoadingIndicator.displayName = 'LoadingIndicator'
 
 export type { LoadingIndicatorRef, LoadingState }

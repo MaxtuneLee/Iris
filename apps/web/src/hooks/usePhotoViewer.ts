@@ -3,6 +3,7 @@ import { atom, useAtom, useAtomValue } from 'jotai'
 import { useCallback, useMemo } from 'react'
 
 import { gallerySettingAtom } from '~/atoms/app'
+import { trackView } from '~/lib/tracker'
 
 const openAtom = atom(false)
 const currentIndexAtom = atom(0)
@@ -52,6 +53,9 @@ export const usePhotoViewer = () => {
   const [currentIndex, setCurrentIndex] = useAtom(currentIndexAtom)
   const [triggerElement, setTriggerElement] = useAtom(triggerElementAtom)
 
+  const id = useMemo(() => {
+    return photos[currentIndex].id
+  }, [photos, currentIndex])
   const openViewer = useCallback(
     (index: number, element?: HTMLElement) => {
       setCurrentIndex(index)
@@ -59,8 +63,10 @@ export const usePhotoViewer = () => {
       setIsOpen(true)
       // 防止背景滚动
       document.body.style.overflow = 'hidden'
+
+      trackView(id)
     },
-    [setCurrentIndex, setIsOpen, setTriggerElement],
+    [id, setCurrentIndex, setIsOpen, setTriggerElement],
   )
 
   const closeViewer = useCallback(() => {
@@ -70,25 +76,14 @@ export const usePhotoViewer = () => {
     document.body.style.overflow = ''
   }, [setIsOpen, setTriggerElement])
 
-  const goToNext = useCallback(() => {
-    if (currentIndex < photos.length - 1) {
-      setCurrentIndex(currentIndex + 1)
-    }
-  }, [currentIndex, photos.length, setCurrentIndex])
-
-  const goToPrevious = useCallback(() => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1)
-    }
-  }, [currentIndex, setCurrentIndex])
-
   const goToIndex = useCallback(
     (index: number) => {
       if (index >= 0 && index < photos.length) {
         setCurrentIndex(index)
+        trackView(photos[index].id)
       }
     },
-    [photos.length, setCurrentIndex],
+    [photos, setCurrentIndex],
   )
 
   return {
@@ -97,8 +92,7 @@ export const usePhotoViewer = () => {
     triggerElement,
     openViewer,
     closeViewer,
-    goToNext,
-    goToPrevious,
+
     goToIndex,
   }
 }

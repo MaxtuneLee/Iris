@@ -104,30 +104,7 @@ export async function generateFavicons() {
     writeFileSync(faviconPath, faviconBuffer)
     console.info(`✅ Generated main favicon: favicon.ico`)
 
-    // 生成 site.webmanifest
-    const manifest = {
-      name: 'Afilmory',
-      short_name: 'Afilmory',
-      icons: [
-        {
-          src: '/android-chrome-192x192.png',
-          sizes: '192x192',
-          type: 'image/png',
-        },
-        {
-          src: '/android-chrome-512x512.png',
-          sizes: '512x512',
-          type: 'image/png',
-        },
-      ],
-      theme_color: '#0a0a0a',
-      background_color: '#0a0a0a',
-      display: 'standalone',
-    }
-
-    const manifestPath = join(outputDir, 'site.webmanifest')
-    writeFileSync(manifestPath, JSON.stringify(manifest, null, 2))
-    console.info(`✅ Generated web manifest: site.webmanifest`)
+    // PWA manifest 由 vite-plugin-pwa 生成，这里不再生成重复的文件
 
     console.info(
       `🎨 All favicons generated successfully from logo.jpg with rounded corners!`,

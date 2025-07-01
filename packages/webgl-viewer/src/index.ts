@@ -1,3 +1,4 @@
+export { LoadingState } from './enum'
 export type {
   AlignmentAnimationConfig,
   DebugInfo,

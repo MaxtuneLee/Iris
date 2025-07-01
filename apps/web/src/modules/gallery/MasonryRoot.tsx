@@ -13,13 +13,12 @@ import { clsxm } from '~/lib/cn'
 import { Spring } from '~/lib/spring'
 import type { PhotoManifest } from '~/types/photo'
 
-import type { PanelType } from './ActionGroup'
+import type { ActionType } from './ActionGroup'
 import { ActionGroup, ActionPanel } from './ActionGroup'
-import type { ActionType } from './FloatingActionButton'
 import { FloatingActionButton } from './FloatingActionButton'
 import { Masonry } from './Masonic'
 import { MasonryHeaderMasonryItem } from './MasonryHeaderMasonryItem'
-import { PhotoMasonryItem } from './PhotoMasonryItem'
+import { MasonryPhotoItem } from './MasonryPhotoItem'
 
 class MasonryHeaderItem {
   static default = new MasonryHeaderItem()
@@ -201,7 +200,7 @@ export const MasonryRoot = () => {
             setActivePanel(null)
           }
         }}
-        type={activePanel as PanelType | null}
+        type={activePanel}
       />
     </>
   )
@@ -274,7 +273,7 @@ export const MasonryItem = memo(
           animate="visible"
           onAnimationComplete={shouldAnimate ? onAnimationComplete : undefined}
         >
-          <PhotoMasonryItem
+          <MasonryPhotoItem
             data={data as PhotoManifest}
             width={width}
             index={index}

@@ -156,7 +156,9 @@ const categories = {
     'GPS Position',
     'GPS Speed',
     'GPS Speed Ref',
-    'GPS Map Datum',
+    'GPS Time Stamp',
+    'GPS Date Stamp',
+    'GPS Date/Time',
   ],
   imageProperties: [
     'Image Width',
@@ -377,7 +379,7 @@ export const RawExifViewer: React.FC<RawExifViewerProps> = ({
 
         <ScrollArea
           rootClassName="h-0 grow flex-1 -mb-6 -mx-6"
-          viewportClassName="px-7 pb-6 pt-4"
+          viewportClassName="px-7 pb-6 pt-4 [&_*]:select-text"
           flex
         >
           <div className="min-w-0 space-y-6">

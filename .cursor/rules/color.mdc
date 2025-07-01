@@ -1,6 +1,6 @@
 ---
 description: 
-globs: 
+globs: apps/**/*
 alwaysApply: false
 ---
 # UIKit Colors for Tailwind CSS

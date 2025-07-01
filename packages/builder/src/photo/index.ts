@@ -3,13 +3,16 @@ export type { PhotoProcessorOptions } from './processor.js'
 export { processPhoto } from './processor.js'
 
 // 缓存管理
-export type { CacheableData, ThumbnailResult } from './cache-manager.js'
+export type { CacheableData } from './cache-manager.js'
+export { shouldProcessPhoto } from './cache-manager.js'
+
+// 数据处理器
+export type { ThumbnailResult } from './data-processors.js'
 export {
   processExifData,
   processThumbnailAndBlurhash,
   processToneAnalysis,
-  shouldProcessPhoto,
-} from './cache-manager.js'
+} from './data-processors.js'
 
 // Live Photo 处理
 export type { LivePhotoResult } from './live-photo-handler.js'

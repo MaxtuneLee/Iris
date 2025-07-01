@@ -1,4 +1,3 @@
-export const runtime = 'edge'
 export const GET =
   process.env.NODE_ENV === 'development'
     ? // @ts-expect-error

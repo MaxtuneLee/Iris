@@ -215,7 +215,11 @@ export const formatExifData = (exif: PickedExif | null) => {
 
   // 快门速度
   const exposureTime = exif.ExposureTime
-  const shutterSpeed = `${exposureTime}s`
+  const shutterSpeed = exposureTime
+    ? `${exposureTime}s`
+    : exif.ShutterSpeedValue
+      ? `${exif.ShutterSpeedValue}s`
+      : null
 
   // 光圈
   const aperture = exif.FNumber ? `f/${exif.FNumber}` : null

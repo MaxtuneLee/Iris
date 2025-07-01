@@ -12,7 +12,7 @@ i18n
   .use(initReactI18next)
   .init({
     fallbackLng: {
-      default: ['zh-CN'],
+      default: ['en'],
     },
     defaultNS: 'app',
     resources,

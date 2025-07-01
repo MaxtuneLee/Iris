@@ -1,7 +1,7 @@
-import type { Spring } from 'motion/react'
+import type { Transition } from 'motion/react'
 import { animateValue } from 'motion/react'
 
-const spring: Spring = {
+const spring: Transition = {
   type: 'spring',
   stiffness: 1000,
   damping: 250,

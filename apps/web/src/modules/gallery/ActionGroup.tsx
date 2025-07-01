@@ -1,5 +1,6 @@
 import { photoLoader } from '@afilmory/data'
 import { useAtom } from 'jotai'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Drawer } from 'vaul'
 
@@ -159,6 +160,154 @@ const ColumnsPanel = () => {
   )
 }
 
+// 通用的操作按钮组件
+const ActionButton = ({
+  icon,
+  title,
+  badge,
+  onClick,
+  ref,
+  ...props
+}: {
+  icon: string
+  title: string
+  badge?: number | string
+  onClick: () => void
+  ref?: React.RefObject<HTMLButtonElement>
+}) => {
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      className="relative h-10 w-10 rounded-full border-0 bg-gray-100 transition-all duration-200 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
+      title={title}
+      onClick={onClick}
+      ref={ref}
+      {...props}
+    >
+      <i
+        className={clsxm(icon, 'text-base text-gray-600 dark:text-gray-300')}
+      />
+      {badge && (
+        <span className="bg-accent absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-xs font-medium text-white shadow-sm">
+          {badge}
+        </span>
+      )}
+    </Button>
+  )
+}
+
+// 桌面端的下拉菜单按钮
+const DesktopActionButton = ({
+  icon,
+  title,
+  badge,
+  children,
+  contentClassName,
+}: {
+  icon: string
+  title: string
+  badge?: number | string
+  children: React.ReactNode
+  contentClassName?: string
+}) => {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <ActionButton
+          icon={icon}
+          title={title}
+          badge={badge}
+          onClick={() => {}}
+        />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="center" className={contentClassName}>
+        {children}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
+// 移动端的抽屉按钮
+const MobileActionButton = ({
+  icon,
+  title,
+  badge,
+  children,
+  open,
+  onOpenChange,
+}: {
+  icon: string
+  title: string
+  badge?: number | string
+  children: React.ReactNode
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}) => {
+  return (
+    <>
+      <ActionButton
+        icon={icon}
+        title={title}
+        badge={badge}
+        onClick={() => onOpenChange(!open)}
+      />
+      <Drawer.Root open={open} onOpenChange={onOpenChange}>
+        <Drawer.Portal>
+          <Drawer.Overlay className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm" />
+          <Drawer.Content className="fixed right-0 bottom-0 left-0 z-50 flex flex-col rounded-t-2xl border-t border-zinc-200 bg-white/80 p-4 backdrop-blur-xl dark:border-zinc-800 dark:bg-black/80">
+            <div className="mx-auto mb-4 h-1.5 w-12 flex-shrink-0 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+            {children}
+          </Drawer.Content>
+        </Drawer.Portal>
+      </Drawer.Root>
+    </>
+  )
+}
+
+// 响应式操作按钮组件
+const ResponsiveActionButton = ({
+  icon,
+  title,
+  badge,
+  children,
+  contentClassName,
+}: {
+  icon: string
+  title: string
+  badge?: number | string
+  children: React.ReactNode
+  contentClassName?: string
+}) => {
+  const isMobile = useMobile()
+  const [open, setOpen] = useState(false)
+
+  if (isMobile) {
+    return (
+      <MobileActionButton
+        icon={icon}
+        title={title}
+        badge={badge}
+        open={open}
+        onOpenChange={setOpen}
+      >
+        {children}
+      </MobileActionButton>
+    )
+  }
+
+  return (
+    <DesktopActionButton
+      icon={icon}
+      title={title}
+      badge={badge}
+      contentClassName={contentClassName}
+    >
+      {children}
+    </DesktopActionButton>
+  )
+}
+
 export const ActionGroup = () => {
   const { t } = useTranslation()
   const [gallerySetting] = useAtom(gallerySettingAtom)
@@ -166,80 +315,42 @@ export const ActionGroup = () => {
   return (
     <div className="flex items-center justify-center gap-3">
       {/* 标签筛选按钮 */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="relative h-10 w-10 rounded-full border-0 bg-gray-100 transition-all duration-200 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
-            title={t('action.tag.filter')}
-          >
-            <i className="i-mingcute-tag-line text-base text-gray-600 dark:text-gray-300" />
-            {gallerySetting.selectedTags.length > 0 && (
-              <span className="bg-accent absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-xs font-medium text-white shadow-sm">
-                {gallerySetting.selectedTags.length}
-              </span>
-            )}
-          </Button>
-        </DropdownMenuTrigger>
+      <ResponsiveActionButton
+        icon="i-mingcute-tag-line"
+        title={t('action.tag.filter')}
+        badge={
+          gallerySetting.selectedTags.length > 0
+            ? gallerySetting.selectedTags.length
+            : undefined
+        }
+      >
+        <TagsPanel />
+      </ResponsiveActionButton>
 
-        <DropdownMenuContent align="center">
-          <TagsPanel />
-        </DropdownMenuContent>
-      </DropdownMenu>
-
-      <AdjustColumnsButton />
+      {/* 列数调整按钮 */}
+      <ResponsiveActionButton
+        icon="i-mingcute-grid-line"
+        title={t('action.columns.setting')}
+        badge={
+          gallerySetting.columns !== 'auto' ? gallerySetting.columns : undefined
+        }
+      >
+        <ColumnsPanel />
+      </ResponsiveActionButton>
 
       {/* 排序按钮 */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-10 w-10 rounded-full border-0 bg-gray-100 transition-all duration-200 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
-            title={t('action.sort.mode')}
-          >
-            {gallerySetting.sortOrder === 'desc' ? (
-              <i className="i-mingcute-sort-descending-line text-base text-gray-600 dark:text-gray-300" />
-            ) : (
-              <i className="i-mingcute-sort-ascending-line text-base text-gray-600 dark:text-gray-300" />
-            )}
-          </Button>
-        </DropdownMenuTrigger>
-
-        <DropdownMenuContent align="center" className="w-48">
-          <SortPanel />
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <ResponsiveActionButton
+        icon={
+          gallerySetting.sortOrder === 'desc'
+            ? 'i-mingcute-sort-descending-line'
+            : 'i-mingcute-sort-ascending-line'
+        }
+        title={t('action.sort.mode')}
+        contentClassName="w-48"
+      >
+        <SortPanel />
+      </ResponsiveActionButton>
     </div>
-  )
-}
-
-const AdjustColumnsButton = () => {
-  const { t } = useTranslation()
-  const [gallerySetting] = useAtom(gallerySettingAtom)
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="relative h-10 w-10 rounded-full border-0 bg-gray-100 transition-all duration-200 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
-          title={t('action.columns.setting')}
-        >
-          <i className="i-mingcute-grid-line text-base text-gray-600 dark:text-gray-300" />
-          {gallerySetting.columns !== 'auto' && (
-            <span className="bg-accent absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-xs font-medium text-white shadow-sm">
-              {gallerySetting.columns}
-            </span>
-          )}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="center">
-        <ColumnsPanel />
-      </DropdownMenuContent>
-    </DropdownMenu>
   )
 }
 
@@ -250,6 +361,9 @@ const panelMap = {
 }
 
 export type PanelType = keyof typeof panelMap
+// 导出 ActionType 以保持与 FloatingActionButton 的一致性
+export type ActionType = PanelType
+
 export const ActionPanel = ({
   open,
   onOpenChange,
@@ -257,7 +371,7 @@ export const ActionPanel = ({
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
-  type: keyof typeof panelMap | null
+  type: PanelType | null
 }) => {
   const Panel = type ? panelMap[type] : null
   return (

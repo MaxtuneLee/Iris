@@ -1,10 +1,11 @@
-import { photoLoader } from '@afilmory/data'
-import type { PhotoManifest } from '@afilmory/data/types'
+import type { PhotoManifestItem } from '@afilmory/builder'
 import siteConfig from '@config'
 import { DOMParser } from 'linkedom'
 import type { NextRequest } from 'next/server'
 
-import indexHtml from '../../index.html'
+import indexHtml from '~/index.html'
+import { injectConfigToDocument } from '~/lib/injectable'
+import { photoLoader } from '~/lib/photo-loader'
 
 type HtmlElement = ReturnType<typeof DOMParser.prototype.parseFromString>
 type OnlyHTMLDocument = HtmlElement extends infer T
@@ -46,6 +47,8 @@ export const handler = async (
     // Insert meta open graph tags and twitter meta tags
     createAndInsertOpenGraphMeta(document, photo, request)
 
+    injectConfigToDocument(document)
+
     return new Response(document.documentElement.outerHTML, {
       headers: {
         'Content-Type': 'text/html',
@@ -66,7 +69,7 @@ export const handler = async (
 
 const createAndInsertOpenGraphMeta = (
   document: OnlyHTMLDocument,
-  photo: PhotoManifest,
+  photo: PhotoManifestItem,
   request: NextRequest,
 ) => {
   // Open Graph meta tags

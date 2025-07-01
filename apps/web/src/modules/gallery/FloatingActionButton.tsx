@@ -10,7 +10,7 @@ import { Spring } from '~/lib/spring'
 type TranslationKeys = keyof typeof en
 
 const actions: {
-  id: string
+  id: 'sort' | 'tags' | 'columns'
   icon: string
   title: TranslationKeys
 }[] = [
@@ -25,7 +25,7 @@ const actions: {
     icon: 'i-mingcute-grid-line',
     title: 'action.columns.setting',
   },
-]
+] as const
 
 export type ActionType = (typeof actions)[number]['id']
 
@@ -149,7 +149,7 @@ export const FloatingActionButton = ({
                     // setIsOpen(false)
                   }}
                 >
-                  <i className={clsxm(action.icon, 'text-xl text-accent')} />
+                  <i className={clsxm(action.icon, 'text-xl text-white')} />
                 </GlassButton>
               </m.div>
             ))}
@@ -158,19 +158,11 @@ export const FloatingActionButton = ({
               onClick={() => setIsOpen(!isOpen)}
               className="relative z-10"
             >
-              {isOpen && (
-                <m.div
-                  className="pointer-events-none absolute inset-0 rounded-full bg-white/20"
-                  initial={{ scale: 0, opacity: 0.7 }}
-                  animate={{ scale: 3, opacity: 0 }}
-                  transition={{ duration: 0.6, ease: 'easeOut' }}
-                />
-              )}
               <AnimatePresence initial={false} mode="wait">
                 <m.i
                   key={isOpen ? 'close' : 'settings'}
                   className={clsxm(
-                    'absolute text-2xl text-accent',
+                    'absolute text-2xl text-white',
                     isOpen
                       ? 'i-mingcute-close-line'
                       : 'i-mingcute-settings-3-line',
