@@ -8,6 +8,6 @@ export const isMobileDevice = (() => {
       navigator.userAgent,
     ) ||
     // 现代检测方式：支持触摸且屏幕较小
-    ('ontouchstart' in window && window.screen.width < 1024)
+    'ontouchstart' in window
   )
 })()

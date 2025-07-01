@@ -1,4 +1,5 @@
 // @ts-check
+import { globalIgnores } from 'eslint/config'
 import { defineConfig } from 'eslint-config-hyoban'
 
 import checkI18nJson from './plugins/eslint/eslint-check-i18n-json.js'
@@ -60,4 +61,5 @@ export default defineConfig(
       '@stylistic/jsx-self-closing-comp': 'error',
     },
   },
+  globalIgnores(['apps/ssr/src/index.html.ts']),
 )

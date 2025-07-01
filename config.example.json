@@ -8,17 +8,5 @@
     "name": "Innei",
     "url": "https://innei.in/",
     "avatar": "https://cdn.jsdelivr.net/gh/Innei/static@master/avatar.png"
-  },
-  "social": {
-    "twitter": "@__oQuery",
-    "github": "Innei"
-  },
-  "feed": {
-    "folo": {
-      "challenge": {
-        "feedId": "155982289762921472",
-        "userId": "41312624216137728"
-      }
-    }
   }
 }

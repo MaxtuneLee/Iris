@@ -1,3 +1,5 @@
+import type { LoadingState } from './enum'
+
 export interface WheelConfig {
   step: number
   wheelDisabled?: boolean
@@ -47,7 +49,7 @@ export interface WebGLImageViewerProps {
   onImageCopied?: () => void
   onLoadingStateChange?: (
     isLoading: boolean,
-    message?: string,
+    state?: LoadingState,
     quality?: 'high' | 'medium' | 'low' | 'unknown',
   ) => void
   debug?: boolean

@@ -11,22 +11,28 @@ import type { PhotoManifestItem } from '../types/photo.js'
 const manifestPath = path.join(workdir, 'src/data/photos-manifest.json')
 
 export async function loadExistingManifest(): Promise<AfilmoryManifest> {
+  let manifest: AfilmoryManifest
   try {
     const manifestContent = await fs.readFile(manifestPath, 'utf-8')
-    const manifest = JSON.parse(manifestContent) as AfilmoryManifest
-    if (manifest.version !== 'v2') {
-      throw new Error('Invalid manifest version')
-    }
-    return manifest
+    manifest = JSON.parse(manifestContent) as AfilmoryManifest
   } catch {
     logger.fs.error(
       '🔍 未找到 manifest 文件/解析失败，创建新的 manifest 文件...',
     )
     return {
-      version: 'v2',
+      version: 'v5',
       data: [],
     }
   }
+
+  if (manifest.version !== 'v5') {
+    logger.fs.error('🔍 无效的 manifest 版本，创建新的 manifest 文件...')
+    return {
+      version: 'v5',
+      data: [],
+    }
+  }
+  return manifest
 }
 
 // 检查照片是否需要更新（基于最后修改时间）
@@ -55,7 +61,7 @@ export async function saveManifest(items: PhotoManifestItem[]): Promise<void> {
     manifestPath,
     JSON.stringify(
       {
-        version: 'v2',
+        version: 'v5',
         data: sortedManifest,
       } as AfilmoryManifest,
       null,

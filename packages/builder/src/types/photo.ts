@@ -26,13 +26,11 @@ export interface ToneAnalysis {
   contrast: number // 0-100，对比度
   shadowRatio: number // 0-1，阴影区域占比
   highlightRatio: number // 0-1，高光区域占比
-  histogram: CompressedHistogramData // 压缩的直方图数据
 }
 
 export interface PhotoInfo {
   title: string
   dateTaken: string
-  views: number
   tags: string[]
   description: string
 }
@@ -43,16 +41,11 @@ export interface ImageMetadata {
   format: string
 }
 
-export interface PhotoManifestItem {
+export interface PhotoManifestItem extends PhotoInfo {
   id: string
-  title: string
-  description: string
-  dateTaken: string
-  views: number
-  tags: string[]
   originalUrl: string
-  thumbnailUrl: string | null
-  blurhash: string | null
+  thumbnailUrl: string
+  thumbHash: string | null
   width: number
   height: number
   aspectRatio: number
@@ -158,7 +151,7 @@ export interface PickedExif {
 export interface ThumbnailResult {
   thumbnailUrl: string | null
   thumbnailBuffer: Buffer | null
-  blurhash: string | null
+  thumbHash: Uint8Array | null
 }
 
 export type FujiRecipe = {

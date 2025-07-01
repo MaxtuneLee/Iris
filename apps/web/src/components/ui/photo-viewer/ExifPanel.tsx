@@ -1,6 +1,6 @@
 import './PhotoViewer.css'
 
-import type { PickedExif } from '@afilmory/data'
+import type { PhotoManifestItem, PickedExif } from '@afilmory/builder'
 import { isNil } from 'es-toolkit/compat'
 import { useAtomValue } from 'jotai'
 import { m } from 'motion/react'
@@ -20,7 +20,6 @@ import {
 } from '~/icons'
 import { getImageFormat } from '~/lib/image-utils'
 import { Spring } from '~/lib/spring'
-import type { PhotoManifest } from '~/types/photo'
 
 import { MotionButtonBase } from '../button'
 import { formatExifData, Row } from './formatExifData'
@@ -28,7 +27,7 @@ import { HistogramChart } from './HistogramChart'
 import { RawExifViewer } from './RawExifViewer'
 
 export const ExifPanel: FC<{
-  currentPhoto: PhotoManifest
+  currentPhoto: PhotoManifestItem
   exifData: PickedExif | null
 
   onClose?: () => void
@@ -46,9 +45,9 @@ export const ExifPanel: FC<{
     <m.div
       className={`${
         isMobile
-          ? 'exif-panel-mobile fixed right-0 bottom-0 left-0 max-h-[60vh] w-full rounded-t-2xl backdrop-blur-[70px]'
+          ? 'exif-panel-mobile fixed right-0 bottom-0 left-0 z-10 max-h-[60vh] w-full rounded-t-2xl backdrop-blur-[70px]'
           : 'w-80 shrink-0'
-      } bg-material-medium z-10 flex flex-col text-white`}
+      } bg-material-medium flex flex-col text-white`}
       initial={{
         opacity: 0,
         ...(isMobile ? { y: 100 } : { x: 100 }),
@@ -83,7 +82,7 @@ export const ExifPanel: FC<{
 
       <ScrollArea
         rootClassName="flex-1 min-h-0 overflow-auto lg:overflow-hidden"
-        viewportClassName="px-4 pb-4"
+        viewportClassName="px-4 pb-4 [&_*]:select-text"
       >
         <div className={`space-y-${isMobile ? '3' : '4'}`}>
           {/* 基本信息和标签 - 合并到一个 section */}
@@ -157,59 +156,64 @@ export const ExifPanel: FC<{
               )}
             </div>
 
-            {formattedExifData && (
-              <div>
-                <h4 className="my-2 text-sm font-medium text-white/80">
-                  {t('exif.capture.parameters')}
-                </h4>
-                <div className={`grid grid-cols-2 gap-2`}>
-                  {formattedExifData.focalLength35mm && (
-                    <div className="flex h-6 items-center gap-2 rounded-md bg-white/10 px-2">
-                      <StreamlineImageAccessoriesLensesPhotosCameraShutterPicturePhotographyPicturesPhotoLens className="text-sm text-white/70" />
-                      <span className="text-xs">
-                        {formattedExifData.focalLength35mm}mm
-                      </span>
-                    </div>
-                  )}
+            {formattedExifData &&
+              (formattedExifData.shutterSpeed ||
+                formattedExifData.iso ||
+                formattedExifData.aperture ||
+                formattedExifData.exposureBias ||
+                formattedExifData.focalLength35mm) && (
+                <div>
+                  <h4 className="my-2 text-sm font-medium text-white/80">
+                    {t('exif.capture.parameters')}
+                  </h4>
+                  <div className={`grid grid-cols-2 gap-2`}>
+                    {formattedExifData.focalLength35mm && (
+                      <div className="flex h-6 items-center gap-2 rounded-md bg-white/10 px-2">
+                        <StreamlineImageAccessoriesLensesPhotosCameraShutterPicturePhotographyPicturesPhotoLens className="text-sm text-white/70" />
+                        <span className="text-xs">
+                          {formattedExifData.focalLength35mm}mm
+                        </span>
+                      </div>
+                    )}
 
-                  {formattedExifData.aperture && (
-                    <div className="flex h-6 items-center gap-2 rounded-md bg-white/10 px-2">
-                      <TablerAperture className="text-sm text-white/70" />
-                      <span className="text-xs">
-                        {formattedExifData.aperture}
-                      </span>
-                    </div>
-                  )}
+                    {formattedExifData.aperture && (
+                      <div className="flex h-6 items-center gap-2 rounded-md bg-white/10 px-2">
+                        <TablerAperture className="text-sm text-white/70" />
+                        <span className="text-xs">
+                          {formattedExifData.aperture}
+                        </span>
+                      </div>
+                    )}
 
-                  {formattedExifData.shutterSpeed && (
-                    <div className="flex h-6 items-center gap-2 rounded-md bg-white/10 px-2">
-                      <MaterialSymbolsShutterSpeed className="text-sm text-white/70" />
-                      <span className="text-xs">
-                        {formattedExifData.shutterSpeed}
-                      </span>
-                    </div>
-                  )}
+                    {formattedExifData.shutterSpeed && (
+                      <div className="flex h-6 items-center gap-2 rounded-md bg-white/10 px-2">
+                        <MaterialSymbolsShutterSpeed className="text-sm text-white/70" />
+                        <span className="text-xs">
+                          {formattedExifData.shutterSpeed}
+                        </span>
+                      </div>
+                    )}
 
-                  {formattedExifData.iso && (
-                    <div className="flex h-6 items-center gap-2 rounded-md bg-white/10 px-2">
-                      <CarbonIsoOutline className="text-sm text-white/70" />
-                      <span className="text-xs">
-                        ISO {formattedExifData.iso}
-                      </span>
-                    </div>
-                  )}
+                    {formattedExifData.iso && (
+                      <div className="flex h-6 items-center gap-2 rounded-md bg-white/10 px-2">
+                        <CarbonIsoOutline className="text-sm text-white/70" />
+                        <span className="text-xs">
+                          ISO {formattedExifData.iso}
+                        </span>
+                      </div>
+                    )}
 
-                  {formattedExifData.exposureBias && (
-                    <div className="flex h-6 items-center gap-2 rounded-md bg-white/10 px-2">
-                      <MaterialSymbolsExposure className="text-sm text-white/70" />
-                      <span className="text-xs">
-                        {formattedExifData.exposureBias}
-                      </span>
-                    </div>
-                  )}
+                    {formattedExifData.exposureBias && (
+                      <div className="flex h-6 items-center gap-2 rounded-md bg-white/10 px-2">
+                        <MaterialSymbolsExposure className="text-sm text-white/70" />
+                        <span className="text-xs">
+                          {formattedExifData.exposureBias}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
             {/* 标签信息 - 移到基本信息 section 内 */}
             {currentPhoto.tags && currentPhoto.tags.length > 0 && (
@@ -286,7 +290,7 @@ export const ExifPanel: FC<{
                   <div className="mb-2 text-xs font-medium text-white/70">
                     {t('exif.histogram')}
                   </div>
-                  <HistogramChart toneAnalysis={currentPhoto.toneAnalysis} />
+                  <HistogramChart thumbnailUrl={currentPhoto.thumbnailUrl} />
                 </div>
               </div>
             </div>

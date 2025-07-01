@@ -1,4 +1,4 @@
-import { WebGLImageViewer } from '@afilmory/webgl-viewer'
+import { LoadingState, WebGLImageViewer } from '@afilmory/webgl-viewer'
 import { AnimatePresence, m } from 'motion/react'
 import {
   startTransition,
@@ -16,14 +16,16 @@ import {
   useShowContextMenu,
 } from '~/atoms/context-menu'
 import { clsxm } from '~/lib/cn'
+import { isMobileDevice } from '~/lib/device-viewport'
 import { canUseWebGL } from '~/lib/feature'
 import { ImageLoaderManager } from '~/lib/image-loader-manager'
 
 import { SlidingNumber } from '../number/SlidingNumber'
+import type { LivePhotoHandle } from './LivePhoto'
 import { LivePhoto } from './LivePhoto'
 import type { LoadingIndicatorRef } from './LoadingIndicator'
-import { LoadingIndicator } from './LoadingIndicator'
 
+const SHOW_SCALE_INDICATOR_DURATION = 1000
 interface ProgressiveImageProps {
   src: string
   thumbnailSrc?: string
@@ -47,6 +49,8 @@ interface ProgressiveImageProps {
   // Live Photo 相关 props
   isLivePhoto?: boolean
   livePhotoVideoUrl?: string
+
+  loadingIndicatorRef: React.RefObject<LoadingIndicatorRef | null>
 }
 
 export const ProgressiveImage = ({
@@ -70,6 +74,7 @@ export const ProgressiveImage = ({
   // Live Photo props
   isLivePhoto = false,
   livePhotoVideoUrl,
+  loadingIndicatorRef,
 }: ProgressiveImageProps) => {
   const { t } = useTranslation()
   const [blobSrc, setBlobSrc] = useState<string | null>(null)
@@ -85,8 +90,10 @@ export const ProgressiveImage = ({
   const [showScaleIndicator, setShowScaleIndicator] = useState(false)
   const scaleIndicatorTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  const loadingIndicatorRef = useRef<LoadingIndicatorRef>(null)
   const imageLoaderManagerRef = useRef<ImageLoaderManager | null>(null)
+  const livePhotoRef = useRef<LivePhotoHandle>(null)
+  const longPressTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const [isLivePhotoPlaying, setIsLivePhotoPlaying] = useState(false)
 
   useEffect(() => {
     if (highResLoaded || error || !isCurrentImage) return
@@ -156,22 +163,55 @@ export const ProgressiveImage = ({
         clearTimeout(scaleIndicatorTimeoutRef.current)
       }
 
-      // 设置新的定时器，500ms 后隐藏提示
       scaleIndicatorTimeoutRef.current = setTimeout(() => {
         setShowScaleIndicator(false)
-      }, 500)
+      }, SHOW_SCALE_INDICATOR_DURATION)
 
       onZoomChange?.(isZoomed)
     },
     [onZoomChange],
   )
 
+  const handleLongPressStart = useCallback(() => {
+    if (!isMobileDevice) return
+    const playVideo = () => livePhotoRef.current?.play()
+    if (
+      !isLivePhoto ||
+      !livePhotoRef.current?.getIsVideoLoaded() ||
+      isLivePhotoPlaying
+    ) {
+      return
+    }
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current)
+    }
+    longPressTimerRef.current = setTimeout(playVideo, 200)
+  }, [isLivePhoto, isLivePhotoPlaying])
+
+  const handleLongPressEnd = useCallback(() => {
+    if (!isMobileDevice) return
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current)
+    }
+    if (isLivePhotoPlaying) {
+      livePhotoRef.current?.stop()
+    }
+  }, [isLivePhotoPlaying])
+
   const handleWebGLLoadingStateChange = useCallback(
     (
       isLoading: boolean,
-      message?: string,
+      state?: LoadingState,
       quality?: 'high' | 'medium' | 'low' | 'unknown',
     ) => {
+      let message = ''
+
+      if (state === LoadingState.CREATE_TEXTURE) {
+        message = t('photo.webgl.creatingTexture')
+      } else if (state === LoadingState.IMAGE_LOADING) {
+        message = t('photo.webgl.loadingImage')
+      }
+
       loadingIndicatorRef.current?.updateLoadingState({
         isVisible: isLoading,
         isWebGLLoading: isLoading,
@@ -179,7 +219,7 @@ export const ProgressiveImage = ({
         webglQuality: quality,
       })
     },
-    [],
+    [t],
   )
 
   const [isThumbnailLoaded, setIsThumbnailLoaded] = useState(false)
@@ -207,7 +247,14 @@ export const ProgressiveImage = ({
   }
 
   return (
-    <div className={clsxm('relative overflow-hidden', className)}>
+    <div
+      className={clsxm('relative overflow-hidden', className)}
+      onMouseDown={handleLongPressStart}
+      onMouseUp={handleLongPressEnd}
+      onMouseLeave={handleLongPressEnd}
+      onTouchStart={handleLongPressStart}
+      onTouchEnd={handleLongPressEnd}
+    >
       {/* 缩略图 */}
       {thumbnailSrc && !isHighResImageRendered && (
         <img
@@ -337,10 +384,12 @@ export const ProgressiveImage = ({
         isCurrentImage &&
         imageLoaderManagerRef.current && (
           <LivePhoto
+            ref={livePhotoRef}
             videoUrl={livePhotoVideoUrl}
             imageLoaderManager={imageLoaderManagerRef.current}
             loadingIndicatorRef={loadingIndicatorRef}
             isCurrentImage={isCurrentImage}
+            onPlayingChange={setIsLivePhotoPlaying}
           />
         )}
 
@@ -353,9 +402,6 @@ export const ProgressiveImage = ({
           </span>
         </div>
       )}
-
-      {/* 加载指示器 */}
-      <LoadingIndicator ref={loadingIndicatorRef} />
 
       {/* 操作提示 */}
       {!isLivePhoto && (
@@ -371,7 +417,7 @@ export const ProgressiveImage = ({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
-            className="pointer-events-none absolute bottom-4 left-4 z-20 flex items-center gap-0.5 rounded bg-black/50 px-3 py-1 text-lg text-white"
+            className="pointer-events-none absolute bottom-4 left-4 z-20 flex items-center gap-0.5 rounded bg-black/50 px-3 py-1 text-lg text-white tabular-nums"
           >
             <SlidingNumber number={currentScale} decimalPlaces={1} />x
           </m.div>

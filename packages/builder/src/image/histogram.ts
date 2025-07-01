@@ -1,44 +1,11 @@
-import type { Logger } from '@afilmory/builder/logger/index.js'
 import type {
-  CompressedHistogramData,
   HistogramData,
   ToneAnalysis,
   ToneType,
 } from '@afilmory/builder/types/photo.js'
 import type sharp from 'sharp'
 
-/**
- * 将 256 点位直方图压缩到 64 点位
- * @param histogram 原始直方图数据
- * @returns 压缩后的直方图数据
- */
-function compressHistogram(histogram: HistogramData): CompressedHistogramData {
-  const compressChannel = (data: number[]): number[] => {
-    const compressed: number[] = []
-    const groupSize = 4 // 256 / 64 = 4，每 4 个点合并为 1 个点
-
-    for (let i = 0; i < 64; i++) {
-      let sum = 0
-      for (let j = 0; j < groupSize; j++) {
-        const index = i * groupSize + j
-        if (index < data.length) {
-          sum += data[index]
-        }
-      }
-      // 量化为整数 (0-10000)，保留4位小数精度
-      compressed[i] = Math.round(sum * 10000)
-    }
-
-    return compressed
-  }
-
-  return {
-    red: compressChannel(histogram.red),
-    green: compressChannel(histogram.green),
-    blue: compressChannel(histogram.blue),
-    luminance: compressChannel(histogram.luminance),
-  }
-}
+import { getGlobalLoggers } from '../photo'
 
 /**
  * 计算图片的直方图
@@ -48,9 +15,8 @@ function compressHistogram(histogram: HistogramData): CompressedHistogramData {
  */
 async function calculateHistogram(
   sharpInstance: sharp.Sharp,
-  imageLogger?: Logger['image'],
 ): Promise<HistogramData | null> {
-  const log = imageLogger
+  const log = getGlobalLoggers().image
 
   try {
     log?.info('开始计算图片直方图')
@@ -114,11 +80,8 @@ async function calculateHistogram(
  * @param imageLogger 日志记录器
  * @returns 影调分析结果
  */
-function analyzeTone(
-  histogram: HistogramData,
-  imageLogger?: Logger['image'],
-): ToneAnalysis {
-  const log = imageLogger
+function analyzeTone(histogram: HistogramData): ToneAnalysis {
+  const log = getGlobalLoggers().image
 
   try {
     log?.info('开始分析图片影调')
@@ -180,7 +143,6 @@ function analyzeTone(
       contrast,
       shadowRatio: Math.round(shadowRatio * 100) / 100,
       highlightRatio: Math.round(highlightRatio * 100) / 100,
-      histogram: compressHistogram(histogram),
     }
 
     log?.success(
@@ -189,21 +151,15 @@ function analyzeTone(
 
     return result
   } catch (error) {
-    log?.error('分析影调失败：', error)
+    log.error('分析影调失败：', error)
     // 返回默认值
-    const defaultHistogram: CompressedHistogramData = {
-      red: Array.from({ length: 64 }).fill(0) as number[],
-      green: Array.from({ length: 64 }).fill(0) as number[],
-      blue: Array.from({ length: 64 }).fill(0) as number[],
-      luminance: Array.from({ length: 64 }).fill(0) as number[],
-    }
+
     return {
       toneType: 'normal',
       brightness: 50,
       contrast: 50,
       shadowRatio: 0.33,
       highlightRatio: 0.33,
-      histogram: defaultHistogram,
     }
   }
 }
@@ -216,12 +172,11 @@ function analyzeTone(
  */
 export async function calculateHistogramAndAnalyzeTone(
   sharpInstance: sharp.Sharp,
-  imageLogger?: Logger['image'],
 ): Promise<ToneAnalysis | null> {
-  const histogram = await calculateHistogram(sharpInstance, imageLogger)
+  const histogram = await calculateHistogram(sharpInstance)
   if (!histogram) {
     return null
   }
 
-  return analyzeTone(histogram, imageLogger)
+  return analyzeTone(histogram)
 }

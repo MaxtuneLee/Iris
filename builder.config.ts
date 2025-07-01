@@ -14,6 +14,8 @@ export interface BuilderConfig {
   repo: {
     enable: boolean
     url: string
+    // Git token for pushing updates back to the repository
+    token?: string
   }
   // 存储配置
   storage: StorageConfig
@@ -74,6 +76,7 @@ export const defaultBuilderConfig: BuilderConfig = {
   repo: {
     enable: false,
     url: '',
+    token: env.GIT_TOKEN,
   },
 
   storage: {

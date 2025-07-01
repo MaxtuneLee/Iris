@@ -36,11 +36,11 @@ export function ErrorElement() {
   return (
     <div className="m-auto flex min-h-full max-w-prose flex-col p-8 pt-12 select-text">
       <div className="fixed inset-x-0 top-0 h-12" />
-      <div className="center flex flex-col">
+      <div className="flex flex-col items-center justify-center">
         <i className="i-mingcute-bug-fill size-12 text-red-400" />
-        <h2 className="mt-12 text-2xl">{t('error.title')}</h2>
+        <h2 className="mt-12 text-2xl select-text">{t('error.title')}</h2>
       </div>
-      <h3 className="text-xl">{message}</h3>
+      <h3 className="text-xl select-text">{message}</h3>
       {import.meta.env.DEV && stack ? (
         <div className="mt-4 cursor-text overflow-auto rounded-md bg-red-50 p-4 text-left font-mono text-sm whitespace-pre text-red-600">
           {attachOpenInEditor(stack)}

@@ -8,13 +8,14 @@ import {
   isBitmap,
   preprocessImageBuffer,
 } from '../image/processor.js'
+import { compressUint8Array } from '../lib/u8array.js'
 import type { PhotoManifestItem } from '../types/photo.js'
+import { shouldProcessPhoto } from './cache-manager.js'
 import {
   processExifData,
   processThumbnailAndBlurhash,
   processToneAnalysis,
-  shouldProcessPhoto,
-} from './cache-manager.js'
+} from './data-processors.js'
 import { extractPhotoInfo } from './info-extractor.js'
 import { processLivePhoto } from './live-photo-handler.js'
 import { getGlobalLoggers } from './logger-adapter.js'
@@ -154,8 +155,6 @@ export async function executePhotoProcessingPipeline(
     const thumbnailResult = await processThumbnailAndBlurhash(
       imageBuffer,
       photoId,
-      metadata.width,
-      metadata.height,
       existingItem,
       options,
     )
@@ -191,13 +190,14 @@ export async function executePhotoProcessingPipeline(
       title: photoInfo.title,
       description: photoInfo.description,
       dateTaken: photoInfo.dateTaken,
-      views: photoInfo.views,
       tags: photoInfo.tags,
       originalUrl: defaultBuilder
         .getStorageManager()
         .generatePublicUrl(photoKey),
       thumbnailUrl: thumbnailResult.thumbnailUrl,
-      blurhash: thumbnailResult.blurhash,
+      thumbHash: thumbnailResult.thumbHash
+        ? compressUint8Array(thumbnailResult.thumbHash)
+        : null,
       width: metadata.width,
       height: metadata.height,
       aspectRatio,

@@ -1,3 +1,4 @@
+import { LoadingState } from './enum'
 import { ImageViewerEngineBase } from './ImageViewerEngineBase'
 import type { DebugInfo, WebGLImageViewerProps } from './interface'
 import {
@@ -90,7 +91,7 @@ export class WebGLImageViewerEngine extends ImageViewerEngineBase {
   private onImageCopied?: () => void
   private onLoadingStateChange?: (
     isLoading: boolean,
-    message?: string,
+    state?: LoadingState,
     quality?: 'high' | 'medium' | 'low' | 'unknown',
   ) => void
   private onDebugUpdate?: React.RefObject<(debugInfo: any) => void>
@@ -341,7 +342,7 @@ export class WebGLImageViewerEngine extends ImageViewerEngineBase {
   ) {
     this.originalImageSrc = url
     this.isLoadingTexture = true
-    this.notifyLoadingStateChange(true, '图片加载中...')
+    this.notifyLoadingStateChange(true, LoadingState.IMAGE_LOADING)
 
     if (preknownWidth && preknownHeight) {
       this.imageWidth = preknownWidth
@@ -361,7 +362,7 @@ export class WebGLImageViewerEngine extends ImageViewerEngineBase {
             this.setupInitialScaling()
           }
 
-          this.notifyLoadingStateChange(true, '创建纹理中...')
+          this.notifyLoadingStateChange(true, LoadingState.CREATE_TEXTURE)
           await this.createTexture(image)
 
           // Also, create an ImageBitmap and send to worker
@@ -1129,13 +1130,14 @@ export class WebGLImageViewerEngine extends ImageViewerEngineBase {
 
   private notifyLoadingStateChange(
     isLoading: boolean,
-    message?: string,
+
+    state?: LoadingState,
     quality?: 'high' | 'medium' | 'low' | 'unknown',
   ) {
     if (this.onLoadingStateChange) {
       this.onLoadingStateChange(
         isLoading,
-        message,
+        state,
         quality || this.currentQuality,
       )
     }

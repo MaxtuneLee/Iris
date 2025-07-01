@@ -1,9 +1,11 @@
+import { siteConfig } from '@config'
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
 import { AnimatePresence, m } from 'motion/react'
 import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
+import { injectConfig } from '~/config'
 import { clsxm } from '~/lib/cn'
 import { Spring } from '~/lib/spring'
 import type { PhotoManifest } from '~/types/photo'
@@ -121,6 +123,23 @@ export const SharePanel = ({ photo, trigger, blobSrc }: SharePanelProps) => {
     }
   }, [t])
 
+  const handleCopyEmbedCode = useCallback(async () => {
+    try {
+      const embedCode = `<iframe
+  src="${siteConfig.url}/share/iframe?id=${photo.id}"
+  height="500"
+  className="w-full"
+  allowTransparency
+  sandbox="allow-scripts allow-same-origin allow-popups"
+/>`
+      await navigator.clipboard.writeText(embedCode)
+      toast.success(t('photo.share.embed.copied'))
+      setIsOpen(false)
+    } catch {
+      toast.error(t('photo.share.copy.failed'))
+    }
+  }, [photo.id, t])
+
   const handleSocialShare = useCallback(
     (url: string) => {
       const shareUrl = encodeURIComponent(window.location.href)
@@ -159,6 +178,13 @@ export const SharePanel = ({ photo, trigger, blobSrc }: SharePanelProps) => {
       label: t('photo.share.copy.link'),
       icon: 'i-mingcute-link-line',
       action: handleCopyLink,
+    },
+    {
+      id: 'copy-embed',
+      label: t('photo.share.embed.code'),
+      icon: 'i-mingcute-code-line',
+      action: handleCopyEmbedCode,
+      color: 'text-purple-500',
     },
   ]
 
@@ -208,7 +234,7 @@ export const SharePanel = ({ photo, trigger, blobSrc }: SharePanelProps) => {
                       {t('photo.share.social.media')}
                     </h4>
                   </div>
-                  <div className="flex justify-center gap-4">
+                  <div className="flex gap-6 px-2">
                     {socialOptions.map((option) => (
                       <button
                         key={option.id}
@@ -240,7 +266,45 @@ export const SharePanel = ({ photo, trigger, blobSrc }: SharePanelProps) => {
                   </div>
                 </div>
 
-                {/* 功能选项 - 第二排 */}
+                {/* 嵌入代码 - 第二排 */}
+                {injectConfig.useNext && (
+                  <div className="mb-6">
+                    <div className="mb-3">
+                      <h4 className="text-text-secondary text-xs font-medium tracking-wide uppercase">
+                        {t('photo.share.embed.code')}
+                      </h4>
+                      <p className="text-text-tertiary mt-1 text-xs">
+                        {t('photo.share.embed.description')}
+                      </p>
+                    </div>
+                    <div className="relative">
+                      <div className="bg-fill-secondary/50 border-border/10 rounded-lg border p-3">
+                        <code className="text-text-secondary font-mono text-xs break-all whitespace-pre select-all">
+                          {`<iframe
+  src="${siteConfig.url}/share/iframe?id=${photo.id}"
+  height="500"
+  style="width: 100%;"
+  allowTransparency
+  sandbox="allow-scripts allow-same-origin allow-popups"
+/>`}
+                        </code>
+                      </div>
+                      <button
+                        type="button"
+                        className={clsxm(
+                          'absolute top-2 right-2 flex items-center justify-center',
+                          'size-7 rounded-md bg-fill-tertiary/80 hover:bg-fill-tertiary backdrop-blur-3xl',
+                          'transition-colors duration-200 group',
+                        )}
+                        onClick={handleCopyEmbedCode}
+                      >
+                        <i className="i-mingcute-copy-line text-text-secondary group-hover:text-text size-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* 功能选项 - 第三排 */}
                 <div>
                   <div className="mb-3">
                     <h4 className="text-text-secondary text-xs font-medium tracking-wide uppercase">
@@ -248,40 +312,42 @@ export const SharePanel = ({ photo, trigger, blobSrc }: SharePanelProps) => {
                     </h4>
                   </div>
                   <div className="grid grid-cols-2 gap-1">
-                    {actionOptions.map((option) => (
-                      <button
-                        key={option.id}
-                        type="button"
-                        className={clsxm(
-                          'relative flex cursor-pointer select-none items-center rounded-lg px-2 py-2',
-                          'text-sm outline-none transition-all duration-200',
-                          'hover:bg-fill-secondary/80 active:bg-fill-secondary',
-                          'group',
-                        )}
-                        onClick={() => option.action()}
-                      >
-                        <div className="flex items-center gap-2">
-                          <div
-                            className={clsxm(
-                              'flex size-7 items-center justify-center rounded-full',
-                              'bg-fill-tertiary/80 group-hover:bg-fill-tertiary',
-                              'transition-colors duration-200',
-                            )}
-                          >
-                            <i
+                    {actionOptions
+                      .filter((option) => option.id !== 'copy-embed')
+                      .map((option) => (
+                        <button
+                          key={option.id}
+                          type="button"
+                          className={clsxm(
+                            'relative flex cursor-pointer select-none items-center rounded-lg px-2 py-2',
+                            'text-sm outline-none transition-all duration-200',
+                            'hover:bg-fill-secondary/80 active:bg-fill-secondary',
+                            'group',
+                          )}
+                          onClick={() => option.action()}
+                        >
+                          <div className="flex items-center gap-2">
+                            <div
                               className={clsxm(
-                                option.icon,
-                                'size-3.5',
-                                option.color || 'text-text-secondary',
+                                'flex size-7 items-center justify-center rounded-full',
+                                'bg-fill-tertiary/80 group-hover:bg-fill-tertiary',
+                                'transition-colors duration-200',
                               )}
-                            />
+                            >
+                              <i
+                                className={clsxm(
+                                  option.icon,
+                                  'size-3.5',
+                                  option.color || 'text-text-secondary',
+                                )}
+                              />
+                            </div>
+                            <span className="text-text text-xs font-medium">
+                              {option.label}
+                            </span>
                           </div>
-                          <span className="text-text text-xs font-medium">
-                            {option.label}
-                          </span>
-                        </div>
-                      </button>
-                    ))}
+                        </button>
+                      ))}
                   </div>
                 </div>
               </m.div>

@@ -99,7 +99,6 @@ export function extractPhotoInfo(
   return {
     title,
     dateTaken,
-    views,
     tags,
     description: '', // 可以从 EXIF 或其他元数据中获取
   }

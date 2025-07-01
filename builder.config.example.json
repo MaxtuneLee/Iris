@@ -1,6 +1,10 @@
 {
-  "repo": {
-    "enable": true,
-    "url": "https://github.com/Innei/gallery-public"
+  "storage": {
+    "provider": "s3",
+    "bucket": "my-photos",
+    "region": "us-east-1",
+    "prefix": "photos/",
+    "customDomain": "https://cdn.example.com",
+    "endpoint": "https://s3.amazonaws.com"
   }
 }

@@ -26,6 +26,15 @@ export interface BuilderOptions {
   concurrencyLimit?: number // 可选，如果未提供则使用配置文件中的默认值
 }
 
+export interface BuilderResult {
+  hasUpdates: boolean
+  newCount: number
+  processedCount: number
+  skippedCount: number
+  deletedCount: number
+  totalPhotos: number
+}
+
 class PhotoGalleryBuilder {
   private storageManager: StorageManager
   private config: BuilderConfig
@@ -68,9 +77,9 @@ class PhotoGalleryBuilder {
     // 目前日志配置在 logger 模块中处理
   }
 
-  async buildManifest(options: BuilderOptions): Promise<void> {
+  async buildManifest(options: BuilderOptions): Promise<BuilderResult> {
     try {
-      await this.#buildManifest(options)
+      return await this.#buildManifest(options)
     } catch (error) {
       logger.main.error('❌ 构建 manifest 失败：', error)
       throw error
@@ -80,7 +89,7 @@ class PhotoGalleryBuilder {
    * 构建照片清单
    * @param options 构建选项
    */
-  async #buildManifest(options: BuilderOptions): Promise<void> {
+  async #buildManifest(options: BuilderOptions): Promise<BuilderResult> {
     const startTime = Date.now()
 
     this.logBuildStart()
@@ -122,7 +131,14 @@ class PhotoGalleryBuilder {
 
     if (imageObjects.length === 0) {
       logger.main.error('❌ 没有找到需要处理的照片')
-      return
+      return {
+        hasUpdates: false,
+        newCount: 0,
+        processedCount: 0,
+        skippedCount: 0,
+        deletedCount: 0,
+        totalPhotos: 0,
+      }
     }
 
     // 筛选出实际需要处理的图片
@@ -278,6 +294,17 @@ class PhotoGalleryBuilder {
         Date.now() - startTime,
       )
     }
+
+    // 返回构建结果
+    const hasUpdates = newCount > 0 || processedCount > 0 || deletedCount > 0
+    return {
+      hasUpdates,
+      newCount,
+      processedCount,
+      skippedCount,
+      deletedCount,
+      totalPhotos: manifest.length,
+    }
   }
 
   private async loadExistingManifest(
@@ -285,7 +312,7 @@ class PhotoGalleryBuilder {
   ): Promise<AfilmoryManifest> {
     return options.isForceMode || options.isForceManifest
       ? {
-          version: 'v2',
+          version: 'v5',
           data: [],
         }
       : await loadExistingManifest()

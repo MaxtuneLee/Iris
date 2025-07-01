@@ -2,7 +2,9 @@ import { DOMParser } from 'linkedom'
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 
-const host = 'http://localhost:1924'
+import { injectConfigToDocument } from '~/lib/injectable'
+
+const host = 'http://localhost:3000'
 export const handler = async (req: NextRequest) => {
   if (process.env.NODE_ENV !== 'development') {
     return new NextResponse(null, { status: 404 })
@@ -28,10 +30,7 @@ async function proxyIndexHtml() {
   const htmlText = await fetch(host).then((res) => res.text())
 
   const parser = new DOMParser()
-  const document = parser.parseFromString(
-    htmlText,
-    'text/html',
-  ) as unknown as HTMLDocument
+  const document = parser.parseFromString(htmlText, 'text/html')
 
   const scripts = document.querySelectorAll(
     'script',
@@ -59,6 +58,8 @@ async function proxyIndexHtml() {
       )
       .replace('/@react-refresh', `${host}/@react-refresh`)
   })
+
+  injectConfigToDocument(document)
 
   return new NextResponse(document.documentElement.outerHTML, {
     headers: { 'Content-Type': 'text/html' },
