@@ -13,13 +13,11 @@ import {
   useRef,
   useState,
 } from 'react'
-import { ErrorBoundary } from 'react-error-boundary'
 import { useTranslation } from 'react-i18next'
 import type { Swiper as SwiperType } from 'swiper'
 import { Keyboard, Navigation, Virtual } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
-import { PassiveFragment } from '~/components/common/PassiveFragmenet'
 import { injectConfig } from '~/config'
 import { useMobile } from '~/hooks/useMobile'
 import { Spring } from '~/lib/spring'
@@ -147,36 +145,37 @@ export const PhotoViewer = ({
 
   return (
     <>
-      {/* 固定背景层防止透出 */}
-      {/* 交叉溶解的 Blurhash 背景 */}
-      <AnimatePresence mode="popLayout">
-        {isOpen && currentPhoto.thumbHash && (
-          <ErrorBoundary fallback={null}>
-            <PassiveFragment>
-              <m.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={Spring.presets.smooth}
-                className="bg-material-opaque fixed inset-0"
-              />
-              <m.div
-                key={currentPhoto.id}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={Spring.presets.smooth}
-                className="fixed inset-0"
-              >
-                <Thumbhash
-                  thumbHash={currentPhoto.thumbHash}
-                  className="size-fill"
-                />
-              </m.div>
-            </PassiveFragment>
-          </ErrorBoundary>
+      <AnimatePresence>
+        {isOpen && (
+          <m.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={Spring.presets.snappy}
+            className="bg-material-opaque fixed inset-0"
+          />
         )}
       </AnimatePresence>
+      {/* 固定背景层防止透出 */}
+      {/* 交叉溶解的 Blurhash 背景 */}
+      <AnimatePresence mode="sync">
+        {isOpen && currentPhoto.thumbHash && (
+          <m.div
+            key={currentPhoto.id}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={Spring.presets.snappy}
+            className="fixed inset-0"
+          >
+            <Thumbhash
+              thumbHash={currentPhoto.thumbHash}
+              className="size-fill scale-110"
+            />
+          </m.div>
+        )}
+      </AnimatePresence>
+
       <AnimatePresence>
         {isOpen && (
           <div
