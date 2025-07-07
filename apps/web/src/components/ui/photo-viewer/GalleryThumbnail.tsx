@@ -8,6 +8,8 @@ import { nextFrame } from '~/lib/dom'
 import { Spring } from '~/lib/spring'
 import type { PhotoManifest } from '~/types/photo'
 
+import { Thumbhash } from '../thumbhash'
+
 const thumbnailSize = {
   mobile: 48,
   desktop: 64,
@@ -97,7 +99,7 @@ export const GalleryThumbnail: FC<{
 
   return (
     <m.div
-      className="bg-material-ultra-thick pb-safe z-10 shrink-0"
+      className="bg-material-medium pb-safe z-10 shrink-0"
       initial={{ y: 100 }}
       animate={{ y: 0 }}
       exit={{ y: 100 }}
@@ -121,18 +123,31 @@ export const GalleryThumbnail: FC<{
               `flex-shrink-0 rounded-lg overflow-hidden ring-2 transition-all contain-intrinsic-size`,
               index === currentIndex
                 ? 'ring-accent scale-110'
-                : 'ring-transparent hover:ring-accent',
+                : 'ring-transparent hover:ring-accent grayscale-50 hover:grayscale-0',
             )}
-            style={{
-              width: isMobile ? thumbnailSize.mobile : thumbnailSize.desktop,
-              height: isMobile ? thumbnailSize.mobile : thumbnailSize.desktop,
-            }}
+            style={
+              isMobile
+                ? {
+                    width: thumbnailSize.mobile,
+                    height: thumbnailSize.mobile,
+                  }
+                : {
+                    width: thumbnailSize.desktop,
+                    height: thumbnailSize.desktop,
+                  }
+            }
             onClick={() => onIndexChange(index)}
           >
+            {photo.thumbHash && (
+              <Thumbhash
+                thumbHash={photo.thumbHash}
+                className="size-fill absolute inset-0"
+              />
+            )}
             <img
               src={photo.thumbnailUrl}
               alt={photo.title}
-              className="h-full w-full object-cover"
+              className="absolute inset-0 h-full w-full object-cover"
             />
           </button>
         ))}

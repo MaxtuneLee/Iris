@@ -1,10 +1,9 @@
 import { atom } from 'jotai'
-import { atomWithStorage } from 'jotai/utils'
 
 export type GallerySortBy = 'date'
 export type GallerySortOrder = 'asc' | 'desc'
 
-export const gallerySettingAtom = atomWithStorage('gallery-settings', {
+export const gallerySettingAtom = atom({
   sortBy: 'date' as GallerySortBy,
   sortOrder: 'desc' as GallerySortOrder,
   selectedTags: [] as string[],
