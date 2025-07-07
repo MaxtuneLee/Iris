@@ -51,15 +51,26 @@ jobs:
       - name: Install dependencies # Install project dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Create .env file # Create .env file from secrets for the Docker build
-        run: |
-          touch .env
-          echo S3_ACCESS_KEY_ID=${{ secrets.S3_ACCESS_KEY_ID }} >> .env
-          echo S3_SECRET_ACCESS_KEY=${{ secrets.S3_SECRET_ACCESS_KEY }} >> .env
-          echo PG_CONNECTION_STRING=${{ secrets.PG_CONNECTION_STRING }} >> .env
+      - name: Cache build artifacts # Cache Next.js build artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            apps/ssr/.next/cache
+            apps/ssr/.next/standalone
+            apps/ssr/.next/static
+          key: ${{ runner.os }}-build-${{ hashFiles('apps/ssr/**/*.js', 'apps/ssr/**/*.ts', 'apps/ssr/**/*.tsx', 'apps/ssr/**/*.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
 
       - name: Build manifest # Build the project manifest
         run: pnpm build:manifest
+
+      - name: Build project # Build the project in GitHub Actions
+        run: |
+          export S3_ACCESS_KEY_ID=${{ secrets.S3_ACCESS_KEY_ID }}
+          export S3_SECRET_ACCESS_KEY=${{ secrets.S3_SECRET_ACCESS_KEY }}
+          export PG_CONNECTION_STRING=${{ secrets.PG_CONNECTION_STRING }}
+          pnpm build
 
       - name: Set up Docker Buildx # Setup Docker Buildx for multi-platform builds
         uses: docker/setup-buildx-action@v3
@@ -72,9 +83,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
-      - name: Build Docker image # Build the Docker image
+      - name: Build Docker image # Build the Docker image with pre-built artifacts
         run: |
-          docker buildx build --platform linux/amd64 -t max/iris-gallery --output type=docker,dest=iris-gallery.tar .
+          docker buildx build --platform linux/amd64 -f Dockerfile.deploy -t max/iris-gallery --output type=docker,dest=iris-gallery.tar .
 
       - name: Extract image # Extract the built Docker image tarball
         run: |
@@ -126,4 +137,4 @@ jobs:
               docker rmi max/iris-gallery
             fi
             docker load -i iris-gallery.tar
-            docker run --restart always -d --name iris-gallery -p 8081:3000 max/iris-gallery
+            docker run --restart always -d --name iris-gallery -p 8081:3000 -e PG_CONNECTION_STRING="${{ secrets.PG_CONNECTION_STRING }}" max/iris-gallery
