@@ -129,6 +129,13 @@ export const ProgressiveImage = ({
       } catch (loadError) {
         console.error('Failed to load image:', loadError)
         setError(true)
+
+        // 显示错误状态，而不是完全隐藏图片
+        loadingIndicatorRef.current?.updateLoadingState({
+          isVisible: true,
+          isError: true,
+          errorMessage: t('photo.error.loading'),
+        })
       }
     }
 
@@ -146,6 +153,8 @@ export const ProgressiveImage = ({
     onError,
     isCurrentImage,
     onBlobSrcChange,
+    loadingIndicatorRef,
+    t,
   ])
 
   const onTransformed = useCallback(
@@ -219,7 +228,7 @@ export const ProgressiveImage = ({
         webglQuality: quality,
       })
     },
-    [t],
+    [t, loadingIndicatorRef],
   )
 
   const [isThumbnailLoaded, setIsThumbnailLoaded] = useState(false)
@@ -230,21 +239,22 @@ export const ProgressiveImage = ({
 
   const showContextMenu = useShowContextMenu()
 
-  if (error) {
-    return (
-      <div
-        className={clsxm(
-          'flex items-center justify-center bg-material-opaque',
-          className,
-        )}
-      >
-        <div className="text-text-secondary text-center">
-          <i className="i-mingcute-image-line mb-2 text-4xl" />
-          <p className="text-sm">{t('photo.error.loading')}</p>
-        </div>
-      </div>
-    )
-  }
+  // 移除原来的错误处理逻辑，改为在加载失败时显示错误状态并继续显示缩略图
+  // if (error) {
+  //   return (
+  //     <div
+  //       className={clsxm(
+  //         'flex items-center justify-center bg-material-opaque',
+  //         className,
+  //       )}
+  //     >
+  //       <div className="text-text-secondary text-center">
+  //         <i className="i-mingcute-image-line mb-2 text-4xl" />
+  //         <p className="text-sm">{t('photo.error.loading')}</p>
+  //       </div>
+  //     </div>
+  //   )
+  // }
 
   return (
     <div
@@ -255,8 +265,8 @@ export const ProgressiveImage = ({
       onTouchStart={handleLongPressStart}
       onTouchEnd={handleLongPressEnd}
     >
-      {/* 缩略图 */}
-      {thumbnailSrc && !isHighResImageRendered && (
+      {/* 缩略图 - 在高分辨率图片未加载或加载失败时显示 */}
+      {thumbnailSrc && (!isHighResImageRendered || error) && (
         <img
           ref={thumbnailRef}
           src={thumbnailSrc}
@@ -270,7 +280,8 @@ export const ProgressiveImage = ({
         />
       )}
 
-      {highResLoaded && blobSrc && isCurrentImage && (
+      {/* 高分辨率图片 - 只在成功加载且非错误状态时显示 */}
+      {highResLoaded && blobSrc && isCurrentImage && !error && (
         <WebGLImageViewer
           src={blobSrc}
           className="absolute inset-0 h-full w-full"
@@ -378,10 +389,11 @@ export const ProgressiveImage = ({
         />
       )}
 
-      {/* Live Photo 组件 */}
+      {/* Live Photo 组件 - 只在非错误状态时显示 */}
       {isLivePhoto &&
         livePhotoVideoUrl &&
         isCurrentImage &&
+        !error &&
         imageLoaderManagerRef.current && (
           <LivePhoto
             ref={livePhotoRef}
@@ -393,8 +405,8 @@ export const ProgressiveImage = ({
           />
         )}
 
-      {/* 备用图片（当 WebGL 不可用时） */}
-      {!canUseWebGL && highResLoaded && blobSrc && (
+      {/* 备用图片（当 WebGL 不可用时） - 只在非错误状态时显示 */}
+      {!canUseWebGL && highResLoaded && blobSrc && !error && (
         <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-black/20">
           <i className="i-mingcute-warning-line mb-2 text-4xl" />
           <span className="text-center text-sm text-white">
