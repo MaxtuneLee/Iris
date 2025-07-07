@@ -43,10 +43,12 @@ jobs:
         env:
           cache-name: cache-pnpm-modules
         with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.node-version }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          path: |
+            ~/.pnpm-store
+            **/node_modules
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.node-version }}-
+            ${{ runner.os }}-pnpm-
 
       - name: Install dependencies # Install project dependencies
         run: pnpm install --frozen-lockfile
@@ -142,4 +144,4 @@ jobs:
               docker rmi max/iris-gallery
             fi
             docker load -i iris-gallery.tar
-            docker run --restart always -d --name iris-gallery -p 8081:3000 -e PG_CONNECTION_STRING="${{ secrets.PG_CONNECTION_STRING }}" max/iris-gallery
+            docker run --restart always -d --name iris-gallery -p 8081:3000 max/iris-gallery
