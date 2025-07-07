@@ -62,11 +62,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-build-
 
+      - name: Create .env file # Create .env file from secrets for the Docker build
+        run: |
+          touch .env
+          echo S3_ACCESS_KEY_ID=${{ secrets.S3_ACCESS_KEY_ID }} >> .env
+          echo S3_SECRET_ACCESS_KEY=${{ secrets.S3_SECRET_ACCESS_KEY }} >> .env
+          echo PG_CONNECTION_STRING=${{ secrets.PG_CONNECTION_STRING }} >> .env
+
       - name: Build manifest # Build the project manifest
         run: |
-          export S3_ACCESS_KEY_ID=${{ secrets.S3_ACCESS_KEY_ID }}
-          export S3_SECRET_ACCESS_KEY=${{ secrets.S3_SECRET_ACCESS_KEY }}
-          export PG_CONNECTION_STRING=${{ secrets.PG_CONNECTION_STRING }}
           pnpm build:manifest
 
       - name: Build project # Build the project in GitHub Actions
