@@ -33,7 +33,11 @@ export const PhotoMarkerPin = ({
       longitude={marker.longitude}
       latitude={marker.latitude}
     >
-      <HoverCard openDelay={400} closeDelay={100}>
+      <HoverCard
+        open={isSelected ? true : undefined} // 当选中时强制打开
+        openDelay={isSelected ? 0 : 400} // 选中时立即打开
+        closeDelay={isSelected ? 0 : 100} // 选中时不自动关闭
+      >
         <HoverCardTrigger asChild>
           <m.div
             className="group relative cursor-pointer"
@@ -48,7 +52,7 @@ export const PhotoMarkerPin = ({
             whileTap={{ scale: 0.9 }}
             onClick={handleClick}
           >
-            {/* Selection ring */}
+            {/* Selection ring - 只有选中时显示 */}
             {isSelected && (
               <div className="bg-blue/30 absolute inset-0 -m-2 animate-pulse rounded-full" />
             )}
@@ -92,14 +96,33 @@ export const PhotoMarkerPin = ({
         </HoverCardTrigger>
 
         <HoverCardContent
-          className="w-80 overflow-hidden border-white/20 bg-white/95 p-0 backdrop-blur-[120px] dark:bg-black/95"
+          className={`w-80 overflow-hidden border-white/20 bg-white/95 p-0 backdrop-blur-[120px] dark:bg-black/95 ${
+            isSelected ? 'shadow-2xl' : ''
+          }`}
           side="top"
           align="center"
           sideOffset={8}
+          // 当选中时阻止点击外部关闭
+          onPointerDownOutside={
+            isSelected ? (e) => e.preventDefault() : undefined
+          }
+          onEscapeKeyDown={isSelected ? (e) => e.preventDefault() : undefined}
         >
           <div className="relative">
+            {/* 选中时显示关闭按钮 */}
+            {isSelected && (
+              <GlassButton
+                className="absolute top-3 right-3 z-10 size-8"
+                onClick={handleClose}
+              >
+                <i className="i-mingcute-close-line text-lg" />
+              </GlassButton>
+            )}
+
             {/* Photo header */}
-            <div className="relative h-32 overflow-hidden">
+            <div
+              className={`relative overflow-hidden ${isSelected ? 'h-40' : 'h-32'}`}
+            >
               <LazyImage
                 src={marker.photo.thumbnailUrl || marker.photo.originalUrl}
                 alt={marker.photo.title || marker.photo.id}
@@ -121,7 +144,9 @@ export const PhotoMarkerPin = ({
                 className="group/link hover:text-blue flex items-center gap-2 transition-colors"
               >
                 <h3
-                  className="text-text flex-1 truncate text-sm font-semibold"
+                  className={`text-text flex-1 truncate font-semibold ${
+                    isSelected ? 'text-base' : 'text-sm'
+                  }`}
                   title={marker.photo.title || marker.photo.id}
                 >
                   {marker.photo.title || marker.photo.id}
@@ -132,14 +157,16 @@ export const PhotoMarkerPin = ({
               {/* Metadata */}
               <div className="space-y-2">
                 {marker.photo.exif?.DateTimeOriginal && (
-                  <div className="text-text-secondary flex items-center gap-2 text-xs">
+                  <div
+                    className={`text-text-secondary flex items-center gap-2 ${isSelected ? 'text-sm' : 'text-xs'}`}
+                  >
                     <i className="i-mingcute-calendar-line text-sm" />
-                    <span>
+                    <span className={isSelected ? 'text-xs' : ''}>
                       {new Date(
                         marker.photo.exif.DateTimeOriginal,
                       ).toLocaleDateString('zh-CN', {
                         year: 'numeric',
-                        month: 'short',
+                        month: isSelected ? 'long' : 'short',
                         day: 'numeric',
                       })}
                     </span>
@@ -147,30 +174,46 @@ export const PhotoMarkerPin = ({
                 )}
 
                 {marker.photo.exif?.Make && marker.photo.exif?.Model && (
-                  <div className="text-text-secondary flex items-center gap-2 text-xs">
+                  <div
+                    className={`text-text-secondary flex items-center gap-2 ${isSelected ? 'text-sm' : 'text-xs'}`}
+                  >
                     <i className="i-mingcute-camera-line text-sm" />
-                    <span className="truncate">
+                    <span className={`truncate ${isSelected ? 'text-xs' : ''}`}>
                       {marker.photo.exif.Make} {marker.photo.exif.Model}
                     </span>
                   </div>
                 )}
 
-                <div className="text-text-secondary space-y-1 text-xs">
+                <div
+                  className={`text-text-secondary space-y-1 ${isSelected ? 'text-sm' : 'text-xs'}`}
+                >
                   <div className="flex items-center gap-2">
                     <i className="i-mingcute-location-line text-sm" />
-                    <span className="font-mono">
-                      {Math.abs(marker.latitude).toFixed(4)}°
-                      {marker.latitudeRef || 'N'},{' '}
-                      {Math.abs(marker.longitude).toFixed(4)}°
-                      {marker.longitudeRef || 'E'}
+                    <span
+                      className={`font-mono ${isSelected ? 'text-xs' : ''}`}
+                    >
+                      <span>
+                        {Math.abs(marker.latitude).toFixed(isSelected ? 6 : 4)}°
+                      </span>
+                      <span>{marker.latitudeRef || 'N'}</span>
+                      <span>, </span>
+                      <span>
+                        {Math.abs(marker.longitude).toFixed(isSelected ? 6 : 4)}
+                        °
+                      </span>
+                      <span>{marker.longitudeRef || 'E'}</span>
                     </span>
                   </div>
                   {marker.altitude !== undefined && (
                     <div className="flex items-center gap-2">
                       <i className="i-mingcute-mountain-2-line text-sm" />
-                      <span className="font-mono">
-                        {marker.altitudeRef === 'Below Sea Level' ? '-' : ''}
-                        {Math.abs(marker.altitude).toFixed(1)}m
+                      <span
+                        className={`font-mono ${isSelected ? 'text-xs' : ''}`}
+                      >
+                        <span>
+                          {marker.altitudeRef === 'Below Sea Level' ? '-' : ''}
+                        </span>
+                        <span>{Math.abs(marker.altitude).toFixed(1)}m</span>
                       </span>
                     </div>
                   )}
@@ -180,107 +223,6 @@ export const PhotoMarkerPin = ({
           </div>
         </HoverCardContent>
       </HoverCard>
-
-      {/* Enhanced popup for selected state */}
-      {isSelected && (
-        <m.div
-          className="absolute -top-80 left-1/2 z-50 -translate-x-1/2 transform"
-          initial={{ y: 20, opacity: 0, scale: 0.9 }}
-          animate={{ y: 0, opacity: 1, scale: 1 }}
-          exit={{ y: 20, opacity: 0, scale: 0.9 }}
-          transition={{ duration: 0.3, ease: 'easeOut' }}
-        >
-          <div className="border-fill-tertiary bg-material-thick relative w-72 cursor-default overflow-hidden rounded-xl border shadow-2xl backdrop-blur-[80px]">
-            {/* Close button */}
-            <GlassButton
-              className="absolute top-3 right-3 z-10 size-8"
-              onClick={handleClose}
-            >
-              <i className="i-mingcute-close-line text-lg" />
-            </GlassButton>
-
-            {/* Photo container */}
-            <div className="relative overflow-hidden">
-              <LazyImage
-                src={marker.photo.thumbnailUrl || marker.photo.originalUrl}
-                alt={marker.photo.title || marker.photo.id}
-                thumbHash={marker.photo.thumbHash}
-                className="h-40 w-full object-cover"
-                rootMargin="200px"
-                threshold={0.1}
-              />
-              {/* Gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-            </div>
-
-            {/* Content */}
-            <div className="flex flex-col gap-3 p-4">
-              {/* Title with link */}
-              <Link
-                to={`/${marker.photo.id}`}
-                target="_blank"
-                className="group/link hover:text-blue flex items-center gap-2 transition-colors"
-              >
-                <h3
-                  className="text-text flex-1 truncate text-base font-semibold"
-                  title={marker.photo.title || marker.photo.id}
-                >
-                  {marker.photo.title || marker.photo.id}
-                </h3>
-                <i className="i-mingcute-arrow-right-line" />
-              </Link>
-
-              {/* Metadata */}
-              <div className="space-y-2">
-                {marker.photo.exif?.DateTimeOriginal && (
-                  <div className="text-text-secondary flex items-center gap-2 text-sm">
-                    <i className="i-mingcute-calendar-line" />
-                    <span className="text-xs">
-                      {new Date(
-                        marker.photo.exif.DateTimeOriginal,
-                      ).toLocaleDateString('zh-CN', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
-                    </span>
-                  </div>
-                )}
-
-                {marker.photo.exif?.Make && marker.photo.exif?.Model && (
-                  <div className="text-text-secondary flex items-center gap-2 text-sm">
-                    <i className="i-mingcute-camera-line" />
-                    <span className="truncate text-xs">
-                      {marker.photo.exif.Make} {marker.photo.exif.Model}
-                    </span>
-                  </div>
-                )}
-
-                <div className="text-text-secondary space-y-1 text-sm">
-                  <div className="flex items-center gap-2">
-                    <i className="i-mingcute-location-line" />
-                    <span className="font-mono text-xs">
-                      {Math.abs(marker.latitude).toFixed(6)}°
-                      {marker.latitudeRef || 'N'},{' '}
-                      {Math.abs(marker.longitude).toFixed(6)}°
-                      {marker.longitudeRef || 'E'}
-                    </span>
-                  </div>
-                  {marker.altitude !== undefined && (
-                    <div className="flex items-center gap-2">
-                      <i className="i-mingcute-mountain-2-line" />
-                      <span className="font-mono text-xs">
-                        {marker.altitudeRef === 'Below Sea Level' ? '-' : ''}
-                        {Math.abs(marker.altitude).toFixed(1)}m
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </m.div>
-      )}
     </Marker>
   )
 }
