@@ -35,10 +35,11 @@ export const DOMImageViewer: FC<DOMImageViewerProps> = ({
   const transformRef = useRef<ReactZoomPanPinchRef>(null)
 
   useEffect(() => {
-    if (transformRef.current) {
-      transformRef.current.resetTransform()
+    const activeRef = ref || transformRef;
+    if (activeRef?.current) {
+      activeRef.current.resetTransform();
     }
-  }, [src])
+  }, [src, ref])
 
   return (
     <TransformWrapper
