@@ -69,12 +69,14 @@ export const PhotoViewer = ({
   const handlePrevious = useCallback(() => {
     if (currentIndex > 0) {
       onIndexChange(currentIndex - 1)
+      swiperRef.current?.slidePrev()
     }
   }, [currentIndex, onIndexChange])
 
   const handleNext = useCallback(() => {
     if (currentIndex < photos.length - 1) {
       onIndexChange(currentIndex + 1)
+      swiperRef.current?.slideNext()
     }
   }, [currentIndex, photos.length, onIndexChange])
 
@@ -258,10 +260,6 @@ export const PhotoViewer = ({
                       enabled: true,
                       onlyInViewport: true,
                     }}
-                    navigation={{
-                      prevEl: '.swiper-button-prev-custom',
-                      nextEl: '.swiper-button-next-custom',
-                    }}
                     onSwiper={(swiper) => {
                       swiperRef.current = swiper
                       // 初始化时确保触摸滑动是启用的
@@ -332,7 +330,7 @@ export const PhotoViewer = ({
                       {currentIndex > 0 && (
                         <button
                           type="button"
-                          className={`swiper-button-prev-custom bg-material-medium absolute top-1/2 left-4 z-20 flex size-8 -translate-y-1/2 items-center justify-center rounded-full text-white opacity-0 backdrop-blur-sm duration-200 group-hover:opacity-100 hover:bg-black/40`}
+                          className={`bg-material-medium absolute top-1/2 left-4 z-20 flex size-8 -translate-y-1/2 items-center justify-center rounded-full text-white opacity-0 backdrop-blur-sm duration-200 group-hover:opacity-100 hover:bg-black/40`}
                           onClick={handlePrevious}
                         >
                           <i className={`i-mingcute-left-line text-xl`} />
@@ -342,7 +340,8 @@ export const PhotoViewer = ({
                       {currentIndex < photos.length - 1 && (
                         <button
                           type="button"
-                          className={`swiper-button-next-custom bg-material-medium absolute top-1/2 right-4 z-20 flex size-8 -translate-y-1/2 items-center justify-center rounded-full text-white opacity-0 backdrop-blur-sm duration-200 group-hover:opacity-100 hover:bg-black/40`}
+                          className={`bg-material-medium absolute top-1/2 right-4 z-20 flex size-8 -translate-y-1/2 items-center justify-center rounded-full text-white opacity-0 backdrop-blur-sm duration-200 group-hover:opacity-100 hover:bg-black/40`}
+                          onClick={handleNext}
                         >
                           <i className={`i-mingcute-right-line text-xl`} />
                         </button>

@@ -3,6 +3,7 @@ import clsx from 'clsx'
 import * as React from 'react'
 
 import { clsxm } from '~/lib/cn'
+import { stopPropagation } from '~/lib/dom'
 
 import { ScrollElementContext } from './ctx'
 
@@ -161,6 +162,7 @@ export const ScrollArea = ({
     <ScrollElementContext value={viewportRef}>
       <Root className={rootClassName}>
         <Viewport
+          onWheel={stopPropagation}
           ref={setViewportRef}
           className={clsxm(
             flex ? '[&>div]:!flex [&>div]:!flex-col' : '',

@@ -41,7 +41,7 @@ const SortPanel = () => {
         onClick={() => setSortOrder('desc')}
       >
         <i className="i-mingcute-sort-descending-line" />
-        <span>最新优先</span>
+        <span>{t('action.sort.newest.first')}</span>
         {gallerySetting.sortOrder === 'desc' && (
           <i className="i-mingcute-check-line ml-auto" />
         )}
@@ -53,7 +53,7 @@ const SortPanel = () => {
         onClick={() => setSortOrder('asc')}
       >
         <i className="i-mingcute-sort-ascending-line" />
-        <span>最早优先</span>
+        <span>{t('action.sort.oldest.first')}</span>
         {gallerySetting.sortOrder === 'asc' && (
           <i className="i-mingcute-check-line ml-auto" />
         )}
@@ -97,14 +97,14 @@ const TagsPanel = () => {
             onClick={clearAllTags}
             className="absolute top-0 right-0 h-8 rounded-md px-2 text-xs"
           >
-            清除
+            {t('action.tag.clear')}
           </Button>
         )}
       </div>
 
       {allTags.length === 0 ? (
         <div className="px-3 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
-          暂无标签
+          {t('action.tag.empty')}
         </div>
       ) : (
         <div className="pb-safe-offset-4 lg:pb-safe -mx-4 -mb-4 max-h-64 overflow-y-auto px-4 lg:mx-0 lg:mb-0 lg:px-0">

@@ -120,9 +120,7 @@ export const PhotoMarkerPin = ({
             )}
 
             {/* Photo header */}
-            <div
-              className={`relative overflow-hidden ${isSelected ? 'h-40' : 'h-32'}`}
-            >
+            <div className="relative h-32 overflow-hidden">
               <LazyImage
                 src={marker.photo.thumbnailUrl || marker.photo.originalUrl}
                 alt={marker.photo.title || marker.photo.id}
@@ -144,9 +142,7 @@ export const PhotoMarkerPin = ({
                 className="group/link hover:text-blue flex items-center gap-2 transition-colors"
               >
                 <h3
-                  className={`text-text flex-1 truncate font-semibold ${
-                    isSelected ? 'text-base' : 'text-sm'
-                  }`}
+                  className="text-text flex-1 truncate text-sm font-semibold"
                   title={marker.photo.title || marker.photo.id}
                 >
                   {marker.photo.title || marker.photo.id}
@@ -157,16 +153,14 @@ export const PhotoMarkerPin = ({
               {/* Metadata */}
               <div className="space-y-2">
                 {marker.photo.exif?.DateTimeOriginal && (
-                  <div
-                    className={`text-text-secondary flex items-center gap-2 ${isSelected ? 'text-sm' : 'text-xs'}`}
-                  >
+                  <div className="text-text-secondary flex items-center gap-2 text-xs">
                     <i className="i-mingcute-calendar-line text-sm" />
-                    <span className={isSelected ? 'text-xs' : ''}>
+                    <span>
                       {new Date(
                         marker.photo.exif.DateTimeOriginal,
                       ).toLocaleDateString('zh-CN', {
                         year: 'numeric',
-                        month: isSelected ? 'long' : 'short',
+                        month: 'short',
                         day: 'numeric',
                       })}
                     </span>
@@ -174,42 +168,29 @@ export const PhotoMarkerPin = ({
                 )}
 
                 {marker.photo.exif?.Make && marker.photo.exif?.Model && (
-                  <div
-                    className={`text-text-secondary flex items-center gap-2 ${isSelected ? 'text-sm' : 'text-xs'}`}
-                  >
+                  <div className="text-text-secondary flex items-center gap-2">
                     <i className="i-mingcute-camera-line text-sm" />
-                    <span className={`truncate ${isSelected ? 'text-xs' : ''}`}>
+                    <span className="truncate">
                       {marker.photo.exif.Make} {marker.photo.exif.Model}
                     </span>
                   </div>
                 )}
 
-                <div
-                  className={`text-text-secondary space-y-1 ${isSelected ? 'text-sm' : 'text-xs'}`}
-                >
+                <div className="text-text-secondary space-y-1 text-xs">
                   <div className="flex items-center gap-2">
                     <i className="i-mingcute-location-line text-sm" />
-                    <span
-                      className={`font-mono ${isSelected ? 'text-xs' : ''}`}
-                    >
-                      <span>
-                        {Math.abs(marker.latitude).toFixed(isSelected ? 6 : 4)}°
-                      </span>
+                    <span className="font-mono">
+                      <span>{Math.abs(marker.latitude).toFixed(4)}°</span>
                       <span>{marker.latitudeRef || 'N'}</span>
                       <span>, </span>
-                      <span>
-                        {Math.abs(marker.longitude).toFixed(isSelected ? 6 : 4)}
-                        °
-                      </span>
+                      <span>{Math.abs(marker.longitude).toFixed(4)}°</span>
                       <span>{marker.longitudeRef || 'E'}</span>
                     </span>
                   </div>
                   {marker.altitude !== undefined && (
                     <div className="flex items-center gap-2">
                       <i className="i-mingcute-mountain-2-line text-sm" />
-                      <span
-                        className={`font-mono ${isSelected ? 'text-xs' : ''}`}
-                      >
+                      <span className="font-mono">
                         <span>
                           {marker.altitudeRef === 'Below Sea Level' ? '-' : ''}
                         </span>

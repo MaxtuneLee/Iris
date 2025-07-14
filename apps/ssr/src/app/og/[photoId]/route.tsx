@@ -50,7 +50,7 @@ export const GET = async (
     const exifInfo = formatExifInfo()
     const thumbnailBuffer = await Promise.any([
       fetch(
-        `http://localhost:3000${photo.thumbnailUrl.replace('.webp', '.jpg')}`,
+        `http://localhost:13333${photo.thumbnailUrl.replace('.webp', '.jpg')}`,
       ).then((res) => res.arrayBuffer()),
       process.env.NEXT_PUBLIC_APP_URL
         ? fetch(

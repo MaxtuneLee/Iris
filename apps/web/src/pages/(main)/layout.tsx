@@ -14,7 +14,7 @@ import { gallerySettingAtom } from '~/atoms/app'
 import { ScrollElementContext } from '~/components/ui/scroll-areas/ctx'
 import { ScrollArea } from '~/components/ui/scroll-areas/ScrollArea'
 import { useMobile } from '~/hooks/useMobile'
-import { usePhotoViewer } from '~/hooks/usePhotoViewer'
+import { getFilteredPhotos, usePhotoViewer } from '~/hooks/usePhotoViewer'
 import { MasonryRoot } from '~/modules/gallery/MasonryRoot'
 
 export const Component = () => {
@@ -97,7 +97,7 @@ const useSyncStateToUrl = () => {
         return () => clearTimeout(timer)
       }
     } else {
-      const photos = photoLoader.getPhotos()
+      const photos = getFilteredPhotos()
       const targetPathname = `/${photos[currentIndex].id}`
       if (location.pathname !== targetPathname) {
         navigate(targetPathname)

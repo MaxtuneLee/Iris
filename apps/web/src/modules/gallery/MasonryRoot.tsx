@@ -16,6 +16,7 @@ import type { PhotoManifest } from '~/types/photo'
 import type { ActionType } from './ActionGroup'
 import { ActionGroup, ActionPanel } from './ActionGroup'
 import { FloatingActionButton } from './FloatingActionButton'
+import type { MasonryRef } from './Masonic'
 import { Masonry } from './Masonic'
 import { MasonryHeaderMasonryItem } from './MasonryHeaderMasonryItem'
 import { MasonryPhotoItem } from './MasonryPhotoItem'
@@ -51,6 +52,10 @@ export const MasonryRoot = () => {
   const [containerWidth, setContainerWidth] = useState(0)
 
   const photos = usePhotos()
+  const masonryRef = useRef<MasonryRef>(null)
+  // useEffect(() => {
+  //   nextFrame(() => masonryRef.current?.reposition())
+  // }, [photos])
   const { dateRange, handleRender } = useVisiblePhotosDateRange(photos)
   const scrollElement = useScrollViewElement()
 
@@ -163,6 +168,7 @@ export const MasonryRoot = () => {
       <div className="p-1 lg:px-0 lg:pb-0 [&_*]:!select-none">
         {isMobile && <MasonryHeaderMasonryItem className="mb-1" />}
         <Masonry<MasonryItemType>
+          ref={masonryRef}
           items={useMemo(
             () => (isMobile ? photos : [MasonryHeaderItem.default, ...photos]),
             [photos, isMobile],

@@ -22,6 +22,9 @@ import * as React from 'react'
 
 import { useScrollViewElement } from '~/components/ui/scroll-areas/hooks'
 
+export interface MasonryRef {
+  reposition: () => void
+}
 /**
  * A "batteries included" masonry grid which includes all of the implementation details below. This component is the
  * easiest way to get off and running in your app, before switching to more advanced implementations, if necessary.
@@ -30,7 +33,9 @@ import { useScrollViewElement } from '~/components/ui/scroll-areas/hooks'
  *
  * @param props
  */
-export const Masonry = <Item,>(props: MasonryProps<Item>) => {
+export const Masonry = <Item,>(
+  props: MasonryProps<Item> & { ref?: React.Ref<MasonryRef> },
+) => {
   const [scrollTop, setScrollTop] = React.useState(0)
   const [isScrolling, setIsScrolling] = React.useState(false)
   const scrollElement = useScrollViewElement()
@@ -91,6 +96,14 @@ export const Masonry = <Item,>(props: MasonryProps<Item>) => {
     props,
   ) as any
 
+  const [positionIndex, setPositionIndex] = React.useState(0)
+
+  React.useImperativeHandle(props.ref, () => ({
+    reposition: () => {
+      setPositionIndex((i) => i + 1)
+    },
+  }))
+
   // Workaround for https://github.com/jaredLunde/masonic/issues/12
   const itemCounter = React.useRef<number>(props.items.length)
 
@@ -102,7 +115,9 @@ export const Masonry = <Item,>(props: MasonryProps<Item>) => {
     itemCounter.current = props.items.length
   }
 
-  nextProps.positioner = usePositioner(nextProps, [shrunk && Math.random()])
+  nextProps.positioner = usePositioner(nextProps, [
+    shrunk ? Math.random() + positionIndex : positionIndex,
+  ])
 
   nextProps.resizeObserver = useResizeObserver(nextProps.positioner)
   nextProps.scrollTop = scrollTop

@@ -14,7 +14,8 @@
     "format": "prettier --write \"src/**/*.ts\" ",
     "lint": "eslint --fix",
     "serve": "vite preview",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "web": "vite"
   },
   "dependencies": {
     "@afilmory/data": "workspace:*",

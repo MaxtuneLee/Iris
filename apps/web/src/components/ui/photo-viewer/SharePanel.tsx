@@ -281,7 +281,7 @@ export const SharePanel = ({ photo, trigger, blobSrc }: SharePanelProps) => {
                       <div className="bg-fill-secondary/50 border-border/10 rounded-lg border p-3">
                         <code className="text-text-secondary font-mono text-xs break-all whitespace-pre select-all">
                           {`<iframe
-  src="${siteConfig.url}/share/iframe?id=${photo.id}"
+  src="${siteConfig.url.replace(/\/$/, '')}/share/iframe?id=${photo.id}"
   height="500"
   style="width: 100%;"
   allowTransparency

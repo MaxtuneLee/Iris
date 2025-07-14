@@ -11,6 +11,7 @@ import { canUseWebGL } from '~/lib/feature'
 
 import { SlidingNumber } from '../number/SlidingNumber'
 import { DOMImageViewer } from './DOMImageViewer'
+import { HDRBadge } from './HDRBadge'
 import {
   createContextMenuItems,
   useImageLoader,
@@ -101,6 +102,8 @@ export const ProgressiveImage = ({
   const showContextMenu = useShowContextMenu()
 
   const isHDRSupported = useMediaQuery('(dynamic-range: high)')
+  // Only use HDR if the browser supports it and the image is HDR
+  const shouldUseHDR = isHDR && isHDRSupported
 
   return (
     <div
@@ -129,13 +132,14 @@ export const ProgressiveImage = ({
       {/* 高分辨率图片 - 只在成功加载且非错误状态时显示 */}
       {highResLoaded && blobSrc && isCurrentImage && !error && (
         <div
+          className="absolute inset-0 h-full w-full"
           onContextMenu={(e) => {
             const items = createContextMenuItems(blobSrc, alt, t)
             showContextMenu(items, e)
           }}
         >
           {/* LivePhoto 或 HDR 模式使用 DOMImageViewer */}
-          {isLivePhoto || (isHDR && isHDRSupported) ? (
+          {isLivePhoto || shouldUseHDR ? (
             <DOMImageViewer
               ref={domImageViewerRef}
               onZoomChange={onDOMTransformed}
@@ -180,13 +184,16 @@ export const ProgressiveImage = ({
         </div>
       )}
 
-      {/* LivePhoto 控制按钮 - 不跟随图片缩放 */}
       {isLivePhoto && highResLoaded && blobSrc && isCurrentImage && !error && (
         <LivePhotoBadge
           livePhotoRef={livePhotoRef}
           isLivePhotoPlaying={isLivePhotoPlaying}
           imageLoaderManagerRef={imageLoaderManagerRef}
         />
+      )}
+
+      {shouldUseHDR && highResLoaded && blobSrc && isCurrentImage && !error && (
+        <HDRBadge />
       )}
 
       {/* 备用图片（当 WebGL 不可用时） - 只在非错误状态时显示 */}

@@ -186,7 +186,7 @@ export default defineConfig({
     devPrint(),
   ],
   server: {
-    port: !DEV_NEXT_JS ? 1924 : 3000, // 1924 年首款 35mm 相机问世
+    port: !DEV_NEXT_JS ? 1924 : 13333, // 1924 年首款 35mm 相机问世
   },
   define: {
     APP_DEV_CWD: JSON.stringify(process.cwd()),

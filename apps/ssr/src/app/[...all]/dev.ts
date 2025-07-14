@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 
 import { injectConfigToDocument } from '~/lib/injectable'
 
-const host = 'http://localhost:3000'
+const host = 'http://localhost:13333'
 export const handler = async (req: NextRequest) => {
   if (process.env.NODE_ENV !== 'development') {
     return new NextResponse(null, { status: 404 })
