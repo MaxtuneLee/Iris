@@ -4,10 +4,10 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Map from 'react-map-gl/maplibre'
 
+import { getMapStyle } from '~/lib/map/style'
 import { calculateMapBounds } from '~/lib/map-utils'
 import type { PhotoMarker } from '~/types/map'
 
-import MAP_STYLE from './MapLibreStyle.json'
 import {
   ClusterMarker,
   clusterMarkers,
@@ -27,6 +27,7 @@ export interface PureMaplibreProps {
     zoom: number
   }
   markers?: PhotoMarker[]
+  selectedMarkerId?: string | null
   geoJsonData?: GeoJSON.FeatureCollection
   onMarkerClick?: (marker: PhotoMarker) => void
   onGeoJsonClick?: (event: any) => void
@@ -42,6 +43,7 @@ export const Maplibre = ({
   id,
   initialViewState = DEFAULT_VIEW_STATE,
   markers = DEFAULT_MARKERS,
+  selectedMarkerId,
   geoJsonData,
   onMarkerClick,
   onGeoJsonClick,
@@ -52,25 +54,31 @@ export const Maplibre = ({
   mapRef,
   autoFitBounds = true,
 }: PureMaplibreProps) => {
-  const [selectedMarkerId, setSelectedMarkerId] = useState<string | null>(null)
   const [currentZoom, setCurrentZoom] = useState(initialViewState.zoom)
   const [viewState, setViewState] = useState(initialViewState)
   const [isMapLoaded, setIsMapLoaded] = useState(false)
+  const [hasInitialFitCompleted, setHasInitialFitCompleted] = useState(false)
 
-  // Handle marker click
+  // Handle marker click - only call the external callback
   const handleMarkerClick = useCallback(
     (marker: PhotoMarker) => {
-      // Toggle selection: if already selected, deselect; otherwise select
-      setSelectedMarkerId((prev) => (prev === marker.id ? null : marker.id))
       onMarkerClick?.(marker)
     },
     [onMarkerClick],
   )
 
-  // Handle marker close
+  // Handle marker close - call onMarkerClick with the currently selected marker to toggle it off
   const handleMarkerClose = useCallback(() => {
-    setSelectedMarkerId(null)
-  }, [])
+    if (selectedMarkerId && onMarkerClick) {
+      // Find the currently selected marker and call onMarkerClick to deselect it
+      const selectedMarker = markers.find(
+        (marker) => marker.id === selectedMarkerId,
+      )
+      if (selectedMarker) {
+        onMarkerClick(selectedMarker)
+      }
+    }
+  }, [selectedMarkerId, onMarkerClick, markers])
 
   // Clustered markers
   const clusteredMarkers = useMemo(
@@ -90,12 +98,21 @@ export const Maplibre = ({
     return 2 // 跨洲
   }, [])
 
-  // 自动适配到包含所有照片的区域
+  // 自动适配到包含所有照片的区域 - 只在初次加载时执行
   const fitMapToBounds = useCallback(() => {
-    if (!autoFitBounds || markers.length === 0 || !isMapLoaded) return
+    if (
+      !autoFitBounds ||
+      markers.length === 0 ||
+      !isMapLoaded ||
+      hasInitialFitCompleted
+    )
+      return
 
     const bounds = calculateMapBounds(markers)
     if (!bounds) return
+
+    // 标记初次适配已完成
+    setHasInitialFitCompleted(true)
 
     // 如果只有一个点，设置默认缩放级别
     if (markers.length === 1) {
@@ -170,7 +187,14 @@ export const Maplibre = ({
       setViewState(newViewState)
       setCurrentZoom(zoom)
     }
-  }, [markers, autoFitBounds, isMapLoaded, mapRef, calculateZoomLevel])
+  }, [
+    markers,
+    autoFitBounds,
+    isMapLoaded,
+    mapRef,
+    calculateZoomLevel,
+    hasInitialFitCompleted,
+  ])
 
   // 当地图加载完成时触发适配
   const handleMapLoad = useCallback(() => {
@@ -194,8 +218,7 @@ export const Maplibre = ({
         ref={mapRef}
         {...viewState}
         style={{ width: '100%', height: '100%' }}
-        // @ts-expect-error
-        mapStyle={MAP_STYLE}
+        mapStyle={getMapStyle()}
         attributionControl={false}
         interactiveLayerIds={geoJsonData ? ['data'] : undefined}
         onClick={onGeoJsonClick}

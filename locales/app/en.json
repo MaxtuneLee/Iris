@@ -231,6 +231,8 @@
   "loading.heic.main": "HEIC",
   "loading.webgl.building": "Building high-quality textures...",
   "loading.webgl.main": "WebGL Texture Loading",
+  "minimap.loading": "Loading map...",
+  "minimap.view.in.map": "View location in map",
   "photo.conversion.webcodecs": "WebCodecs",
   "photo.copy.error": "Failed to copy image, please try again later",
   "photo.copy.image": "Copy Image",

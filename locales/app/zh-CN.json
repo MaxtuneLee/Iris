@@ -231,6 +231,8 @@
   "loading.heic.main": "HEIC",
   "loading.webgl.building": "正在构建高质量纹理...",
   "loading.webgl.main": "WebGL 纹理加载",
+  "minimap.loading": "加载地图中...",
+  "minimap.view.in.map": "在地图中查看位置",
   "photo.conversion.webcodecs": "WebCodecs",
   "photo.copy.error": "复制图像失败，请稍后重试",
   "photo.copy.image": "复制图像",
