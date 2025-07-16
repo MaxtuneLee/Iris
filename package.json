@@ -13,6 +13,8 @@
     "build:manifest": "pnpm --filter @afilmory/builder cli",
     "build:update-remote-repo": "sh scripts/build-update-remote-repo.sh",
     "dev": "pnpm --filter @afilmory/ssr dev",
+    "docs:build": "pnpm --filter @afilmory/docs build",
+    "docs:dev": "pnpm --filter @afilmory/docs dev",
     "extract:font": "tsx scripts/extract-font-glyphs.ts",
     "format": "prettier --write \"src/**/*.ts\" ",
     "lint": "eslint --fix",
