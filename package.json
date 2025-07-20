@@ -15,6 +15,7 @@
     "dev": "pnpm --filter @afilmory/ssr dev",
     "docs:build": "pnpm --filter @afilmory/docs build",
     "docs:dev": "pnpm --filter @afilmory/docs dev",
+    "docs:preview": "pnpm --filter @afilmory/docs preview",
     "extract:font": "tsx scripts/extract-font-glyphs.ts",
     "format": "prettier --write \"src/**/*.ts\" ",
     "lint": "eslint --fix",

@@ -20,3 +20,4 @@ catalog:
 
 onlyBuiltDependencies:
   - esbuild
+  - puppeteer

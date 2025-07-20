@@ -1,0 +1,161 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+@plugin 'tailwind-scrollbar';
+@plugin 'tailwindcss-animate';
+@plugin 'tailwindcss-safe-area';
+@import 'tailwindcss-uikit-colors/v4/macos.css';
+
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+[data-theme='dark'] {
+  --radius: 0.5rem;
+  --border: 0 0% 22.1%;
+}
+
+@theme {
+  /* Container */
+  --container-padding: 2rem;
+  --container-max-width-2xl: 1400px;
+
+  /* Custom cursors */
+  --cursor-button: var(--cursor-button);
+  --cursor-select: var(--cursor-select);
+  --cursor-checkbox: var(--cursor-checkbox);
+  --cursor-link: var(--cursor-link);
+  --cursor-menu: var(--cursor-menu);
+  --cursor-radio: var(--cursor-radio);
+  --cursor-switch: var(--cursor-switch);
+  --cursor-card: var(--cursor-card);
+
+  /* Colors */
+  --color-border: hsl(var(--border));
+
+  /* Border radius */
+  --radius: var(--radius);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  /* Font families */
+  --font-sans: Geist, ui-sans-serif, system-ui, sans-serif;
+  --font-serif:
+    'Noto Serif CJK SC', 'Noto Serif SC', var(--font-serif),
+    'Source Han Serif SC', 'Source Han Serif', source-han-serif-sc, SongTi SC,
+    SimSum, 'Hiragino Sans GB', system-ui, -apple-system, Segoe UI, Roboto,
+    Helvetica, 'Microsoft YaHei', 'WenQuanYi Micro Hei', sans-serif;
+  --font-mono:
+    'OperatorMonoSSmLig Nerd Font', 'Cascadia Code PL',
+    'FantasqueSansMono Nerd Font', 'operator mono', JetBrainsMono,
+    'Fira code Retina', 'Fira code', Consolas, Monaco, 'Hannotate SC',
+    monospace, -apple-system;
+
+  /* Custom screens */
+  --screen-light-mode: (prefers-color-scheme: light);
+  --screen-dark-mode: (prefers-color-scheme: dark);
+  --screen-w-screen: 100vw;
+  --screen-h-screen: 100vh;
+
+  /* Width and max-width */
+  --width-screen: 100vw;
+  --max-width-screen: 100vw;
+
+  /* Height and max-height */
+  --height-screen: 100vh;
+  --max-height-screen: 100vh;
+}
+
+@layer base {
+  .container {
+    margin-left: auto;
+    margin-right: auto;
+    padding: var(--container-padding);
+  }
+  @media (min-width: 1536px) {
+    .container {
+      max-width: var(--container-max-width-2xl);
+    }
+  }
+
+  html {
+    @apply font-sans;
+  }
+
+  html body {
+    @apply max-w-screen overflow-x-hidden;
+  }
+
+  /* 移动端优化 */
+  @media (max-width: 1023px) {
+    html body {
+      @apply text-base;
+    }
+
+    /* 优化移动端的prose样式 */
+    .prose {
+      @apply text-base leading-relaxed;
+    }
+
+    .prose h1 {
+      @apply text-2xl font-bold mb-4;
+    }
+
+    .prose h2 {
+      @apply text-xl font-semibold mb-3;
+    }
+
+    .prose h3 {
+      @apply text-lg font-medium mb-2;
+    }
+
+    .prose p {
+      @apply mb-4;
+    }
+
+    .prose ul,
+    .prose ol {
+      @apply mb-4;
+    }
+
+    .prose li {
+      @apply mb-1;
+    }
+
+    /* 优化代码块在移动端的显示 */
+    .prose pre {
+      @apply text-sm overflow-x-auto;
+    }
+
+    .prose code {
+      @apply text-sm;
+    }
+  }
+
+  *:focus {
+    outline: none;
+  }
+
+  *:not(input):not(textarea):not([contenteditable='true']):focus-visible {
+    outline: 0 !important;
+  }
+}
+
+@layer components {
+  .shadow-context-menu {
+    box-shadow:
+      rgba(0, 0, 0, 0.067) 0px 3px 8px,
+      rgba(0, 0, 0, 0.067) 0px 2px 5px,
+      rgba(0, 0, 0, 0.067) 0px 1px 1px;
+  }
+}
+
+@layer components {
+  .shadow-tooltip-bottom {
+    --bg: var(--color-primary);
+    box-shadow: 0px 5px 20px -11px var(--bg);
+  }
+
+  .shadow-tooltip-top {
+    --bg: var(--color-primary);
+    box-shadow: 0px -5px 20px -11px var(--bg);
+  }
+}

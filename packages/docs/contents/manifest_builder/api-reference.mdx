@@ -1,0 +1,585 @@
+---
+title: API Reference
+description: Complete API reference for integrating Afilmory Builder into your applications and extending its functionality.
+createdAt: 2025-07-20T22:35:03+08:00
+lastModified: 2025-07-20T22:35:03+08:00
+---
+
+import { Callout } from '@/src/components/markdown/Callout';
+
+## Core API
+
+### Builder Class
+
+The main entry point for programmatic usage:
+
+```typescript
+import { Builder } from '@afilmory/builder';
+
+const builder = new Builder(config);
+```
+
+#### Constructor
+
+```typescript
+constructor(config: BuilderConfig)
+```
+
+Creates a new Builder instance with the specified configuration.
+
+**Parameters:**
+- `config`: BuilderConfig - Configuration object
+
+#### Methods
+
+##### `build(options?)`
+
+Processes photos and generates the manifest.
+
+```typescript
+async build(options?: BuildOptions): Promise<BuildResult>
+```
+
+**Parameters:**
+- `options` (optional): BuildOptions - Build-specific options
+
+**Returns:** Promise&lt;BuildResult&gt;
+
+**Example:**
+```typescript
+const result = await builder.build({
+  force: false,
+  includePatterns: ['*.jpg', '*.jpeg'],
+  excludePatterns: ['temp/*']
+});
+
+console.log(`Processed ${result.processedCount} photos`);
+```
+
+##### `validate(options?)`
+
+Validates the current manifest and photo library.
+
+```typescript
+async validate(options?: ValidateOptions): Promise<ValidationResult>
+```
+
+**Example:**
+```typescript
+const validation = await builder.validate({
+  checkThumbnails: true,
+  checkImageIntegrity: true
+});
+
+if (!validation.isValid) {
+  console.error('Validation errors:', validation.errors);
+}
+```
+
+##### `cleanup(options?)`
+
+Performs cleanup operations on the photo library.
+
+```typescript
+async cleanup(options?: CleanupOptions): Promise<CleanupResult>
+```
+
+**Example:**
+```typescript
+await builder.cleanup({
+  orphanedThumbnails: true,
+  cacheFiles: true,
+  tempFiles: true
+});
+```
+
+## Configuration Interfaces
+
+### BuilderConfig
+
+Main configuration interface for the Builder.
+
+```typescript
+interface BuilderConfig {
+  storage: StorageConfig;
+  performance?: PerformanceConfig;
+  options?: BuilderOptions;
+}
+```
+
+### StorageConfig
+
+Configuration for storage providers.
+
+```typescript
+type StorageConfig = S3Config | GitHubConfig | LocalConfig;
+
+interface S3Config {
+  provider: 's3';
+  bucket: string;
+  region: string;
+  accessKeyId?: string;
+  secretAccessKey?: string;
+  sessionToken?: string;
+  endpoint?: string;
+  pathStyle?: boolean;
+  customDomain?: string;
+  uploadOptions?: S3UploadOptions;
+}
+
+interface GitHubConfig {
+  provider: 'github';
+  owner: string;
+  repo: string;
+  branch?: string;
+  token: string;
+  baseUrl?: string;
+  uploadOptions?: GitHubUploadOptions;
+}
+
+interface LocalConfig {
+  provider: 'local';
+  basePath: string;
+  baseUrl: string;
+  uploadOptions?: LocalUploadOptions;
+}
+```
+
+### PerformanceConfig
+
+Performance and optimization settings.
+
+```typescript
+interface PerformanceConfig {
+  worker?: WorkerConfig;
+  concurrency?: ConcurrencyConfig;
+  cache?: CacheConfig;
+  optimization?: OptimizationConfig;
+}
+
+interface WorkerConfig {
+  useClusterMode?: boolean;
+  workerCount?: number;
+  workerConcurrency?: number;
+  threadPoolSize?: number;
+  maxQueueSize?: number;
+  memoryLimit?: string;
+  restartWorkerAfter?: number;
+}
+
+interface ConcurrencyConfig {
+  photoProcessing?: number;
+  thumbnailGeneration?: number;
+  uploadTasks?: number;
+}
+```
+
+## Photo Processing API
+
+### PhotoProcessor
+
+Core photo processing functionality.
+
+```typescript
+import { PhotoProcessor } from '@afilmory/builder';
+
+const processor = new PhotoProcessor(config);
+```
+
+#### Methods
+
+##### `processPhoto(file, options?)`
+
+Process a single photo file.
+
+```typescript
+async processPhoto(
+  file: string | Buffer | PhotoFile,
+  options?: ProcessPhotoOptions
+): Promise<ProcessedPhoto>
+```
+
+**Example:**
+```typescript
+const processed = await processor.processPhoto('./photo.jpg', {
+  generateThumbnails: true,
+  extractExif: true,
+  analyzeTone: true
+});
+
+console.log('Photo processed:', processed.id);
+console.log('Thumbnails:', processed.thumbnails);
+console.log('EXIF data:', processed.exif);
+```
+
+##### `generateThumbnails(photo, sizes?)`
+
+Generate thumbnails for a photo.
+
+```typescript
+async generateThumbnails(
+  photo: ProcessedPhoto | string,
+  sizes?: number[]
+): Promise<Thumbnail[]>
+```
+
+##### `extractMetadata(file)`
+
+Extract metadata from a photo file.
+
+```typescript
+async extractMetadata(file: string | Buffer): Promise<PhotoMetadata>
+```
+
+### Image Analysis API
+
+#### ThumbHash Generation
+
+```typescript
+import { generateThumbHash } from '@afilmory/builder';
+
+const thumbHash = await generateThumbHash(imageBuffer);
+```
+
+#### Tone Analysis
+
+```typescript
+import { analyzeTone } from '@afilmory/builder';
+
+const toneAnalysis = await analyzeTone(imageBuffer);
+// Returns: { toneType: 'normal' | 'high-key' | 'low-key' | 'high-contrast', brightness: number, contrast: number }
+```
+
+#### Histogram Generation
+
+```typescript
+import { generateHistogram } from '@afilmory/builder';
+
+const histogram = await generateHistogram(imageBuffer);
+// Returns compressed histogram data
+```
+
+## Storage API
+
+### Storage Providers
+
+Access to storage provider implementations:
+
+```typescript
+import { S3Provider, GitHubProvider, LocalProvider } from '@afilmory/builder';
+
+// S3 Provider
+const s3 = new S3Provider({
+  bucket: 'my-bucket',
+  region: 'us-west-2'
+});
+
+await s3.upload('path/to/file.jpg', buffer);
+const url = await s3.getUrl('path/to/file.jpg');
+
+// GitHub Provider
+const github = new GitHubProvider({
+  owner: 'username',
+  repo: 'photos',
+  token: 'ghp_...'
+});
+
+await github.upload('photos/image.jpg', buffer);
+```
+
+### Storage Interface
+
+All storage providers implement the `StorageProvider` interface:
+
+```typescript
+interface StorageProvider {
+  upload(path: string, data: Buffer, options?: UploadOptions): Promise<string>;
+  download(path: string): Promise<Buffer>;
+  delete(path: string): Promise<void>;
+  exists(path: string): Promise<boolean>;
+  list(prefix?: string): Promise<StorageItem[]>;
+  getUrl(path: string): Promise<string>;
+  getMetadata(path: string): Promise<StorageMetadata>;
+}
+```
+
+## Worker API
+
+### Cluster Processing
+
+```typescript
+import { ClusterPool } from '@afilmory/builder';
+
+const cluster = new ClusterPool({
+  workerCount: 8,
+  workerScript: './worker.js'
+});
+
+const results = await cluster.process(tasks, {
+  concurrency: 2
+});
+```
+
+### Thread Pool Processing
+
+```typescript
+import { ThreadPool } from '@afilmory/builder';
+
+const pool = new ThreadPool({
+  size: 4,
+  maxQueueSize: 100
+});
+
+const result = await pool.execute(async () => {
+  // CPU-intensive task
+  return processImage(imageData);
+});
+```
+
+## Manifest API
+
+### Manifest Management
+
+```typescript
+import { ManifestManager } from '@afilmory/builder';
+
+const manager = new ManifestManager(config);
+
+// Load existing manifest
+const manifest = await manager.load();
+
+// Add photo to manifest
+await manager.addPhoto(processedPhoto);
+
+// Save manifest
+await manager.save();
+
+// Validate manifest
+const validation = await manager.validate();
+```
+
+### Manifest Schema
+
+```typescript
+interface PhotoManifest {
+  version: string;
+  generatedAt: string;
+  totalCount: number;
+  data: Photo[];
+}
+
+interface Photo {
+  id: string;
+  originalUrl: string;
+  thumbnailUrl?: string;
+  thumbHash?: string;
+  width: number;
+  height: number;
+  aspectRatio: number;
+  fileSize: number;
+  dateTaken?: string;
+  dateAdded: string;
+  exif?: ExifData;
+  toneAnalysis?: ToneAnalysis;
+  histogram?: number[];
+  isLivePhoto?: boolean;
+  livePhotoVideoUrl?: string;
+  isHDR?: boolean;
+  tags?: string[];
+  location?: GeoLocation;
+}
+```
+
+## Event System
+
+Builder provides an event system for monitoring and extending functionality:
+
+```typescript
+import { Builder, BuilderEvents } from '@afilmory/builder';
+
+const builder = new Builder(config);
+
+// Listen to events
+builder.on(BuilderEvents.PHOTO_PROCESSED, (photo) => {
+  console.log(`Processed: ${photo.id}`);
+});
+
+builder.on(BuilderEvents.BUILD_STARTED, (info) => {
+  console.log(`Starting build with ${info.totalFiles} files`);
+});
+
+builder.on(BuilderEvents.BUILD_COMPLETED, (result) => {
+  console.log(`Build completed: ${result.processedCount} photos`);
+});
+
+builder.on(BuilderEvents.ERROR, (error) => {
+  console.error('Builder error:', error);
+});
+```
+
+### Available Events
+
+```typescript
+enum BuilderEvents {
+  BUILD_STARTED = 'build:started',
+  BUILD_COMPLETED = 'build:completed',
+  BUILD_PROGRESS = 'build:progress',
+  PHOTO_PROCESSING = 'photo:processing',
+  PHOTO_PROCESSED = 'photo:processed',
+  PHOTO_ERROR = 'photo:error',
+  THUMBNAIL_GENERATED = 'thumbnail:generated',
+  UPLOAD_STARTED = 'upload:started',
+  UPLOAD_COMPLETED = 'upload:completed',
+  ERROR = 'error'
+}
+```
+
+## Extensions and Plugins
+
+### Creating Custom Processors
+
+```typescript
+import { PhotoProcessor, ProcessorPlugin } from '@afilmory/builder';
+
+class CustomProcessor implements ProcessorPlugin {
+  name = 'custom-processor';
+  
+  async process(photo: ProcessedPhoto): Promise<ProcessedPhoto> {
+    // Custom processing logic
+    photo.customData = await this.customAnalysis(photo);
+    return photo;
+  }
+  
+  private async customAnalysis(photo: ProcessedPhoto) {
+    // Implementation
+  }
+}
+
+// Register plugin
+const processor = new PhotoProcessor(config);
+processor.use(new CustomProcessor());
+```
+
+### Creating Storage Providers
+
+```typescript
+import { StorageProvider } from '@afilmory/builder';
+
+class CustomStorageProvider implements StorageProvider {
+  async upload(path: string, data: Buffer): Promise<string> {
+    // Implementation
+  }
+  
+  async download(path: string): Promise<Buffer> {
+    // Implementation
+  }
+  
+  // ... other required methods
+}
+```
+
+## Utility Functions
+
+### File Utilities
+
+```typescript
+import { 
+  isImageFile,
+  isVideoFile,
+  isLivePhoto,
+  getFileInfo,
+  generateId 
+} from '@afilmory/builder/utils';
+
+// Check file types
+const isImage = isImageFile('photo.jpg'); // true
+const isVideo = isVideoFile('video.mov'); // true
+const isLive = isLivePhoto('IMG_1234.HEIC', 'IMG_1234.MOV'); // true
+
+// Get file information
+const info = await getFileInfo('./photo.jpg');
+// Returns: { size: number, mtime: Date, ... }
+
+// Generate unique ID
+const id = generateId('IMG_1234.jpg'); // 'img-1234'
+```
+
+### Image Utilities
+
+```typescript
+import { 
+  resizeImage,
+  convertFormat,
+  optimizeImage 
+} from '@afilmory/builder/utils';
+
+// Resize image
+const resized = await resizeImage(buffer, { width: 800, height: 600 });
+
+// Convert format
+const jpeg = await convertFormat(heicBuffer, 'jpeg');
+
+// Optimize image
+const optimized = await optimizeImage(buffer, { quality: 85 });
+```
+
+## Error Handling
+
+Builder provides specific error types for different scenarios:
+
+```typescript
+import { 
+  BuilderError,
+  StorageError,
+  ProcessingError,
+  ValidationError 
+} from '@afilmory/builder';
+
+try {
+  await builder.build();
+} catch (error) {
+  if (error instanceof StorageError) {
+    console.error('Storage error:', error.message);
+  } else if (error instanceof ProcessingError) {
+    console.error('Processing error:', error.details);
+  } else if (error instanceof ValidationError) {
+    console.error('Validation error:', error.violations);
+  }
+}
+```
+
+## TypeScript Support
+
+Builder is written in TypeScript and provides full type definitions:
+
+```typescript
+import type {
+  BuilderConfig,
+  ProcessedPhoto,
+  PhotoManifest,
+  StorageProvider,
+  BuildResult
+} from '@afilmory/builder';
+
+// Type-safe configuration
+const config: BuilderConfig = {
+  storage: {
+    provider: 's3',
+    bucket: 'photos',
+    region: 'us-west-2'
+  }
+};
+
+// Type-safe results
+const result: BuildResult = await builder.build();
+```
+
+<Callout type="info">
+**Performance Tip**: Use the cluster mode API for CPU-intensive operations when processing large numbers of photos. The thread pool is better for I/O-bound tasks.
+</Callout>
+
+<Callout type="warning">
+**Memory Management**: When processing large images programmatically, ensure proper memory management by disposing of buffers and limiting concurrent operations.
+</Callout>
+
+Next: [Development Guide](./development.mdx)
