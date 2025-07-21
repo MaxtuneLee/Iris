@@ -1,4 +1,4 @@
-import type { Heading,Root } from 'mdast'
+import type { Heading, Root } from 'mdast'
 import type { Plugin } from 'unified'
 import { visit } from 'unist-util-visit'
 
@@ -18,7 +18,7 @@ function generateHeadingId(text: string): string {
 /**
  * 从 MDAST 节点中提取文本内容
  */
- 
+
 function extractTextFromNode(node: any): string {
   if (typeof node === 'string') {
     return node
@@ -41,7 +41,9 @@ function extractTextFromNode(node: any): string {
   }
 
   if (node.children && Array.isArray(node.children)) {
-    return node.children.map((element) => extractTextFromNode(element)).join('')
+    return node.children
+      .map((element: any) => extractTextFromNode(element))
+      .join('')
   }
 
   return ''
@@ -97,7 +99,7 @@ const remarkHeading: Plugin<[RemarkHeadingOptions?], Root> = (options = {}) => {
 
       // 提取标题文本
       const text = node.children
-        .map((element) => extractTextFromNode(element))
+        .map((element: any) => extractTextFromNode(element))
         .join('')
 
       if (!text.trim()) {
@@ -131,4 +133,4 @@ const remarkHeading: Plugin<[RemarkHeadingOptions?], Root> = (options = {}) => {
 }
 
 export default remarkHeading
-export { generateHeadingId,remarkHeading }
+export { generateHeadingId, remarkHeading }
