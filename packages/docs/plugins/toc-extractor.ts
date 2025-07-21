@@ -268,7 +268,7 @@ function extractHeadings(content: string, maxDepth: number): TocItem[] {
     const text = match[2].trim()
 
     // 生成 ID（转换为小写，替换空格和特殊字符）
-    const id = generateHeadingId(text)
+    const id = `heading-${generateHeadingId(text)}`
 
     headings.push({
       id,

@@ -192,11 +192,11 @@ function App({ url }: { url?: string }) {
 
           {/* 桌面端目录 */}
           <div className="hidden w-64 px-4 py-6 lg:py-12 xl:block">
+            <h4 className="mb-3 flex items-center gap-2 text-sm font-normal text-gray-600">
+              <AlignLeftIcon className="mr-1 inline-block h-4 w-4" />
+              On this page
+            </h4>
             <div className="scrollbar-hide sticky top-6 max-h-[calc(100vh-2rem)] overflow-y-auto rounded-xl">
-              <h4 className="mb-3 flex items-center gap-2 text-sm font-normal text-gray-600">
-                <AlignLeftIcon className="mr-1 inline-block h-4 w-4" />
-                On this page
-              </h4>
               <TableOfContents
                 currentPath={currentPath}
                 handleScroll={handleScrollMainContent}

@@ -34,7 +34,11 @@ export default defineConfig({
         // files inside contents will be processed as MDX
         include: ['contents/**/*.{md,mdx}'],
         providerImportSource: '@mdx-js/react',
-        remarkPlugins: [remarkHeading, remarkFrontmatter, remarkGfm],
+        remarkPlugins: [
+          [remarkHeading, { prefix: 'heading-' }],
+          remarkFrontmatter,
+          remarkGfm,
+        ],
         rehypePlugins: [
           [
             shikiRehype,

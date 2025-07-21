@@ -22,29 +22,29 @@ export const tocData: FileToc[] = [
     title: 'Overview',
     toc: [
       {
-        id: 'overview',
+        id: 'heading-overview',
         level: 1,
         text: 'Overview',
         children: [
           {
-            id: 'features',
+            id: 'heading-features',
             level: 2,
             text: '🌟 Features',
             children: [
               {
-                id: 'core-functionality',
+                id: 'heading-core-functionality',
                 level: 3,
                 text: 'Core Functionality',
                 children: [],
               },
               {
-                id: 'image-processing',
+                id: 'heading-image-processing',
                 level: 3,
                 text: 'Image Processing',
                 children: [],
               },
               {
-                id: 'advanced-features',
+                id: 'heading-advanced-features',
                 level: 3,
                 text: 'Advanced Features',
                 children: [],
@@ -52,24 +52,24 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'technical-architecture',
+            id: 'heading-technical-architecture',
             level: 2,
             text: '🏗️ Technical Architecture',
             children: [
               {
-                id: 'frontend-tech-stack',
+                id: 'heading-frontend-tech-stack',
                 level: 3,
                 text: 'Frontend Tech Stack',
                 children: [],
               },
               {
-                id: 'build-system',
+                id: 'heading-build-system',
                 level: 3,
                 text: 'Build System',
                 children: [],
               },
               {
-                id: 'storage-architecture',
+                id: 'heading-storage-architecture',
                 level: 3,
                 text: 'Storage Architecture',
                 children: [],
@@ -77,12 +77,12 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'quick-start',
+            id: 'heading-quick-start',
             level: 2,
             text: '🚀 Quick Start',
             children: [
               {
-                id: 'docker-deployment',
+                id: 'heading-docker-deployment',
                 level: 3,
                 text: 'Docker Deployment',
                 children: [],
@@ -90,36 +90,36 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'configuration-options',
+            id: 'heading-configuration-options',
             level: 2,
             text: '⚙️ Configuration Options',
             children: [
               {
-                id: 'remote-repository-configuration-repo',
+                id: 'heading-remote-repository-configuration-repo',
                 level: 4,
                 text: 'Remote Repository Configuration (`repo`)',
                 children: [],
               },
               {
-                id: 'storage-configuration-storage',
+                id: 'heading-storage-configuration-storage',
                 level: 4,
                 text: 'Storage Configuration (`storage`)',
                 children: [],
               },
               {
-                id: 'build-options-options',
+                id: 'heading-build-options-options',
                 level: 4,
                 text: 'Build Options (`options`)',
                 children: [],
               },
               {
-                id: 'performance-configuration-performance',
+                id: 'heading-performance-configuration-performance',
                 level: 4,
                 text: 'Performance Configuration (`performance`)',
                 children: [],
               },
               {
-                id: 'logging-configuration-logging',
+                id: 'heading-logging-configuration-logging',
                 level: 4,
                 text: 'Logging Configuration (`logging`)',
                 children: [],
@@ -127,24 +127,24 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'cli-commands',
+            id: 'heading-cli-commands',
             level: 2,
             text: '📋 CLI Commands',
             children: [
               {
-                id: 'build-commands',
+                id: 'heading-build-commands',
                 level: 3,
                 text: 'Build Commands',
                 children: [],
               },
               {
-                id: 'development-commands',
+                id: 'heading-development-commands',
                 level: 3,
                 text: 'Development Commands',
                 children: [],
               },
               {
-                id: 'notes',
+                id: 'heading-notes',
                 level: 3,
                 text: 'Notes',
                 children: [],
@@ -152,18 +152,18 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'advanced-usage',
+            id: 'heading-advanced-usage',
             level: 2,
             text: '🔧 Advanced Usage',
             children: [
               {
-                id: 'custom-storage-provider',
+                id: 'heading-custom-storage-provider',
                 level: 3,
                 text: 'Custom Storage Provider',
                 children: [],
               },
               {
-                id: 'custom-image-processing',
+                id: 'heading-custom-image-processing',
                 level: 3,
                 text: 'Custom Image Processing',
                 children: [],
@@ -171,13 +171,13 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'license',
+            id: 'heading-license',
             level: 2,
             text: '📄 License',
             children: [],
           },
           {
-            id: 'related-links',
+            id: 'heading-related-links',
             level: 2,
             text: '🔗 Related Links',
             children: [],
@@ -192,7 +192,7 @@ export const tocData: FileToc[] = [
     title: 'Apps Package',
     toc: [
       {
-        id: 'apps-package',
+        id: 'heading-apps-package',
         level: 1,
         text: 'Apps Package',
         children: [],
@@ -205,7 +205,7 @@ export const tocData: FileToc[] = [
     title: 'Deployment',
     toc: [
       {
-        id: 'deployment',
+        id: 'heading-deployment',
         level: 1,
         text: 'Deployment',
         children: [],
@@ -218,18 +218,18 @@ export const tocData: FileToc[] = [
     title: 'Getting Started',
     toc: [
       {
-        id: 'getting-started',
+        id: 'heading-getting-started',
         level: 1,
         text: 'Getting Started',
         children: [
           {
-            id: 'features',
+            id: 'heading-features',
             level: 2,
             text: 'Features',
             children: [],
           },
           {
-            id: 'quick-start',
+            id: 'heading-quick-start',
             level: 2,
             text: 'Quick Start',
             children: [],
@@ -244,35 +244,35 @@ export const tocData: FileToc[] = [
     title: 'Manifest Builder',
     toc: [
       {
-        id: 'manifest-builder',
+        id: 'heading-manifest-builder',
         level: 1,
         text: 'Manifest Builder',
         children: [
           {
-            id: 'core-features',
+            id: 'heading-core-features',
             level: 2,
             text: 'Core Features',
             children: [
               {
-                id: 'photo-processing',
+                id: 'heading-photo-processing',
                 level: 3,
                 text: '📸 Photo Processing',
                 children: [],
               },
               {
-                id: 'image-analysis',
+                id: 'heading-image-analysis',
                 level: 3,
                 text: '🎨 Image Analysis',
                 children: [],
               },
               {
-                id: 'storage-support',
+                id: 'heading-storage-support',
                 level: 3,
                 text: '🗄️ Storage Support',
                 children: [],
               },
               {
-                id: 'performance-optimization',
+                id: 'heading-performance-optimization',
                 level: 3,
                 text: '⚡ Performance Optimization',
                 children: [],
@@ -280,12 +280,12 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'architecture-design',
+            id: 'heading-architecture-design',
             level: 2,
             text: 'Architecture Design',
             children: [
               {
-                id: 'core-modules',
+                id: 'heading-core-modules',
                 level: 3,
                 text: 'Core Modules',
                 children: [],
@@ -293,24 +293,24 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'use-cases',
+            id: 'heading-use-cases',
             level: 2,
             text: 'Use Cases',
             children: [
               {
-                id: '1-photo-library-building',
+                id: 'heading-1-photo-library-building',
                 level: 3,
                 text: '1. Photo Library Building',
                 children: [],
               },
               {
-                id: '2-batch-photo-processing',
+                id: 'heading-2-batch-photo-processing',
                 level: 3,
                 text: '2. Batch Photo Processing',
                 children: [],
               },
               {
-                id: '3-storage-migration',
+                id: 'heading-3-storage-migration',
                 level: 3,
                 text: '3. Storage Migration',
                 children: [],
@@ -318,19 +318,19 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'key-features',
+            id: 'heading-key-features',
             level: 2,
             text: 'Key Features',
             children: [],
           },
           {
-            id: 'configuration-example',
+            id: 'heading-configuration-example',
             level: 2,
             text: 'Configuration Example',
             children: [],
           },
           {
-            id: 'output-format',
+            id: 'heading-output-format',
             level: 2,
             text: 'Output Format',
             children: [],
@@ -345,45 +345,45 @@ export const tocData: FileToc[] = [
     title: 'API Reference',
     toc: [
       {
-        id: 'api-reference',
+        id: 'heading-api-reference',
         level: 1,
         text: 'API Reference',
         children: [
           {
-            id: 'core-api',
+            id: 'heading-core-api',
             level: 2,
             text: 'Core API',
             children: [
               {
-                id: 'builder-class',
+                id: 'heading-builder-class',
                 level: 3,
                 text: 'Builder Class',
                 children: [
                   {
-                    id: 'constructor',
+                    id: 'heading-constructor',
                     level: 4,
                     text: 'Constructor',
                     children: [],
                   },
                   {
-                    id: 'methods',
+                    id: 'heading-methods',
                     level: 4,
                     text: 'Methods',
                     children: [
                       {
-                        id: 'buildoptions',
+                        id: 'heading-buildoptions',
                         level: 5,
                         text: '`build(options?)`',
                         children: [],
                       },
                       {
-                        id: 'validateoptions',
+                        id: 'heading-validateoptions',
                         level: 5,
                         text: '`validate(options?)`',
                         children: [],
                       },
                       {
-                        id: 'cleanupoptions',
+                        id: 'heading-cleanupoptions',
                         level: 5,
                         text: '`cleanup(options?)`',
                         children: [],
@@ -395,24 +395,24 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'configuration-interfaces',
+            id: 'heading-configuration-interfaces',
             level: 2,
             text: 'Configuration Interfaces',
             children: [
               {
-                id: 'builderconfig',
+                id: 'heading-builderconfig',
                 level: 3,
                 text: 'BuilderConfig',
                 children: [],
               },
               {
-                id: 'storageconfig',
+                id: 'heading-storageconfig',
                 level: 3,
                 text: 'StorageConfig',
                 children: [],
               },
               {
-                id: 'performanceconfig',
+                id: 'heading-performanceconfig',
                 level: 3,
                 text: 'PerformanceConfig',
                 children: [],
@@ -420,34 +420,34 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'photo-processing-api',
+            id: 'heading-photo-processing-api',
             level: 2,
             text: 'Photo Processing API',
             children: [
               {
-                id: 'photoprocessor',
+                id: 'heading-photoprocessor',
                 level: 3,
                 text: 'PhotoProcessor',
                 children: [
                   {
-                    id: 'methods',
+                    id: 'heading-methods',
                     level: 4,
                     text: 'Methods',
                     children: [
                       {
-                        id: 'processphotofile-options',
+                        id: 'heading-processphotofile-options',
                         level: 5,
                         text: '`processPhoto(file, options?)`',
                         children: [],
                       },
                       {
-                        id: 'generatethumbnailsphoto-sizes',
+                        id: 'heading-generatethumbnailsphoto-sizes',
                         level: 5,
                         text: '`generateThumbnails(photo, sizes?)`',
                         children: [],
                       },
                       {
-                        id: 'extractmetadatafile',
+                        id: 'heading-extractmetadatafile',
                         level: 5,
                         text: '`extractMetadata(file)`',
                         children: [],
@@ -457,24 +457,24 @@ export const tocData: FileToc[] = [
                 ],
               },
               {
-                id: 'image-analysis-api',
+                id: 'heading-image-analysis-api',
                 level: 3,
                 text: 'Image Analysis API',
                 children: [
                   {
-                    id: 'thumbhash-generation',
+                    id: 'heading-thumbhash-generation',
                     level: 4,
                     text: 'ThumbHash Generation',
                     children: [],
                   },
                   {
-                    id: 'tone-analysis',
+                    id: 'heading-tone-analysis',
                     level: 4,
                     text: 'Tone Analysis',
                     children: [],
                   },
                   {
-                    id: 'histogram-generation',
+                    id: 'heading-histogram-generation',
                     level: 4,
                     text: 'Histogram Generation',
                     children: [],
@@ -484,18 +484,18 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'storage-api',
+            id: 'heading-storage-api',
             level: 2,
             text: 'Storage API',
             children: [
               {
-                id: 'storage-providers',
+                id: 'heading-storage-providers',
                 level: 3,
                 text: 'Storage Providers',
                 children: [],
               },
               {
-                id: 'storage-interface',
+                id: 'heading-storage-interface',
                 level: 3,
                 text: 'Storage Interface',
                 children: [],
@@ -503,18 +503,18 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'worker-api',
+            id: 'heading-worker-api',
             level: 2,
             text: 'Worker API',
             children: [
               {
-                id: 'cluster-processing',
+                id: 'heading-cluster-processing',
                 level: 3,
                 text: 'Cluster Processing',
                 children: [],
               },
               {
-                id: 'thread-pool-processing',
+                id: 'heading-thread-pool-processing',
                 level: 3,
                 text: 'Thread Pool Processing',
                 children: [],
@@ -522,18 +522,18 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'manifest-api',
+            id: 'heading-manifest-api',
             level: 2,
             text: 'Manifest API',
             children: [
               {
-                id: 'manifest-management',
+                id: 'heading-manifest-management',
                 level: 3,
                 text: 'Manifest Management',
                 children: [],
               },
               {
-                id: 'manifest-schema',
+                id: 'heading-manifest-schema',
                 level: 3,
                 text: 'Manifest Schema',
                 children: [],
@@ -541,12 +541,12 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'event-system',
+            id: 'heading-event-system',
             level: 2,
             text: 'Event System',
             children: [
               {
-                id: 'available-events',
+                id: 'heading-available-events',
                 level: 3,
                 text: 'Available Events',
                 children: [],
@@ -554,18 +554,18 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'extensions-and-plugins',
+            id: 'heading-extensions-and-plugins',
             level: 2,
             text: 'Extensions and Plugins',
             children: [
               {
-                id: 'creating-custom-processors',
+                id: 'heading-creating-custom-processors',
                 level: 3,
                 text: 'Creating Custom Processors',
                 children: [],
               },
               {
-                id: 'creating-storage-providers',
+                id: 'heading-creating-storage-providers',
                 level: 3,
                 text: 'Creating Storage Providers',
                 children: [],
@@ -573,18 +573,18 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'utility-functions',
+            id: 'heading-utility-functions',
             level: 2,
             text: 'Utility Functions',
             children: [
               {
-                id: 'file-utilities',
+                id: 'heading-file-utilities',
                 level: 3,
                 text: 'File Utilities',
                 children: [],
               },
               {
-                id: 'image-utilities',
+                id: 'heading-image-utilities',
                 level: 3,
                 text: 'Image Utilities',
                 children: [],
@@ -592,13 +592,13 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'error-handling',
+            id: 'heading-error-handling',
             level: 2,
             text: 'Error Handling',
             children: [],
           },
           {
-            id: 'typescript-support',
+            id: 'heading-typescript-support',
             level: 2,
             text: 'TypeScript Support',
             children: [],
@@ -613,23 +613,23 @@ export const tocData: FileToc[] = [
     title: 'Command Line Usage',
     toc: [
       {
-        id: 'command-line-usage',
+        id: 'heading-command-line-usage',
         level: 1,
         text: 'Command Line Usage',
         children: [
           {
-            id: 'basic-commands',
+            id: 'heading-basic-commands',
             level: 2,
             text: 'Basic Commands',
             children: [
               {
-                id: 'build-command',
+                id: 'heading-build-command',
                 level: 3,
                 text: 'Build Command',
                 children: [],
               },
               {
-                id: 'common-options',
+                id: 'heading-common-options',
                 level: 3,
                 text: 'Common Options',
                 children: [],
@@ -637,24 +637,24 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'advanced-options',
+            id: 'heading-advanced-options',
             level: 2,
             text: 'Advanced Options',
             children: [
               {
-                id: 'processing-control',
+                id: 'heading-processing-control',
                 level: 3,
                 text: 'Processing Control',
                 children: [],
               },
               {
-                id: 'file-filtering',
+                id: 'heading-file-filtering',
                 level: 3,
                 text: 'File Filtering',
                 children: [],
               },
               {
-                id: 'output-control',
+                id: 'heading-output-control',
                 level: 3,
                 text: 'Output Control',
                 children: [],
@@ -662,24 +662,24 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'specialized-commands',
+            id: 'heading-specialized-commands',
             level: 2,
             text: 'Specialized Commands',
             children: [
               {
-                id: 'validation-commands',
+                id: 'heading-validation-commands',
                 level: 3,
                 text: 'Validation Commands',
                 children: [],
               },
               {
-                id: 'maintenance-commands',
+                id: 'heading-maintenance-commands',
                 level: 3,
                 text: 'Maintenance Commands',
                 children: [],
               },
               {
-                id: 'migration-commands',
+                id: 'heading-migration-commands',
                 level: 3,
                 text: 'Migration Commands',
                 children: [],
@@ -687,18 +687,18 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'configuration-options',
+            id: 'heading-configuration-options',
             level: 2,
             text: 'Configuration Options',
             children: [
               {
-                id: 'config-file-selection',
+                id: 'heading-config-file-selection',
                 level: 3,
                 text: 'Config File Selection',
                 children: [],
               },
               {
-                id: 'runtime-configuration',
+                id: 'heading-runtime-configuration',
                 level: 3,
                 text: 'Runtime Configuration',
                 children: [],
@@ -706,18 +706,18 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'monitoring-and-logging',
+            id: 'heading-monitoring-and-logging',
             level: 2,
             text: 'Monitoring and Logging',
             children: [
               {
-                id: 'progress-monitoring',
+                id: 'heading-progress-monitoring',
                 level: 3,
                 text: 'Progress Monitoring',
                 children: [],
               },
               {
-                id: 'logging-options',
+                id: 'heading-logging-options',
                 level: 3,
                 text: 'Logging Options',
                 children: [],
@@ -725,24 +725,24 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'examples',
+            id: 'heading-examples',
             level: 2,
             text: 'Examples',
             children: [
               {
-                id: 'development-workflow',
+                id: 'heading-development-workflow',
                 level: 3,
                 text: 'Development Workflow',
                 children: [],
               },
               {
-                id: 'production-deployment',
+                id: 'heading-production-deployment',
                 level: 3,
                 text: 'Production Deployment',
                 children: [],
               },
               {
-                id: 'troubleshooting',
+                id: 'heading-troubleshooting',
                 level: 3,
                 text: 'Troubleshooting',
                 children: [],
@@ -750,30 +750,30 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'environment-variables',
+            id: 'heading-environment-variables',
             level: 2,
             text: 'Environment Variables',
             children: [],
           },
           {
-            id: 'exit-codes',
+            id: 'heading-exit-codes',
             level: 2,
             text: 'Exit Codes',
             children: [],
           },
           {
-            id: 'scripting-and-automation',
+            id: 'heading-scripting-and-automation',
             level: 2,
             text: 'Scripting and Automation',
             children: [
               {
-                id: 'github-actions-example',
+                id: 'heading-github-actions-example',
                 level: 3,
                 text: 'GitHub Actions Example',
                 children: [],
               },
               {
-                id: 'cron-job-example',
+                id: 'heading-cron-job-example',
                 level: 3,
                 text: 'Cron Job Example',
                 children: [],
@@ -781,7 +781,7 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'getting-help',
+            id: 'heading-getting-help',
             level: 2,
             text: 'Getting Help',
             children: [],
@@ -796,35 +796,35 @@ export const tocData: FileToc[] = [
     title: 'Configuration Guide',
     toc: [
       {
-        id: 'configuration-guide',
+        id: 'heading-configuration-guide',
         level: 1,
         text: 'Configuration Guide',
         children: [
           {
-            id: 'configuration-file-structure',
+            id: 'heading-configuration-file-structure',
             level: 2,
             text: 'Configuration File Structure',
             children: [],
           },
           {
-            id: 'storage-configuration',
+            id: 'heading-storage-configuration',
             level: 2,
             text: 'Storage Configuration',
             children: [
               {
-                id: 'amazon-s3-configuration',
+                id: 'heading-amazon-s3-configuration',
                 level: 3,
                 text: 'Amazon S3 Configuration',
                 children: [],
               },
               {
-                id: 'github-storage-configuration',
+                id: 'heading-github-storage-configuration',
                 level: 3,
                 text: 'GitHub Storage Configuration',
                 children: [],
               },
               {
-                id: 'local-storage-configuration',
+                id: 'heading-local-storage-configuration',
                 level: 3,
                 text: 'Local Storage Configuration',
                 children: [],
@@ -832,18 +832,18 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'performance-configuration',
+            id: 'heading-performance-configuration',
             level: 2,
             text: 'Performance Configuration',
             children: [
               {
-                id: 'worker-configuration',
+                id: 'heading-worker-configuration',
                 level: 3,
                 text: 'Worker Configuration',
                 children: [],
               },
               {
-                id: 'optimization-settings',
+                id: 'heading-optimization-settings',
                 level: 3,
                 text: 'Optimization Settings',
                 children: [],
@@ -851,18 +851,18 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'general-options',
+            id: 'heading-general-options',
             level: 2,
             text: 'General Options',
             children: [
               {
-                id: 'feature-toggles',
+                id: 'heading-feature-toggles',
                 level: 3,
                 text: 'Feature Toggles',
                 children: [],
               },
               {
-                id: 'path-configuration',
+                id: 'heading-path-configuration',
                 level: 3,
                 text: 'Path Configuration',
                 children: [],
@@ -870,18 +870,18 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'environment-specific-configurations',
+            id: 'heading-environment-specific-configurations',
             level: 2,
             text: 'Environment-Specific Configurations',
             children: [
               {
-                id: 'development-configuration',
+                id: 'heading-development-configuration',
                 level: 3,
                 text: 'Development Configuration',
                 children: [],
               },
               {
-                id: 'production-configuration',
+                id: 'heading-production-configuration',
                 level: 3,
                 text: 'Production Configuration',
                 children: [],
@@ -889,19 +889,19 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'configuration-validation',
+            id: 'heading-configuration-validation',
             level: 2,
             text: 'Configuration Validation',
             children: [],
           },
           {
-            id: 'environment-variables',
+            id: 'heading-environment-variables',
             level: 2,
             text: 'Environment Variables',
             children: [],
           },
           {
-            id: 'configuration-best-practices',
+            id: 'heading-configuration-best-practices',
             level: 2,
             text: 'Configuration Best Practices',
             children: [],
@@ -916,29 +916,29 @@ export const tocData: FileToc[] = [
     title: 'Development Guide',
     toc: [
       {
-        id: 'development-guide',
+        id: 'heading-development-guide',
         level: 1,
         text: 'Development Guide',
         children: [
           {
-            id: 'development-setup',
+            id: 'heading-development-setup',
             level: 2,
             text: 'Development Setup',
             children: [
               {
-                id: 'prerequisites',
+                id: 'heading-prerequisites',
                 level: 3,
                 text: 'Prerequisites',
                 children: [],
               },
               {
-                id: 'environment-setup',
+                id: 'heading-environment-setup',
                 level: 3,
                 text: 'Environment Setup',
                 children: [],
               },
               {
-                id: 'development-scripts',
+                id: 'heading-development-scripts',
                 level: 3,
                 text: 'Development Scripts',
                 children: [],
@@ -946,47 +946,47 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'project-structure',
+            id: 'heading-project-structure',
             level: 2,
             text: 'Project Structure',
             children: [],
           },
           {
-            id: 'architecture-overview',
+            id: 'heading-architecture-overview',
             level: 2,
             text: 'Architecture Overview',
             children: [
               {
-                id: 'core-components',
+                id: 'heading-core-components',
                 level: 3,
                 text: 'Core Components',
                 children: [
                   {
-                    id: '1-builder-core-srcbuilder',
+                    id: 'heading-1-builder-core-srcbuilder',
                     level: 4,
                     text: '1. Builder Core (`src/builder/`)',
                     children: [],
                   },
                   {
-                    id: '2-storage-layer-srcstorage',
+                    id: 'heading-2-storage-layer-srcstorage',
                     level: 4,
                     text: '2. Storage Layer (`src/storage/`)',
                     children: [],
                   },
                   {
-                    id: '3-photo-processing-srcphoto',
+                    id: 'heading-3-photo-processing-srcphoto',
                     level: 4,
                     text: '3. Photo Processing (`src/photo/`)',
                     children: [],
                   },
                   {
-                    id: '4-image-analysis-srcimage',
+                    id: 'heading-4-image-analysis-srcimage',
                     level: 4,
                     text: '4. Image Analysis (`src/image/`)',
                     children: [],
                   },
                   {
-                    id: '5-worker-management-srcworker',
+                    id: 'heading-5-worker-management-srcworker',
                     level: 4,
                     text: '5. Worker Management (`src/worker/`)',
                     children: [],
@@ -994,7 +994,7 @@ export const tocData: FileToc[] = [
                 ],
               },
               {
-                id: 'data-flow',
+                id: 'heading-data-flow',
                 level: 3,
                 text: 'Data Flow',
                 children: [],
@@ -1002,35 +1002,35 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'development-workflows',
+            id: 'heading-development-workflows',
             level: 2,
             text: 'Development Workflows',
             children: [
               {
-                id: 'adding-a-new-storage-provider',
+                id: 'heading-adding-a-new-storage-provider',
                 level: 3,
                 text: 'Adding a New Storage Provider',
                 children: [],
               },
               {
-                id: 'adding-image-analysis-features',
+                id: 'heading-adding-image-analysis-features',
                 level: 3,
                 text: 'Adding Image Analysis Features',
                 children: [],
               },
               {
-                id: 'performance-optimization',
+                id: 'heading-performance-optimization',
                 level: 3,
                 text: 'Performance Optimization',
                 children: [
                   {
-                    id: 'profiling',
+                    id: 'heading-profiling',
                     level: 4,
                     text: 'Profiling',
                     children: [],
                   },
                   {
-                    id: 'memory-management',
+                    id: 'heading-memory-management',
                     level: 4,
                     text: 'Memory Management',
                     children: [],
@@ -1040,24 +1040,24 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'testing',
+            id: 'heading-testing',
             level: 2,
             text: 'Testing',
             children: [
               {
-                id: 'test-structure',
+                id: 'heading-test-structure',
                 level: 3,
                 text: 'Test Structure',
                 children: [],
               },
               {
-                id: 'testing-utilities',
+                id: 'heading-testing-utilities',
                 level: 3,
                 text: 'Testing Utilities',
                 children: [],
               },
               {
-                id: 'example-tests',
+                id: 'heading-example-tests',
                 level: 3,
                 text: 'Example Tests',
                 children: [],
@@ -1065,18 +1065,18 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'debugging',
+            id: 'heading-debugging',
             level: 2,
             text: 'Debugging',
             children: [
               {
-                id: 'logging',
+                id: 'heading-logging',
                 level: 3,
                 text: 'Logging',
                 children: [],
               },
               {
-                id: 'debug-configuration',
+                id: 'heading-debug-configuration',
                 level: 3,
                 text: 'Debug Configuration',
                 children: [],
@@ -1084,30 +1084,30 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'contributing',
+            id: 'heading-contributing',
             level: 2,
             text: 'Contributing',
             children: [
               {
-                id: 'code-style',
+                id: 'heading-code-style',
                 level: 3,
                 text: 'Code Style',
                 children: [],
               },
               {
-                id: 'commit-guidelines',
+                id: 'heading-commit-guidelines',
                 level: 3,
                 text: 'Commit Guidelines',
                 children: [],
               },
               {
-                id: 'pull-request-process',
+                id: 'heading-pull-request-process',
                 level: 3,
                 text: 'Pull Request Process',
                 children: [],
               },
               {
-                id: 'release-process',
+                id: 'heading-release-process',
                 level: 3,
                 text: 'Release Process',
                 children: [],
@@ -1115,18 +1115,18 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'performance-benchmarks',
+            id: 'heading-performance-benchmarks',
             level: 2,
             text: 'Performance Benchmarks',
             children: [
               {
-                id: 'running-benchmarks',
+                id: 'heading-running-benchmarks',
                 level: 3,
                 text: 'Running Benchmarks',
                 children: [],
               },
               {
-                id: 'example-benchmark',
+                id: 'heading-example-benchmark',
                 level: 3,
                 text: 'Example Benchmark',
                 children: [],
@@ -1143,52 +1143,52 @@ export const tocData: FileToc[] = [
     title: 'Storage Providers',
     toc: [
       {
-        id: 'storage-providers',
+        id: 'heading-storage-providers',
         level: 1,
         text: 'Storage Providers',
         children: [
           {
-            id: 'provider-overview',
+            id: 'heading-provider-overview',
             level: 2,
             text: 'Provider Overview',
             children: [],
           },
           {
-            id: 'amazon-s3-provider',
+            id: 'heading-amazon-s3-provider',
             level: 2,
             text: 'Amazon S3 Provider',
             children: [
               {
-                id: 'basic-configuration',
+                id: 'heading-basic-configuration',
                 level: 3,
                 text: 'Basic Configuration',
                 children: [],
               },
               {
-                id: 'advanced-s3-configuration',
+                id: 'heading-advanced-s3-configuration',
                 level: 3,
                 text: 'Advanced S3 Configuration',
                 children: [],
               },
               {
-                id: 's3-compatible-services',
+                id: 'heading-s3-compatible-services',
                 level: 3,
                 text: 'S3-Compatible Services',
                 children: [
                   {
-                    id: 'digitalocean-spaces',
+                    id: 'heading-digitalocean-spaces',
                     level: 4,
                     text: 'DigitalOcean Spaces',
                     children: [],
                   },
                   {
-                    id: 'cloudflare-r2',
+                    id: 'heading-cloudflare-r2',
                     level: 4,
                     text: 'Cloudflare R2',
                     children: [],
                   },
                   {
-                    id: 'minio-self-hosted',
+                    id: 'heading-minio-self-hosted',
                     level: 4,
                     text: 'MinIO (Self-hosted)',
                     children: [],
@@ -1196,7 +1196,7 @@ export const tocData: FileToc[] = [
                 ],
               },
               {
-                id: 's3-performance-optimization',
+                id: 'heading-s3-performance-optimization',
                 level: 3,
                 text: 'S3 Performance Optimization',
                 children: [],
@@ -1204,24 +1204,24 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'github-provider',
+            id: 'heading-github-provider',
             level: 2,
             text: 'GitHub Provider',
             children: [
               {
-                id: 'basic-configuration',
+                id: 'heading-basic-configuration',
                 level: 3,
                 text: 'Basic Configuration',
                 children: [],
               },
               {
-                id: 'advanced-github-configuration',
+                id: 'heading-advanced-github-configuration',
                 level: 3,
                 text: 'Advanced GitHub Configuration',
                 children: [],
               },
               {
-                id: 'github-large-file-support',
+                id: 'heading-github-large-file-support',
                 level: 3,
                 text: 'GitHub Large File Support',
                 children: [],
@@ -1229,24 +1229,24 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'local-storage-provider',
+            id: 'heading-local-storage-provider',
             level: 2,
             text: 'Local Storage Provider',
             children: [
               {
-                id: 'basic-configuration',
+                id: 'heading-basic-configuration',
                 level: 3,
                 text: 'Basic Configuration',
                 children: [],
               },
               {
-                id: 'advanced-local-configuration',
+                id: 'heading-advanced-local-configuration',
                 level: 3,
                 text: 'Advanced Local Configuration',
                 children: [],
               },
               {
-                id: 'local-development-setup',
+                id: 'heading-local-development-setup',
                 level: 3,
                 text: 'Local Development Setup',
                 children: [],
@@ -1254,23 +1254,23 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'provider-specific-features',
+            id: 'heading-provider-specific-features',
             level: 2,
             text: 'Provider-Specific Features',
             children: [
               {
-                id: 's3-features',
+                id: 'heading-s3-features',
                 level: 3,
                 text: 'S3 Features',
                 children: [
                   {
-                    id: 'cloudfront-integration',
+                    id: 'heading-cloudfront-integration',
                     level: 4,
                     text: 'CloudFront Integration',
                     children: [],
                   },
                   {
-                    id: 'lifecycle-management',
+                    id: 'heading-lifecycle-management',
                     level: 4,
                     text: 'Lifecycle Management',
                     children: [],
@@ -1278,18 +1278,18 @@ export const tocData: FileToc[] = [
                 ],
               },
               {
-                id: 'github-features',
+                id: 'heading-github-features',
                 level: 3,
                 text: 'GitHub Features',
                 children: [
                   {
-                    id: 'release-integration',
+                    id: 'heading-release-integration',
                     level: 4,
                     text: 'Release Integration',
                     children: [],
                   },
                   {
-                    id: 'webhook-support',
+                    id: 'heading-webhook-support',
                     level: 4,
                     text: 'Webhook Support',
                     children: [],
@@ -1299,36 +1299,36 @@ export const tocData: FileToc[] = [
             ],
           },
           {
-            id: 'migration-between-providers',
+            id: 'heading-migration-between-providers',
             level: 2,
             text: 'Migration Between Providers',
             children: [],
           },
           {
-            id: 'performance-comparison',
+            id: 'heading-performance-comparison',
             level: 2,
             text: 'Performance Comparison',
             children: [],
           },
           {
-            id: 'best-practices',
+            id: 'heading-best-practices',
             level: 2,
             text: 'Best Practices',
             children: [
               {
-                id: 's3-best-practices',
+                id: 'heading-s3-best-practices',
                 level: 3,
                 text: 'S3 Best Practices',
                 children: [],
               },
               {
-                id: 'github-best-practices',
+                id: 'heading-github-best-practices',
                 level: 3,
                 text: 'GitHub Best Practices',
                 children: [],
               },
               {
-                id: 'local-best-practices',
+                id: 'heading-local-best-practices',
                 level: 3,
                 text: 'Local Best Practices',
                 children: [],
