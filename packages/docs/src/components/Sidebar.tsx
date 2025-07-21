@@ -1,7 +1,7 @@
 import { ChevronRight } from 'lucide-react'
 import { useCallback, useState } from 'react'
 
-import type {RouteConfig} from '../routes';
+import type { RouteConfig } from '../routes'
 import { routes } from '../routes'
 
 interface SidebarProps {
@@ -43,7 +43,7 @@ function buildNavigationTree(routes: RouteConfig[]): NavigationItem[] {
       tree.push(item)
     } else {
       // 多级路径，找到父级
-      const parentPath = `/${  pathParts.slice(0, -1).join('/')}`
+      const parentPath = `/${pathParts.slice(0, -1).join('/')}`
       const parent = pathMap.get(parentPath)
       if (parent) {
         parent.children!.push(item)
@@ -110,7 +110,7 @@ function NavigationItemComponent({
     <div className="w-full">
       <div
         className={`
-          flex w-full cursor-pointer
+          flex w-full
           items-center transition-all duration-200 ease-in-out select-none
           ${
             isActive

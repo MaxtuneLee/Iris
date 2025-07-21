@@ -1,26 +1,44 @@
-import { useState } from 'react'
+import { AlignLeftIcon } from 'lucide-react'
+import { useCallback, useRef, useState } from 'react'
 
+import { MDX } from './components'
 import { DocumentMeta } from './components/DocumentMeta'
+import { MobileTableOfContents } from './components/MobileTableOfContents'
 import { Sidebar } from './components/Sidebar'
+import { TableOfContents } from './components/TableOfContents'
 import routes from './routes'
 
 function App({ url }: { url?: string }) {
   const [currentPath, setCurrentPath] = useState(url || '/')
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const matchedRoute = routes.find((route) => route.path === currentPath)
+  const mainContentRef = useRef<HTMLDivElement>(null)
 
-  const handleNavigate = (path: string) => {
-    setCurrentPath(path)
-    setIsSidebarOpen(false) // 导航后关闭侧边栏
-    // 在实际应用中，这里会更新浏览器历史记录
-    if (typeof window !== 'undefined') {
-      window.history.pushState({}, '', path)
+  const handleScrollMainContent = (top: number) => {
+    console.info('Scrolling to:', top)
+    if (mainContentRef.current) {
+      mainContentRef.current.scrollTo({
+        top,
+        behavior: 'smooth',
+      })
     }
   }
 
-  const toggleSidebar = () => {
+  const handleNavigate = useCallback(
+    (path: string) => {
+      setCurrentPath(path)
+      setIsSidebarOpen(false) // 导航后关闭侧边栏
+      // 在实际应用中，这里会更新浏览器历史记录
+      if (typeof window !== 'undefined') {
+        window.history.pushState({}, '', path)
+      }
+    },
+    [setCurrentPath, setIsSidebarOpen],
+  )
+
+  const toggleSidebar = useCallback(() => {
     setIsSidebarOpen(!isSidebarOpen)
-  }
+  }, [isSidebarOpen])
 
   if (!matchedRoute) {
     return (
@@ -86,6 +104,9 @@ function App({ url }: { url?: string }) {
               Return Home
             </button>
           </div>
+
+          {/* 移动端 TOC (404页面不需要，但为了一致性保留结构) */}
+          <MobileTableOfContents currentPath={currentPath} />
         </main>
       </div>
     )
@@ -121,7 +142,11 @@ function App({ url }: { url?: string }) {
         </div>
       </>
 
-      <main className="bg-fill-primary relative flex-1 overflow-y-auto">
+      {/* 主内容区域 */}
+      <main
+        className="bg-fill-primary relative flex-1 overflow-y-auto"
+        ref={mainContentRef}
+      >
         <div className="bg-fill-primary sticky top-0 z-30 h-16 border-b border-gray-200 bg-white/80 backdrop-blur-3xl lg:hidden">
           <div className="flex h-full items-center px-4">
             <button
@@ -153,15 +178,38 @@ function App({ url }: { url?: string }) {
           </div>
         </div>
 
-        <div className="mx-auto max-w-4xl px-4 py-6 lg:px-8 lg:py-12">
-          <article className="prose prose-lg bg-fill-primary max-w-none rounded-xl p-4 lg:p-8">
-            <Component />
-            <DocumentMeta
-              createdAt={meta.createdAt}
-              lastModified={meta.lastModified}
-            />
-          </article>
+        <div className="mx-auto flex max-w-7xl">
+          {/* 文档内容 */}
+          <div className="w-full flex-1 px-4 py-6 lg:px-8 lg:py-12">
+            <article className="prose prose-lg bg-fill-primary max-w-none rounded-xl p-4 lg:p-8">
+              <MDX content={<Component />} />
+              <DocumentMeta
+                createdAt={meta.createdAt}
+                lastModified={meta.lastModified}
+              />
+            </article>
+          </div>
+
+          {/* 桌面端目录 */}
+          <div className="hidden w-64 px-4 py-6 lg:py-12 xl:block">
+            <div className="scrollbar-hide sticky top-6 max-h-[calc(100vh-2rem)] overflow-y-auto rounded-xl">
+              <h4 className="mb-3 flex items-center gap-2 text-sm font-normal text-gray-600">
+                <AlignLeftIcon className="mr-1 inline-block h-4 w-4" />
+                On this page
+              </h4>
+              <TableOfContents
+                currentPath={currentPath}
+                handleScroll={handleScrollMainContent}
+              />
+            </div>
+          </div>
         </div>
+
+        {/* 移动端 TOC */}
+        <MobileTableOfContents
+          currentPath={currentPath}
+          handleScroll={handleScrollMainContent}
+        />
       </main>
     </div>
   )

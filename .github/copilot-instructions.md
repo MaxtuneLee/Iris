@@ -122,3 +122,11 @@ Currently planned as a custom Vite SSG implementation:
 - **Map Integration**: MapLibre for GPS photo locations
 - **Live Photos**: iOS video detection and playback support
 - **RSS/Social**: OpenGraph metadata and feed generation
+
+## Other Considerations
+
+- Don't have to implement everything at once; focus on core features first
+- Use existing packages as references for implementation patterns
+- Follow the established architecture for consistency
+- Keep documentation up-to-date with code changes
+- If you need to run commands, ask for help, don't run them blindly

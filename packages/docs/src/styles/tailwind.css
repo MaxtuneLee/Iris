@@ -4,6 +4,7 @@
 @plugin 'tailwindcss-animate';
 @plugin 'tailwindcss-safe-area';
 @import 'tailwindcss-uikit-colors/v4/macos.css';
+@import 'tailwind-scrollbar-hide/v4';
 
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
