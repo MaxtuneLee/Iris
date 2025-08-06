@@ -139,7 +139,7 @@ export function TableOfContents({
   }
 
   return (
-    <div className="mb-4 border-l-2 border-gray-200">
+    <div className="border-separator mb-4 border-l-2">
       <nav>
         <ul className="translate-x-[-2px] space-y-1">
           {currentToc.map((item) => (

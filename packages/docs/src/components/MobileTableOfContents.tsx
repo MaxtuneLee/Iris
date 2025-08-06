@@ -18,8 +18,9 @@ export function MobileTableOfContents({
       {/* TOC 按钮 */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="hover:bg-fill-secondary text-text-primary  fixed right-4 bottom-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-white/60 shadow-2xl backdrop-blur-xl transition-all duration-200 hover:shadow-xl xl:hidden"
+        className="hover:bg-material-opaque text-text-primary  bg-material-opaque border-border fixed right-4 bottom-6 z-50 flex h-12 w-12 items-center justify-center rounded-full border-[1px] shadow-2xl backdrop-blur-xl transition-all duration-200 hover:shadow-xl xl:hidden"
         aria-label="Toggle TOC"
+        type="button"
       >
         <svg
           className={`h-5 w-5 transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`}
@@ -50,12 +51,12 @@ export function MobileTableOfContents({
         <>
           {/* 背景遮罩 */}
           <div
-            className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm xl:hidden"
+            className="fixed inset-0 z-40 bg-black/20 xl:hidden"
             onClick={() => setIsOpen(false)}
           />
 
           {/* TOC 内容 */}
-          <div className="animate-in slide-in-from-bottom-4 fade-in fixed right-4 bottom-20 z-50 max-h-96 w-80 overflow-hidden rounded-2xl bg-white/75 shadow-2xl duration-300 xl:hidden">
+          <div className="animate-in slide-in-from-bottom-4 fade-in bg-background-quaternary fixed right-4 bottom-20 z-50 max-h-96 w-80 overflow-hidden rounded-2xl shadow-2xl duration-300 xl:hidden">
             <div className="flex items-center justify-between border-b border-gray-500/50 px-4 py-3">
               <h3 className="text-text-primary text-base font-semibold">
                 目录

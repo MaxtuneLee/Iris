@@ -4,11 +4,14 @@ import { StrictMode } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 
 import App from './App'
+import { Providers } from './providers'
 
 export function render(url: string) {
   const html = renderToStaticMarkup(
     <StrictMode>
-      <App url={url} />
+      <Providers>
+        <App url={url} />
+      </Providers>
     </StrictMode>,
   )
   return { html }

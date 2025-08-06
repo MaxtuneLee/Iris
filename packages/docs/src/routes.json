@@ -9,90 +9,11 @@
     }
   },
   {
-    "path": "/apps",
-    "title": "Apps Package",
-    "meta": {
-      "title": "Apps Package",
-      "description": "Afilmory Apps package includes static web and ssr runtime.",
-      "createdAt": "2025-07-20T22:35:03+08:00",
-      "lastModified": "2025-07-20T22:35:03+08:00"
-    }
-  },
-  {
     "path": "/deployment",
     "title": "Deployment",
     "meta": {
       "title": "Deployment",
       "description": "Guide to deploying Afilmory Builder in production environments, including Docker and configuration options.",
-      "createdAt": "2025-07-20T22:35:03+08:00",
-      "lastModified": "2025-07-20T22:35:03+08:00"
-    }
-  },
-  {
-    "path": "/getting-started",
-    "title": "Getting Started",
-    "meta": {
-      "title": "Getting Started",
-      "createdAt": "2025-07-20T22:35:03+08:00",
-      "lastModified": "2025-07-20T22:35:03+08:00"
-    }
-  },
-  {
-    "path": "/manifest_builder",
-    "title": "Manifest Builder",
-    "meta": {
-      "title": "Manifest Builder",
-      "description": "Afilmory Builder is a high-performance photo processing and indexing system that supports multiple storage backends and concurrent processing modes.",
-      "createdAt": "2025-07-20T22:35:03+08:00",
-      "lastModified": "2025-07-20T22:35:03+08:00"
-    }
-  },
-  {
-    "path": "/manifest_builder/api-reference",
-    "title": "API Reference",
-    "meta": {
-      "title": "API Reference",
-      "description": "Complete API reference for integrating Afilmory Builder into your applications and extending its functionality.",
-      "createdAt": "2025-07-20T22:35:03+08:00",
-      "lastModified": "2025-07-20T22:35:03+08:00"
-    }
-  },
-  {
-    "path": "/manifest_builder/cli-usage",
-    "title": "Command Line Usage",
-    "meta": {
-      "title": "Command Line Usage",
-      "description": "Complete guide to using the Afilmory Builder CLI for photo processing and manifest generation.",
-      "createdAt": "2025-07-20T22:35:03+08:00",
-      "lastModified": "2025-07-20T22:35:03+08:00"
-    }
-  },
-  {
-    "path": "/manifest_builder/configuration",
-    "title": "Configuration Guide",
-    "meta": {
-      "title": "Configuration Guide",
-      "description": "Complete guide to configuring Afilmory Builder for different storage backends and performance scenarios.",
-      "createdAt": "2025-07-20T22:35:03+08:00",
-      "lastModified": "2025-07-20T22:35:03+08:00"
-    }
-  },
-  {
-    "path": "/manifest_builder/development",
-    "title": "Development Guide",
-    "meta": {
-      "title": "Development Guide",
-      "description": "Guide for developers who want to contribute to or extend the Afilmory Builder package.",
-      "createdAt": "2025-07-20T22:35:03+08:00",
-      "lastModified": "2025-07-20T22:35:03+08:00"
-    }
-  },
-  {
-    "path": "/manifest_builder/storage-providers",
-    "title": "Storage Providers",
-    "meta": {
-      "title": "Storage Providers",
-      "description": "Comprehensive guide to configuring and using different storage backends with Afilmory Builder.",
       "createdAt": "2025-07-20T22:35:03+08:00",
       "lastModified": "2025-07-20T22:35:03+08:00"
     }

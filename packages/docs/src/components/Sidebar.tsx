@@ -107,15 +107,15 @@ function NavigationItemComponent({
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full px-2">
       <div
         className={`
           flex w-full
-          items-center transition-all duration-200 ease-in-out select-none
+          items-center rounded-2xl transition-all duration-200 ease-in-out select-none
           ${
             isActive
-              ? 'bg-blue-400/20 font-medium'
-              : 'text-gray-500 hover:text-gray-900'
+              ? 'bg-blue-100 font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+              : 'hover:bg-material-ultrathin text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 hover:dark:text-gray-200'
           }
           ${level > 0 ? 'pl-3' : ''}
         `}
@@ -123,16 +123,18 @@ function NavigationItemComponent({
         <button
           onClick={handleTitleClick}
           className="flex-1 truncate px-3 py-3 text-left text-base lg:py-2.5 lg:text-sm"
+          type="button"
         >
           {item.title}
         </button>
         {hasChildren && (
           <button
             onClick={handleArrowClick}
-            className="hover:bg-opacity-20 mr-1 rounded-md p-3 transition-all duration-200 hover:bg-gray-400/10 lg:p-2"
+            className="mr-1 rounded-xl p-3 transition-all duration-200 hover:bg-gray-100 lg:p-2 dark:hover:bg-gray-700"
+            type="button"
           >
             <ChevronRight
-              className={`h-5 w-5 transition-transform duration-200 lg:h-4 lg:w-4 ${
+              className={`h-5 w-5 text-gray-500 transition-transform duration-200 lg:h-4 lg:w-4 dark:text-gray-500 ${
                 isExpanded ? 'rotate-90' : ''
               }`}
             />
@@ -161,21 +163,25 @@ export function Sidebar({ currentPath, onNavigate }: SidebarProps) {
   const navigationTree = buildNavigationTree(routes)
 
   return (
-    <aside className="lg:border-separator-opaque relative h-screen w-64 overflow-x-hidden overflow-y-auto border-r border-gray-200 bg-white/80 backdrop-blur-2xl">
-      <div className="w-full">
-        <div className="lg:border-separator-opaque flex items-center border-b border-gray-200 px-4 py-6">
+    <aside className="relative h-screen w-64 overflow-x-hidden overflow-y-auto bg-transparent p-2 ">
+      <div className="bg-material-thick border-border h-full w-full border-[1px] border-solid backdrop-blur-2xl md:border-none md:bg-transparent">
+        <div className=" flex items-center px-4 py-6">
           <img
             src="https://github.com/Afilmory/assets/blob/main/512-mac.png?raw=true"
             alt="Afilmory"
             className="h-14 w-14 rounded-t-lg"
           />
           <div className="ml-3 flex-1">
-            <h2 className="text-xl font-semibold text-black">Afilmory</h2>
-            <p className="text-text-tertiary text-sm">Documentation</p>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+              Afilmory
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Documentation
+            </p>
           </div>
         </div>
 
-        <nav className="space-y-1 pb-6">
+        <nav className="space-y-1">
           {navigationTree.map((item) => (
             <NavigationItemComponent
               key={item.path}

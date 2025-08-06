@@ -5,6 +5,7 @@ import shikiRehype from '@shikijs/rehype'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { codeInspectorPlugin } from 'code-inspector-plugin'
+import rehypeMermaid from 'rehype-mermaid'
 import remarkFrontmatter from 'remark-frontmatter'
 import remarkGfm from 'remark-gfm'
 import { defineConfig } from 'vite'
@@ -40,6 +41,7 @@ export default defineConfig({
           remarkGfm,
         ],
         rehypePlugins: [
+          rehypeMermaid,
           [
             shikiRehype,
             {

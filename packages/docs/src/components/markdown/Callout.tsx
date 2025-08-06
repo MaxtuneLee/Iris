@@ -1,4 +1,4 @@
-import { AlertCircle, AlertTriangle, CheckCircle,Info } from 'lucide-react'
+import { AlertCircle, AlertTriangle, CheckCircle, Info } from 'lucide-react'
 import * as React from 'react'
 
 type CalloutType = 'info' | 'warning' | 'error' | 'success'
@@ -54,7 +54,7 @@ export function Callout({
     >
       <div className="min-w-0 flex-1 pt-5 ">
         <div
-          className="text-sm leading-relaxed font-medium"
+          className="inline-flex justify-start gap-5 text-sm leading-relaxed font-medium *:m-0"
           style={{ lineHeight: '1.25rem' }}
         >
           {' '}

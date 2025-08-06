@@ -2,7 +2,7 @@ import { AlignLeftIcon } from 'lucide-react'
 import { useCallback, useRef, useState } from 'react'
 
 import { MDX } from './components'
-import { DocumentMeta } from './components/DocumentMeta'
+import { DocumentFooter } from './components/DocumentFooter'
 import { MobileTableOfContents } from './components/MobileTableOfContents'
 import { Sidebar } from './components/Sidebar'
 import { TableOfContents } from './components/TableOfContents'
@@ -61,13 +61,14 @@ function App({ url }: { url?: string }) {
           </>
         )}
 
-        <main className="bg-fill-primary flex flex-1 items-center justify-center">
+        <main className="bg-background flex flex-1 items-center justify-center">
           {/* 移动端顶部栏 */}
-          <div className="bg-fill-primary fixed top-0 right-0 left-0 z-30 h-16 border-b border-gray-200 lg:hidden">
+          <div className="bg-background fixed top-0 right-0 left-0 z-30 h-16 border-b border-gray-200 lg:hidden">
             <div className="flex h-full items-center px-4">
               <button
                 onClick={toggleSidebar}
-                className="text-text-primary hover:bg-fill-secondary rounded-lg p-2 transition-colors"
+                className="text-text-primary hover:bg-background-secondary rounded-lg p-2 transition-colors"
+                type="button"
               >
                 <svg
                   className="h-6 w-6"
@@ -92,7 +93,7 @@ function App({ url }: { url?: string }) {
             </div>
           </div>
 
-          <div className="bg-fill-secondary border-separator-opaque mx-4 mt-16 rounded-xl border p-8 text-center shadow-sm lg:mt-0">
+          <div className="bg-background-secondary border-separator-opaque mx-4 mt-16 rounded-xl border p-8 text-center shadow-sm lg:mt-0">
             <h1 className="text-text-primary mb-3 text-3xl font-semibold">
               404
             </h1>
@@ -100,6 +101,7 @@ function App({ url }: { url?: string }) {
             <button
               onClick={() => handleNavigate('/')}
               className="bg-accent mt-6 rounded-lg px-4 py-2 text-white transition-opacity hover:opacity-90"
+              type="button"
             >
               Return Home
             </button>
@@ -144,14 +146,15 @@ function App({ url }: { url?: string }) {
 
       {/* 主内容区域 */}
       <main
-        className="bg-fill-primary relative flex-1 overflow-y-auto"
+        className="bg-background relative flex-1 overflow-y-auto"
         ref={mainContentRef}
       >
-        <div className="bg-fill-primary sticky top-0 z-30 h-16 border-b border-gray-200 bg-white/80 backdrop-blur-3xl lg:hidden">
+        <div className="bg-background border-border sticky top-0 z-30 h-16 border-b backdrop-blur-3xl lg:hidden">
           <div className="flex h-full items-center px-4">
             <button
               onClick={toggleSidebar}
-              className="text-text-primary hover:bg-fill-secondary rounded-lg p-2 transition-colors"
+              className="text-text-primary hover:bg-background-secondary rounded-lg p-2 transition-colors"
+              type="button"
             >
               <svg
                 className="h-6 w-6"
@@ -181,9 +184,9 @@ function App({ url }: { url?: string }) {
         <div className="mx-auto flex max-w-7xl">
           {/* 文档内容 */}
           <div className="w-full flex-1 px-4 py-6 lg:px-8 lg:py-12">
-            <article className="prose prose-lg bg-fill-primary max-w-none rounded-xl p-4 lg:p-8">
+            <article className="prose prose-lg bg-background max-w-none rounded-xl p-4 lg:p-8">
               <MDX content={<Component />} />
-              <DocumentMeta
+              <DocumentFooter
                 createdAt={meta.createdAt}
                 lastModified={meta.lastModified}
               />
@@ -196,7 +199,7 @@ function App({ url }: { url?: string }) {
               <AlignLeftIcon className="mr-1 inline-block h-4 w-4" />
               On this page
             </h4>
-            <div className="scrollbar-hide sticky top-6 max-h-[calc(100vh-2rem)] overflow-y-auto rounded-xl">
+            <div className="scrollbar-hide sticky top-6 max-h-[calc(100vh-2rem)] overflow-y-auto">
               <TableOfContents
                 currentPath={currentPath}
                 handleScroll={handleScrollMainContent}
