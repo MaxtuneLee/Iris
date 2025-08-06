@@ -10,7 +10,7 @@
     "dev": "vite",
     "lint": "eslint .",
     "output": "tsx scripts/build.ts",
-    "postinstall": "pnpm exec playwright install",
+    "postinstall": "pnpm dlx playwright install",
     "preview": "pnpm dlx serve dist"
   },
   "dependencies": {
