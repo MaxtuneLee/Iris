@@ -200,6 +200,19 @@ export const tocData: FileToc[] = [
     ],
   },
   {
+    file: 'deployment/cloudflare-pages.mdx',
+    path: '/deployment/cloudflare-pages',
+    title: 'Cloudflare Pages',
+    toc: [
+      {
+        id: 'heading-cloudflare-pages-deployment',
+        level: 1,
+        text: 'Cloudflare Pages Deployment',
+        children: [],
+      },
+    ],
+  },
+  {
     file: 'deployment/docker.mdx',
     path: '/deployment/docker',
     title: 'Docker',
@@ -208,6 +221,45 @@ export const tocData: FileToc[] = [
         id: 'heading-docker-deployment',
         level: 1,
         text: 'Docker Deployment',
+        children: [],
+      },
+    ],
+  },
+  {
+    file: 'deployment/github-action.mdx',
+    path: '/deployment/github-action',
+    title: 'Github Action',
+    toc: [
+      {
+        id: 'heading-github-action-deployment',
+        level: 1,
+        text: 'Github Action Deployment',
+        children: [],
+      },
+    ],
+  },
+  {
+    file: 'deployment/github-pages.mdx',
+    path: '/deployment/github-pages',
+    title: 'Github Pages',
+    toc: [
+      {
+        id: 'heading-github-pages-deployment',
+        level: 1,
+        text: 'Github Pages Deployment',
+        children: [],
+      },
+    ],
+  },
+  {
+    file: 'deployment/vercel.mdx',
+    path: '/deployment/vercel',
+    title: 'Vercel',
+    toc: [
+      {
+        id: 'heading-vercel-deployment',
+        level: 1,
+        text: 'Vercel Deployment',
         children: [],
       },
     ],

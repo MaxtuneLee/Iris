@@ -19,6 +19,16 @@
     }
   },
   {
+    "path": "/deployment/cloudflare-pages",
+    "title": "Cloudflare Pages",
+    "meta": {
+      "title": "Cloudflare Pages",
+      "description": "Guide to deploying Afilmory via Cloudflare Pages.",
+      "createdAt": "2025-07-20T22:35:03+08:00",
+      "lastModified": "2025-08-08T09:08:13.539+08:00"
+    }
+  },
+  {
     "path": "/deployment/docker",
     "title": "Docker",
     "meta": {
@@ -26,6 +36,36 @@
       "description": "Guide to deploying Afilmory via Docker.",
       "createdAt": "2025-07-20T22:35:03+08:00",
       "lastModified": "2025-08-08T08:28:42.778+08:00"
+    }
+  },
+  {
+    "path": "/deployment/github-action",
+    "title": "Github Action",
+    "meta": {
+      "title": "Github Action",
+      "description": "Guide to deploying Afilmory via Github Action.",
+      "createdAt": "2025-07-20T22:35:03+08:00",
+      "lastModified": "2025-08-08T09:08:13.543+08:00"
+    }
+  },
+  {
+    "path": "/deployment/github-pages",
+    "title": "Github Pages",
+    "meta": {
+      "title": "Github Pages",
+      "description": "Guide to deploying Afilmory via Github Pages.",
+      "createdAt": "2025-07-20T22:35:03+08:00",
+      "lastModified": "2025-08-08T09:08:13.544+08:00"
+    }
+  },
+  {
+    "path": "/deployment/vercel",
+    "title": "Vercel",
+    "meta": {
+      "title": "Vercel",
+      "description": "Guide to deploying Afilmory via Vercel.",
+      "createdAt": "2025-07-20T22:35:03+08:00",
+      "lastModified": "2025-08-08T09:08:13.544+08:00"
     }
   }
 ]

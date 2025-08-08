@@ -52,7 +52,7 @@
     "vite-tsconfig-paths": "5.1.4"
   },
   "simple-git-hooks": {
-    "pre-commit": "tsx scripts/update-lastmodified.ts && pnpm exec lint-staged"
+    "pre-commit": "pnpm exec lint-staged"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -60,6 +60,9 @@
     ],
     "*.{js,ts,cjs,mjs,jsx,tsx,json}": [
       "eslint --fix"
+    ],
+    "*.{md,mdx}": [
+      "pnpm update:lastmodified"
     ]
   }
 }
