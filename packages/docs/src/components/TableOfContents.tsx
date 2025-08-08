@@ -35,7 +35,7 @@ function TocItemComponent({
           block py-1 text-[12px] transition-colors duration-200
           ${
             isActive
-              ? 'border-l-2 border-blue-600 pl-3 font-medium text-blue-600'
+              ? 'border-accent text-accent border-l-2 pl-3 font-medium'
               : 'text-text-quaternary hover:text-text-secondary pl-3'
           }
           ${level > 1 ? `ml-${(level - 1) * 4}` : ''}
@@ -91,7 +91,6 @@ export function TableOfContents({
         // 找到可见的标题中最上面的一个
         const visibleEntries = entries.filter((entry) => entry.isIntersecting)
         if (visibleEntries.length > 0) {
-          // 按照在页面中的位置排序，选择最上面的
           visibleEntries.sort((a, b) => {
             const aRect = a.boundingClientRect
             const bRect = b.boundingClientRect
@@ -106,7 +105,6 @@ export function TableOfContents({
       },
     )
 
-    // 获取所有标题ID（包括嵌套的）
     const getAllIds = (items: TocItem[]): string[] => {
       const ids: string[] = []
       for (const item of items) {

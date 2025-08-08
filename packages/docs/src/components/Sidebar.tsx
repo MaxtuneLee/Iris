@@ -122,8 +122,8 @@ function NavigationItemComponent({
           items-center rounded-2xl transition-all duration-200 ease-in-out select-none
           ${
             isActive
-              ? 'bg-blue-100 font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-              : 'hover:bg-material-ultrathin text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 hover:dark:text-gray-200'
+              ? 'text-blue bg-blue/15 font-medium'
+              : 'hover:bg-background-tertiary text-gray-600 dark:text-gray-400'
           }
           ${level > 0 ? 'pl-3' : ''}
         `}
