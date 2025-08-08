@@ -1,28 +1,18 @@
 import { AlignLeftIcon, ArrowRight } from 'lucide-react'
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { MDX } from './components'
 import { DocumentFooter } from './components/DocumentFooter'
 import { MobileTableOfContents } from './components/MobileTableOfContents'
 import { Sidebar } from './components/Sidebar'
 import { TableOfContents } from './components/TableOfContents'
-import routes from './routes'
 import { getRandomKaomoji } from './utils/kaomoji'
+import { getMatchedRoute } from './utils/routes'
 
 function App({ url }: { url?: string }) {
   const [currentPath, setCurrentPath] = useState(url || '/')
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const matchedRoute = routes.find((route) => {
-    const normalizedCurrentPath =
-      currentPath.endsWith('/') && currentPath !== '/'
-        ? currentPath.slice(0, -1)
-        : currentPath
-    const normalizedRoutePath =
-      route.path.endsWith('/') && route.path !== '/'
-        ? route.path.slice(0, -1)
-        : route.path
-    return normalizedRoutePath === normalizedCurrentPath
-  })
+  const matchedRoute = getMatchedRoute(currentPath)
   const mainContentRef = useRef<HTMLDivElement>(null)
 
   const handleScrollMainContent = (top: number) => {
@@ -50,6 +40,14 @@ function App({ url }: { url?: string }) {
   const toggleSidebar = useCallback(() => {
     setIsSidebarOpen(!isSidebarOpen)
   }, [isSidebarOpen])
+
+  useEffect(() => {
+    if (matchedRoute) {
+      document.title = `${matchedRoute.title || 'Docs'} | Afilmory Docs`
+    } else {
+      document.title = '404 Page Not Found | Afilmory Docs'
+    }
+  }, [matchedRoute])
 
   if (!matchedRoute) {
     return (

@@ -1,8 +1,9 @@
 import { ChevronRight } from 'lucide-react'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import type { RouteConfig } from '../routes'
 import { routes } from '../routes'
+import { getMatchedRoute } from '../utils/routes'
 
 interface SidebarProps {
   currentPath?: string
@@ -94,8 +95,15 @@ function NavigationItemComponent({
   }, [currentPath, item.path, item.children])
 
   const [isExpanded, setIsExpanded] = useState(shouldExpand)
-  const isActive = currentPath === item.path
+  const isActive = currentPath
+    ? getMatchedRoute(currentPath)?.path === item.path
+    : false
   const hasChildren = item.children && item.children.length > 0
+
+  // 当 currentPath 改变时，重新计算是否应该展开
+  useEffect(() => {
+    setIsExpanded(shouldExpand())
+  }, [shouldExpand])
 
   const handleTitleClick = () => {
     onNavigate?.(item.path)

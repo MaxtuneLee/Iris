@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
-import { mkdir,readFile, writeFile } from 'node:fs/promises'
-import { dirname,join } from 'node:path'
-import { fileURLToPath, pathToFileURL  } from 'node:url'
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { dirname, join } from 'node:path'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
-import type {RouteConfig} from '../src/routes';
+import type { RouteConfig } from '../src/routes'
 import routes from '../src/routes.json'
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
@@ -31,9 +31,9 @@ async function build() {
         .replace('<!--app-html-->', html)
         .replace(
           '<!--app-title-->',
-          (route.meta?.title as string) ||
-            route.title ||
-            'Afilmory Documentation',
+          `${
+            (route.meta?.title as string) || route.title || 'Docs'
+          } | Afilmory Docs`,
         )
         .replace('<!--app-head-->', generateMetaTags(route))
 
@@ -64,7 +64,10 @@ function generateMetaTags(route: Omit<RouteConfig, 'component'>): string {
   const title = meta.title as string
 
   if (description) {
-    tags.push(`<meta name="description" content="${description}">`, `<meta property="og:description" content="${description}">`)
+    tags.push(
+      `<meta name="description" content="${description}">`,
+      `<meta property="og:description" content="${description}">`,
+    )
   }
 
   if (title) {

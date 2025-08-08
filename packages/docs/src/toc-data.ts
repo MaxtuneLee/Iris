@@ -199,6 +199,19 @@ export const tocData: FileToc[] = [
       },
     ],
   },
+  {
+    file: 'deployment/docker.mdx',
+    path: '/deployment/docker',
+    title: 'Docker',
+    toc: [
+      {
+        id: 'heading-docker-deployment',
+        level: 1,
+        text: 'Docker Deployment',
+        children: [],
+      },
+    ],
+  },
 ]
 
 // Helper function to find TOC data by file path

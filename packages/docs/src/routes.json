@@ -13,9 +13,19 @@
     "title": "Deployment",
     "meta": {
       "title": "Deployment",
-      "description": "Guide to deploying Afilmory Builder in production environments, including Docker and configuration options.",
+      "description": "Guide to deploying Afilmory in production environments, including Docker and configuration options.",
       "createdAt": "2025-07-20T22:35:03+08:00",
-      "lastModified": "2025-07-20T22:35:03+08:00"
+      "lastModified": "2025-08-08T08:28:42.778+08:00"
+    }
+  },
+  {
+    "path": "/deployment/docker",
+    "title": "Docker",
+    "meta": {
+      "title": "Docker",
+      "description": "Guide to deploying Afilmory via Docker.",
+      "createdAt": "2025-07-20T22:35:03+08:00",
+      "lastModified": "2025-08-08T08:28:42.778+08:00"
     }
   }
 ]

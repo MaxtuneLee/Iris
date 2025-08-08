@@ -20,7 +20,8 @@
     "format": "prettier --write \"src/**/*.ts\" ",
     "lint": "eslint --fix",
     "preinstall": "sh scripts/preinstall.sh",
-    "prepare": "simple-git-hooks"
+    "prepare": "simple-git-hooks",
+    "update:lastmodified": "tsx scripts/update-lastmodified.ts"
   },
   "dependencies": {
     "@afilmory/builder": "workspace:*",
@@ -51,7 +52,7 @@
     "vite-tsconfig-paths": "5.1.4"
   },
   "simple-git-hooks": {
-    "pre-commit": "pnpm exec lint-staged"
+    "pre-commit": "tsx scripts/update-lastmodified.ts && pnpm exec lint-staged"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [

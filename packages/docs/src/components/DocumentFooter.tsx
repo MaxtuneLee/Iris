@@ -24,7 +24,6 @@ export function DocumentFooter({ createdAt, lastModified }: DocumentMetaProps) {
       return dateString
     }
   }
-  console.info('Current theme:', theme)
   const themeOptions = [
     { value: 'light', icon: Sun, label: 'Light' },
     { value: 'system', icon: Monitor, label: 'System' },
