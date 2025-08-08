@@ -38,20 +38,32 @@ function updateLastModified(filePath: string): boolean {
     }
 
     // Generate new timestamp
-    const now = new Date()
-    const timezone = '+08:00' // Use GMT+8 timezone
-    const timestamp = now.toISOString().replace('Z', timezone)
+    const currentDate = new Date()
+      .toLocaleString('en-GB', {
+        timeZone: 'Asia/Shanghai',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false,
+      })
+      .replace(
+        /(\d{2})\/(\d{2})\/(\d{4}), (\d{2}:\d{2}:\d{2})/,
+        '$3-$2-$1T$4+08:00',
+      )
 
     // Update lastModified field
     const updatedFrontmatter = frontmatter.replace(
       /lastModified:\s[^\n]+$/m,
-      `lastModified: ${timestamp}`,
+      `lastModified: ${currentDate}`,
     )
 
     const updatedContent = updatedFrontmatter + body
     writeFileSync(filePath, updatedContent, 'utf-8')
 
-    console.info(`✅ Updated ${filePath} lastModified to ${timestamp}`)
+    console.info(`✅ Updated ${filePath} lastModified to ${currentDate}`)
     return true
   } catch (error) {
     console.error(`❌ Failed to update ${filePath}:`, error)

@@ -36,7 +36,7 @@ function TocItemComponent({
           ${
             isActive
               ? 'border-l-2 border-blue-600 pl-3 font-medium text-blue-600'
-              : 'pl-3 text-gray-500 hover:text-gray-900'
+              : 'text-text-quaternary hover:text-text-secondary pl-3'
           }
           ${level > 1 ? `ml-${(level - 1) * 4}` : ''}
         `}

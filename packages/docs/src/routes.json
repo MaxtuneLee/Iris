@@ -25,7 +25,7 @@
       "title": "Cloudflare Pages",
       "description": "Guide to deploying Afilmory via Cloudflare Pages.",
       "createdAt": "2025-07-20T22:35:03+08:00",
-      "lastModified": "2025-08-08T09:08:13.539+08:00"
+      "lastModified": "2025-08-08T17:39:40+08:00"
     }
   },
   {
@@ -35,7 +35,7 @@
       "title": "Docker",
       "description": "Guide to deploying Afilmory via Docker.",
       "createdAt": "2025-07-20T22:35:03+08:00",
-      "lastModified": "2025-08-08T08:28:42.778+08:00"
+      "lastModified": "2025-08-08T17:39:40+08:00"
     }
   },
   {
@@ -45,7 +45,7 @@
       "title": "Github Action",
       "description": "Guide to deploying Afilmory via Github Action.",
       "createdAt": "2025-07-20T22:35:03+08:00",
-      "lastModified": "2025-08-08T09:08:13.543+08:00"
+      "lastModified": "2025-08-08T17:39:40+08:00"
     }
   },
   {
@@ -55,7 +55,7 @@
       "title": "Github Pages",
       "description": "Guide to deploying Afilmory via Github Pages.",
       "createdAt": "2025-07-20T22:35:03+08:00",
-      "lastModified": "2025-08-08T09:08:13.544+08:00"
+      "lastModified": "2025-08-08T17:39:40+08:00"
     }
   },
   {
@@ -65,7 +65,7 @@
       "title": "Vercel",
       "description": "Guide to deploying Afilmory via Vercel.",
       "createdAt": "2025-07-20T22:35:03+08:00",
-      "lastModified": "2025-08-08T09:08:13.544+08:00"
+      "lastModified": "2025-08-08T17:39:40+08:00"
     }
   }
 ]

@@ -17,271 +17,271 @@ export interface FileToc {
 
 export const tocData: FileToc[] = [
   {
-    file: 'index.mdx',
-    path: '/',
-    title: 'Overview',
-    toc: [
+    "file": "index.mdx",
+    "path": "/",
+    "title": "Overview",
+    "toc": [
       {
-        id: 'heading-overview',
-        level: 1,
-        text: 'Overview',
-        children: [
+        "id": "heading-overview",
+        "level": 1,
+        "text": "Overview",
+        "children": [
           {
-            id: 'heading-features',
-            level: 2,
-            text: '🌟 Features',
-            children: [
+            "id": "heading-features",
+            "level": 2,
+            "text": "🌟 Features",
+            "children": [
               {
-                id: 'heading-core-functionality',
-                level: 3,
-                text: 'Core Functionality',
-                children: [],
+                "id": "heading-core-functionality",
+                "level": 3,
+                "text": "Core Functionality",
+                "children": []
               },
               {
-                id: 'heading-image-processing',
-                level: 3,
-                text: 'Image Processing',
-                children: [],
+                "id": "heading-image-processing",
+                "level": 3,
+                "text": "Image Processing",
+                "children": []
               },
               {
-                id: 'heading-advanced-features',
-                level: 3,
-                text: 'Advanced Features',
-                children: [],
-              },
-            ],
+                "id": "heading-advanced-features",
+                "level": 3,
+                "text": "Advanced Features",
+                "children": []
+              }
+            ]
           },
           {
-            id: 'heading-technical-architecture',
-            level: 2,
-            text: '🏗️ Technical Architecture',
-            children: [
+            "id": "heading-technical-architecture",
+            "level": 2,
+            "text": "🏗️ Technical Architecture",
+            "children": [
               {
-                id: 'heading-frontend-tech-stack',
-                level: 3,
-                text: 'Frontend Tech Stack',
-                children: [],
+                "id": "heading-frontend-tech-stack",
+                "level": 3,
+                "text": "Frontend Tech Stack",
+                "children": []
               },
               {
-                id: 'heading-build-system',
-                level: 3,
-                text: 'Build System',
-                children: [],
+                "id": "heading-build-system",
+                "level": 3,
+                "text": "Build System",
+                "children": []
               },
               {
-                id: 'heading-storage-architecture',
-                level: 3,
-                text: 'Storage Architecture',
-                children: [],
-              },
-            ],
+                "id": "heading-storage-architecture",
+                "level": 3,
+                "text": "Storage Architecture",
+                "children": []
+              }
+            ]
           },
           {
-            id: 'heading-quick-start',
-            level: 2,
-            text: '🚀 Quick Start',
-            children: [
+            "id": "heading-quick-start",
+            "level": 2,
+            "text": "🚀 Quick Start",
+            "children": [
               {
-                id: 'heading-docker-deployment',
-                level: 3,
-                text: 'Docker Deployment',
-                children: [],
-              },
-            ],
+                "id": "heading-docker-deployment",
+                "level": 3,
+                "text": "Docker Deployment",
+                "children": []
+              }
+            ]
           },
           {
-            id: 'heading-configuration-options',
-            level: 2,
-            text: '⚙️ Configuration Options',
-            children: [
+            "id": "heading-configuration-options",
+            "level": 2,
+            "text": "⚙️ Configuration Options",
+            "children": [
               {
-                id: 'heading-remote-repository-configuration-repo',
-                level: 4,
-                text: 'Remote Repository Configuration (`repo`)',
-                children: [],
+                "id": "heading-remote-repository-configuration-repo",
+                "level": 4,
+                "text": "Remote Repository Configuration (`repo`)",
+                "children": []
               },
               {
-                id: 'heading-storage-configuration-storage',
-                level: 4,
-                text: 'Storage Configuration (`storage`)',
-                children: [],
+                "id": "heading-storage-configuration-storage",
+                "level": 4,
+                "text": "Storage Configuration (`storage`)",
+                "children": []
               },
               {
-                id: 'heading-build-options-options',
-                level: 4,
-                text: 'Build Options (`options`)',
-                children: [],
+                "id": "heading-build-options-options",
+                "level": 4,
+                "text": "Build Options (`options`)",
+                "children": []
               },
               {
-                id: 'heading-performance-configuration-performance',
-                level: 4,
-                text: 'Performance Configuration (`performance`)',
-                children: [],
+                "id": "heading-performance-configuration-performance",
+                "level": 4,
+                "text": "Performance Configuration (`performance`)",
+                "children": []
               },
               {
-                id: 'heading-logging-configuration-logging',
-                level: 4,
-                text: 'Logging Configuration (`logging`)',
-                children: [],
-              },
-            ],
+                "id": "heading-logging-configuration-logging",
+                "level": 4,
+                "text": "Logging Configuration (`logging`)",
+                "children": []
+              }
+            ]
           },
           {
-            id: 'heading-cli-commands',
-            level: 2,
-            text: '📋 CLI Commands',
-            children: [
+            "id": "heading-cli-commands",
+            "level": 2,
+            "text": "📋 CLI Commands",
+            "children": [
               {
-                id: 'heading-build-commands',
-                level: 3,
-                text: 'Build Commands',
-                children: [],
+                "id": "heading-build-commands",
+                "level": 3,
+                "text": "Build Commands",
+                "children": []
               },
               {
-                id: 'heading-development-commands',
-                level: 3,
-                text: 'Development Commands',
-                children: [],
+                "id": "heading-development-commands",
+                "level": 3,
+                "text": "Development Commands",
+                "children": []
               },
               {
-                id: 'heading-notes',
-                level: 3,
-                text: 'Notes',
-                children: [],
-              },
-            ],
+                "id": "heading-notes",
+                "level": 3,
+                "text": "Notes",
+                "children": []
+              }
+            ]
           },
           {
-            id: 'heading-advanced-usage',
-            level: 2,
-            text: '🔧 Advanced Usage',
-            children: [
+            "id": "heading-advanced-usage",
+            "level": 2,
+            "text": "🔧 Advanced Usage",
+            "children": [
               {
-                id: 'heading-custom-storage-provider',
-                level: 3,
-                text: 'Custom Storage Provider',
-                children: [],
+                "id": "heading-custom-storage-provider",
+                "level": 3,
+                "text": "Custom Storage Provider",
+                "children": []
               },
               {
-                id: 'heading-custom-image-processing',
-                level: 3,
-                text: 'Custom Image Processing',
-                children: [],
-              },
-            ],
+                "id": "heading-custom-image-processing",
+                "level": 3,
+                "text": "Custom Image Processing",
+                "children": []
+              }
+            ]
           },
           {
-            id: 'heading-license',
-            level: 2,
-            text: '📄 License',
-            children: [],
+            "id": "heading-license",
+            "level": 2,
+            "text": "📄 License",
+            "children": []
           },
           {
-            id: 'heading-related-links',
-            level: 2,
-            text: '🔗 Related Links',
-            children: [],
-          },
-        ],
-      },
-    ],
+            "id": "heading-related-links",
+            "level": 2,
+            "text": "🔗 Related Links",
+            "children": []
+          }
+        ]
+      }
+    ]
   },
   {
-    file: 'deployment/index.mdx',
-    path: '/deployment',
-    title: 'Deployment',
-    toc: [
+    "file": "deployment/index.mdx",
+    "path": "/deployment",
+    "title": "Deployment",
+    "toc": [
       {
-        id: 'heading-deployment',
-        level: 1,
-        text: 'Deployment',
-        children: [],
-      },
-    ],
+        "id": "heading-deployment",
+        "level": 1,
+        "text": "Deployment",
+        "children": []
+      }
+    ]
   },
   {
-    file: 'deployment/cloudflare-pages.mdx',
-    path: '/deployment/cloudflare-pages',
-    title: 'Cloudflare Pages',
-    toc: [
+    "file": "deployment/cloudflare-pages.mdx",
+    "path": "/deployment/cloudflare-pages",
+    "title": "Cloudflare Pages",
+    "toc": [
       {
-        id: 'heading-cloudflare-pages-deployment',
-        level: 1,
-        text: 'Cloudflare Pages Deployment',
-        children: [],
-      },
-    ],
+        "id": "heading-cloudflare-pages-deployment",
+        "level": 1,
+        "text": "Cloudflare Pages Deployment",
+        "children": []
+      }
+    ]
   },
   {
-    file: 'deployment/docker.mdx',
-    path: '/deployment/docker',
-    title: 'Docker',
-    toc: [
+    "file": "deployment/docker.mdx",
+    "path": "/deployment/docker",
+    "title": "Docker",
+    "toc": [
       {
-        id: 'heading-docker-deployment',
-        level: 1,
-        text: 'Docker Deployment',
-        children: [],
-      },
-    ],
+        "id": "heading-docker-deployment",
+        "level": 1,
+        "text": "Docker Deployment",
+        "children": []
+      }
+    ]
   },
   {
-    file: 'deployment/github-action.mdx',
-    path: '/deployment/github-action',
-    title: 'Github Action',
-    toc: [
+    "file": "deployment/github-action.mdx",
+    "path": "/deployment/github-action",
+    "title": "Github Action",
+    "toc": [
       {
-        id: 'heading-github-action-deployment',
-        level: 1,
-        text: 'Github Action Deployment',
-        children: [],
-      },
-    ],
+        "id": "heading-github-action-deployment",
+        "level": 1,
+        "text": "Github Action Deployment",
+        "children": []
+      }
+    ]
   },
   {
-    file: 'deployment/github-pages.mdx',
-    path: '/deployment/github-pages',
-    title: 'Github Pages',
-    toc: [
+    "file": "deployment/github-pages.mdx",
+    "path": "/deployment/github-pages",
+    "title": "Github Pages",
+    "toc": [
       {
-        id: 'heading-github-pages-deployment',
-        level: 1,
-        text: 'Github Pages Deployment',
-        children: [],
-      },
-    ],
+        "id": "heading-github-pages-deployment",
+        "level": 1,
+        "text": "Github Pages Deployment",
+        "children": []
+      }
+    ]
   },
   {
-    file: 'deployment/vercel.mdx',
-    path: '/deployment/vercel',
-    title: 'Vercel',
-    toc: [
+    "file": "deployment/vercel.mdx",
+    "path": "/deployment/vercel",
+    "title": "Vercel",
+    "toc": [
       {
-        id: 'heading-vercel-deployment',
-        level: 1,
-        text: 'Vercel Deployment',
-        children: [],
-      },
-    ],
-  },
+        "id": "heading-vercel-deployment",
+        "level": 1,
+        "text": "Vercel Deployment",
+        "children": []
+      }
+    ]
+  }
 ]
 
 // Helper function to find TOC data by file path
 export function getTocByFile(filePath: string): TocItem[] | undefined {
-  const item = tocData.find((item) => item.file === filePath)
+  const item = tocData.find(item => item.file === filePath)
   return item?.toc
 }
 
 // Helper function to find TOC data by route path
 export function getTocByPath(routePath: string): TocItem[] | undefined {
-  const item = tocData.find((item) => item.path === routePath)
+  const item = tocData.find(item => item.path === routePath)
   return item?.toc
 }
 
 // Helper function to flatten TOC tree into a simple array
 export function flattenToc(toc: TocItem[]): TocItem[] {
   const result: TocItem[] = []
-
+  
   function traverse(items: TocItem[]) {
     for (const item of items) {
       result.push({
@@ -294,7 +294,7 @@ export function flattenToc(toc: TocItem[]): TocItem[] {
       }
     }
   }
-
+  
   traverse(toc)
   return result
 }
@@ -302,7 +302,7 @@ export function flattenToc(toc: TocItem[]): TocItem[] {
 // Helper function to get all headings at a specific level
 export function getHeadingsByLevel(toc: TocItem[], level: number): TocItem[] {
   const result: TocItem[] = []
-
+  
   function traverse(items: TocItem[]) {
     for (const item of items) {
       if (item.level === level) {
@@ -313,7 +313,7 @@ export function getHeadingsByLevel(toc: TocItem[], level: number): TocItem[] {
       }
     }
   }
-
+  
   traverse(toc)
   return result
 }
