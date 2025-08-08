@@ -1,4 +1,4 @@
-import { AlignLeftIcon } from 'lucide-react'
+import { AlignLeftIcon, ArrowRight } from 'lucide-react'
 import { useCallback, useRef, useState } from 'react'
 
 import { MDX } from './components'
@@ -7,11 +7,22 @@ import { MobileTableOfContents } from './components/MobileTableOfContents'
 import { Sidebar } from './components/Sidebar'
 import { TableOfContents } from './components/TableOfContents'
 import routes from './routes'
+import { getRandomKaomoji } from './utils/kaomoji'
 
 function App({ url }: { url?: string }) {
   const [currentPath, setCurrentPath] = useState(url || '/')
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const matchedRoute = routes.find((route) => route.path === currentPath)
+  const matchedRoute = routes.find((route) => {
+    const normalizedCurrentPath =
+      currentPath.endsWith('/') && currentPath !== '/'
+        ? currentPath.slice(0, -1)
+        : currentPath
+    const normalizedRoutePath =
+      route.path.endsWith('/') && route.path !== '/'
+        ? route.path.slice(0, -1)
+        : route.path
+    return normalizedRoutePath === normalizedCurrentPath
+  })
   const mainContentRef = useRef<HTMLDivElement>(null)
 
   const handleScrollMainContent = (top: number) => {
@@ -93,17 +104,18 @@ function App({ url }: { url?: string }) {
             </div>
           </div>
 
-          <div className="bg-background-secondary border-separator-opaque mx-4 mt-16 rounded-xl border p-8 text-center shadow-sm lg:mt-0">
-            <h1 className="text-text-primary mb-3 text-3xl font-semibold">
-              404
-            </h1>
+          <div className="mx-4 mt-16 rounded-xl p-8 text-center lg:mt-0">
+            <div className="mb-6 flex items-center justify-center text-4xl">
+              {getRandomKaomoji()}
+            </div>
+            <h1 className="mb-1 text-3xl font-semibold">404</h1>
             <p className="text-text-secondary text-lg">Page not found</p>
             <button
               onClick={() => handleNavigate('/')}
-              className="bg-accent mt-6 rounded-lg px-4 py-2 text-white transition-opacity hover:opacity-90"
+              className="bg-accent mt-6 rounded-2xl px-4 py-2 text-white transition-opacity hover:opacity-90"
               type="button"
             >
-              Return Home
+              Return Home <ArrowRight className="inline-block h-4 w-4" />
             </button>
           </div>
 
